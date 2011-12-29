@@ -12,8 +12,7 @@
         options (merge defaults (:cljsbuild project))]
     (eval-in-project
       {:local-repo-classpath true
-       :dependencies (:dependencies project)
-       :native-path "/tmp" :root "/tmp" :compile-path "/tmp"}
+       :dependencies (:dependencies project)}
       `(cljsbuild.core/run-compiler
          ~(:source-dir options)
          ~(:output-file options)
