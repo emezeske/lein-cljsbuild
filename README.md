@@ -2,7 +2,10 @@
 
 This is a leiningen plugin that makes it easy (and quick) to compile
 ClojureScript source into JavaScript.  It's similar to [cljs-watch] [1],
-but is driven via lein instead of via a standalone executable.
+but is driven via lein instead of via a standalone executable.  This means
+that your project can depend on a specific version of lein-cljsbuild, fetch
+it via `lein deps`, and you don't have to install any special executables into
+your `PATH`.
 
   [1]: https://github.com/ibdknox/cljs-watch
 
