@@ -10,7 +10,7 @@ but is driven via lein instead of via a standalone executable.
 
 You can install the plugin via lein:
 
-    $ lein plugin install lein-cljsbuild 0.0.1
+    $ lein plugin install emezeske/lein-cljsbuild 0.0.1
 
 Or by adding lein-cljs to your `project.clj` file in the `:dev-dependencies`
 section:
