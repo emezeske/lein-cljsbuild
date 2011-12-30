@@ -15,8 +15,10 @@ You can install the plugin via lein:
 Or by adding lein-cljs to your `project.clj` file in the `:dev-dependencies`
 section:
 
+    ```clojure
     (defproject my-thingie "1.2.3"
       :dev-dependencies [[emezeske/lein-cljsbuild "0.0.1"]])
+    ```
 
 Make sure you pull down the jar file:
 
@@ -27,6 +29,7 @@ Make sure you pull down the jar file:
 The lein-cljsbuild configuration is specified under the `:cljsbuild` section
 of your `project.clj` file:
 
+    ```clojure
     (defproject my-thingie "1.2.3"
       :dev-dependencies [[emezeske/lein-cljsbuild "0.0.1"]]
       :cljsbuild {
@@ -39,6 +42,7 @@ of your `project.clj` file:
         :optimizations :whitespace
         ; Specifies whether the compiler will format the JavaScript output nicely.
         :pretty-print true})
+    ```
 
 ##  Usage
 
