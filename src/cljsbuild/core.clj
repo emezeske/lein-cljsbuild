@@ -12,7 +12,10 @@
   (.lastModified (io/file file)))
 
 (defn- filter-cljs [files]
-  (filter #(= "cljs" (last (string/split % #"\."))) files))
+  (let [ext #(last (string/split % #"\."))]
+    ; Need to return *.clj as well as *.cljs because ClojureScript
+    ; macros are written in Clojure.
+    (filter #(#{"clj" "cljs"} (ext %) ) files)))
 
 (defn- find-dir-cljs [root files]
   (for [cljs (filter-cljs files)] (fs/join root cljs)))
