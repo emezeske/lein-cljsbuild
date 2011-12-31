@@ -31,7 +31,7 @@
   (print (str "Compiling " output-file " from " source-dir "..."))
   (flush)
   (when (fs/exists? tmpdir)
-    (fs/delete tmpdir))
+    (fs/deltree tmpdir))
   (fs/mkdirs (fs/dirname output-file))
   (let [started-at (. System (nanoTime))]
     (try
