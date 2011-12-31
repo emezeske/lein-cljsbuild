@@ -1,7 +1,8 @@
 (ns leiningen.cljsbuild
   "Compile ClojureScript source into a JavaScript file."
-  (:use
-    [leiningen.compile :only [eval-in-project]]))
+  (:require
+    [robert.hooke :as hooke]
+    [leiningen.compile :as lcompile]))
 
 (defn cljsbuild
   ([project]
@@ -17,7 +18,7 @@
                     :optimizations "whitespace"
                     :pretty-print true}
           options (merge defaults (:cljsbuild project))]
-      (eval-in-project
+      (lcompile/eval-in-project
         {:local-repo-classpath true
          :extra-classpath-dirs [(:source-dir options)] 
          :dependencies (:dependencies project)}
@@ -31,3 +32,9 @@
         nil
         nil
         '(require 'cljsbuild.core)))))
+
+(defn cljsbuild-hook [task & args]
+  (cljsbuild (first args) "once")
+  (apply task args))
+
+(hooke/add-hook #'lcompile/compile cljsbuild-hook)

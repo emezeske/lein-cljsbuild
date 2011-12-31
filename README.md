@@ -55,6 +55,11 @@ of your `project.clj` file.  A simple project might look like this:
     :pretty-print true})
 ```
 
+If you'd like your ClojureScript to be compiled whenever you run `lein compile`,
+you can also add the following entry to your defproject config:
+
+    :hooks [leiningen.cljsbuild]
+
 ##  Usage
 
 Once the plugin is installed, you can build the ClojureScript once:
