@@ -4,6 +4,7 @@ lib
 classes/
 lein-cljsbuild-*.*.*
 example-projects/*/resources
+example-projects/*/.clojurescript-output
 example-projects/*/classes
 example-projects/*/lib
 example-projects/*/src-cljs/example/crossover
