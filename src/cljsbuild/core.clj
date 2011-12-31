@@ -6,7 +6,7 @@
     [fs :as fs] 
     [cljs.closure :as cljsc]))
 
-(def tmpdir "/tmp/clojurescript-output")
+(def tmpdir ".clojurescript-output")
 
 (defn- filter-cljs [files types]
   (let [ext #(last (string/split % #"\."))]
@@ -30,8 +30,6 @@
 (defn- compile-cljs [source-dir output-file optimizations pretty?]
   (print (str "Compiling " output-file " from " source-dir "..."))
   (flush)
-  (when (fs/exists? tmpdir)
-    (fs/deltree tmpdir))
   (fs/mkdirs (fs/dirname output-file))
   (let [started-at (. System (nanoTime))]
     (try
