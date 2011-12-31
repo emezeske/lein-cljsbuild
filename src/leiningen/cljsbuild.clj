@@ -17,7 +17,10 @@
                     :output-file "main.js"
                     :optimizations "whitespace"
                     :pretty-print true}
-          options (merge defaults (:cljsbuild project))]
+          cljsbuild (:cljsbuild project)
+          options (merge defaults cljsbuild)]
+      (when (nil? cljsbuild)
+        (println "WARNING: no :cljsbuild entry found in project definition."))
       (lcompile/eval-in-project
         {:local-repo-classpath true
          :extra-classpath-dirs [(:source-dir options)] 
