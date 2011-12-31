@@ -80,14 +80,17 @@
         (fs/delete file)   
         :updated))))
 
+(defmacro dofor [seq-exprs body-expr]
+  `(doall (for ~seq-exprs ~body-expr)))
+
 (defn- copy-crossovers [crossovers]
-  (for [{:keys [from-dir to-dir]} crossovers]
+  (dofor [{:keys [from-dir to-dir]} crossovers]
     (let [from-files (find-cljs from-dir #{"clj"})
           to-files (map (partial crossover-to from-dir to-dir) from-files)]
       (fs/mkdirs to-dir)
       (concat
         (delete-extraneous-files to-files to-dir) 
-        (for [[from-file to-file] (zipmap from-files to-files)]
+        (dofor [[from-file to-file] (zipmap from-files to-files)]
           (when
             (or
               (not (fs/exists? to-file))
