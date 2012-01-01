@@ -6,8 +6,6 @@
     [fs :as fs] 
     [cljs.closure :as cljsc]))
 
-(def tmpdir ".clojurescript-output")
-
 (defn- filter-cljs [files types]
   (let [ext #(last (string/split % #"\."))]
     (filter #(types (ext %)) files)))
@@ -27,14 +25,14 @@
     (with-precision 2
       (str (/ (double elapsed-us) 1000000000) " seconds"))))
 
-(defn- compile-cljs [source-dir compiler-options]
+(defn- compile-cljs [cljs-path compiler-options]
   (let [output-file (:output-to compiler-options)]
-    (print (str "Compiling " output-file " from " source-dir "...")) 
+    (print (str "Compiling " output-file " from " cljs-path "...")) 
     (flush) 
     (fs/mkdirs (fs/dirname output-file)) 
     (let [started-at (. System (nanoTime))]
       (try
-        (cljsc/build source-dir compiler-options)
+        (cljsc/build cljs-path compiler-options)
         (println (str " Done in " (elapsed started-at) "."))
         (catch Exception e
           (println " Failed!")
@@ -54,64 +52,73 @@
     "; " file "\n\n"
     (string/replace (slurp file) ";*CLJSBUILD-REMOVE*;" "")))
 
-(defn- crossover-to [from-dir to-dir from-file]
+(defn- crossover-to [clj-path cljs-path from-file]
   (let [abspath (fs/abspath from-file)
         subpath (string/replace-first
                   (fs/abspath from-file)
-                  (fs/abspath from-dir) "")
+                  (fs/abspath clj-path) "")
         to-file (fs/normpath
-                  (fs/join (fs/abspath to-dir) subpath))]
+                  (fs/join (fs/abspath cljs-path) subpath))]
     (if (is-macro-file? from-file)
       to-file
       (string/replace to-file #"\.clj$" ".cljs"))))
 
-(defn- delete-extraneous-files [expected-files to-dir]
-  (let [real-files (map fs/abspath
-                     (find-cljs to-dir #{"clj" "cljs"}))
-        extraneous-files (cset/difference
-                           (set real-files)
-                           (set expected-files))]
-    (for [file extraneous-files]
-      (do
-        (fs/delete file)   
-        :updated))))
-
 (defmacro dofor [seq-exprs body-expr]
   `(doall (for ~seq-exprs ~body-expr)))
 
-(defn- copy-crossovers [crossovers]
-  (dofor [{:keys [from-dir to-dir]} crossovers]
-    (let [from-files (find-cljs from-dir #{"clj"})
-          to-files (map (partial crossover-to from-dir to-dir) from-files)]
-      (fs/mkdirs to-dir)
-      (concat
-        (delete-extraneous-files to-files to-dir) 
-        (dofor [[from-file to-file] (zipmap from-files to-files)]
-          (when
-            (or
-              (not (fs/exists? to-file))
-              (> (fs/mtime from-file) (fs/mtime to-file)))
-            (do
-              (spit to-file (filtered-crossover-file from-file))
-              :updated)))))))
+(defn- ns-to-path [ns]
+  (let [underscored (string/replace (str ns) #"-" "_")]
+    (apply fs/join
+      (string/split underscored #"\."))))
 
-(defn run-compiler [source-dir crossovers compiler-options watch?]
+(defn- fail [& args]
+  (throw (Exception. (apply str args))))
+
+(defn- copy-crossovers [clj-path cljs-path crossovers]
+  (dofor [crossover crossovers]
+    (do
+      (when (map? crossover)
+        (fail "Sorry, crossovers now need to be specified by namespace rather than the old :from-dir/:to-dir map.")) 
+      (let [ns-path (ns-to-path crossover)
+            clj-ns-path (fs/join clj-path ns-path)
+            isdir? (fs/directory? clj-ns-path)
+            clj-ns-file (str clj-ns-path ".clj")
+            isfile? (fs/file? clj-ns-file)]
+        (when (and (not isdir?) (not isfile?))
+          (fail "Invalid crossover: " crossover))
+        (let [from-files (if isdir?
+                           (find-cljs clj-ns-path #{"clj"})
+                           [clj-ns-file])
+              to-files (map (partial crossover-to clj-path cljs-path) from-files)]
+          (doseq [dir (map fs/dirname to-files)]
+            (fs/mkdirs dir)) 
+          (dofor [[from-file to-file] (zipmap from-files to-files)]
+            (when
+              (or
+                (not (fs/exists? to-file))
+                (> (fs/mtime from-file) (fs/mtime to-file)))
+              (do
+                (spit to-file (filtered-crossover-file from-file))
+                :updated))))))))
+
+(defn run-compiler [clj-path cljs-path crossovers compiler-options watch?]
   (println "Compiler started.")
   (loop [last-input-mtimes {}]
     (let [output-file (:output-to compiler-options)
           output-mtime (if (fs/exists? output-file) (fs/mtime output-file) 0)
           ; Need to return *.clj as well as *.cljs because ClojureScript
           ; macros are written in Clojure.
-          input-files (find-cljs source-dir #{"clj" "cljs"})
+          input-files (find-cljs cljs-path #{"clj" "cljs"})
           input-mtimes (map fs/mtime input-files)
           crossover-updated? (some #{:updated}
-                               (flatten (copy-crossovers crossovers)))]
+                               (flatten
+                                 (copy-crossovers clj-path cljs-path crossovers)))]
       (when (or
               (and
                 (not= last-input-mtimes input-mtimes) 
                 (some #(< output-mtime %) input-mtimes)) 
               crossover-updated?)
-        (compile-cljs source-dir compiler-options))
+        (compile-cljs cljs-path compiler-options))
       (when watch?
         (Thread/sleep 100)
         (recur input-mtimes)))))

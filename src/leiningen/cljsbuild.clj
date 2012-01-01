@@ -11,12 +11,13 @@
    :output-dir ".clojurescript-output"})
 
 (def default-options
-  {:source-dir "src-cljs"
+  {:source-path "src-cljs"
    :crossovers [] 
    :compiler default-compiler})
 
 (def relocations
-  {:output-file [:compiler :output-to]
+  {:source-dir [:source-path] 
+   :output-file [:compiler :output-to]
    :optimizations [:compiler :optimizations] 
    :pretty-print [:compiler :pretty-print]})
 
@@ -47,7 +48,7 @@
     (apply deep-merge cljsbuild
       (for [[source dest] relocations]
         (when-let [value (source cljsbuild)]
-          (warn source "is deprecated." )
+          (warn source "is deprecated.")
           (when (nil? (get-in cljsbuild dest))
             (assoc-in {} dest value)))))
     (keys relocations)))
@@ -73,11 +74,12 @@
               compat-cljsbuild)))
           (lcompile/eval-in-project
             {:local-repo-classpath true
-             :extra-classpath-dirs [(:source-dir options)] 
+             :extra-classpath-dirs [(:source-path options)] 
              :dependencies (:dependencies project)}
             `(cljsbuild.core/run-compiler
-               ~(:source-dir options)
-               ~(:crossovers options)
+               ~(:source-path project)
+               ~(:source-path options)
+               '~(:crossovers options)
                ~(:compiler options)
                ~watch?)
             nil

@@ -45,7 +45,7 @@ of your `project.clj` file.  A simple project might look like this:
   :dev-dependencies [[emezeske/lein-cljsbuild "0.0.2"]]
   :cljsbuild {
     ; The path to the top-level ClojureScript source directory:
-    :source-dir "src-cljs"
+    :source-path "src-cljs"
     ; The standard ClojureScript compiler options:
     ; (See the ClojureScript compiler documentation for details.)
     :compiler {
@@ -74,14 +74,14 @@ avoids the time-consuming JVM startup for each build:
 ## Sharing Code Between Clojure and ClojureScript
 
 Sharing code with lein-cljsbuild is accomplished via the configuration
-of "crossovers".  A crossover specifies a directory in your Clojure project,
+of "crossovers".  A crossover specifies a namespace in your Clojure project,
 the content of which should be copied into your ClojureScript project.  The
 files in the Clojure directory will be monitored and copied over when they are
-modified.  Of course, remember that since the files will be used by both Clojure
-and ClojureScript, they will need to only use the subset of features provided by
+modified.  Of course, remember that since the namespace will be used by both Clojure
+and ClojureScript, it will need to only use the subset of features provided by
 both languages.
 
-Assuming that your top-level directory structure looked something like this:
+Assuming that your top-level directory structure looks something like this:
 
 <pre>
 ├── src-clj
@@ -98,21 +98,19 @@ Assuming that your top-level directory structure looked something like this:
         └── util.cljs
 </pre>
 
-And your `project.clj` file looked like this:
+And your `project.clj` file looks like this:
 
 ```clojure
 (defproject lein-cljsbuild-example "1.2.3"
   :dev-dependencies [[emezeske/lein-cljsbuild "0.0.2"]]
   :source-path "src-clj"
   :cljsbuild {
-    :source-dir "src-cljs"
-    ; Each entry in the :crossovers vector describes a directory
-    ; containing Clojure code that is meant to be used with the
-    ; ClojureScript code as well.  Files in :from-dir are copied
-    ; into :to-dir whenever they are modified.
-    :crossovers
-      [{:from-dir "src-clj/example/crossover"
-        :to-dir "src-cljs/example/crossover"}]
+    :source-path "src-cljs"
+    ; Each entry in the :crossovers vector describes a Clojure namespace
+    ; that is meant to be used with the ClojureScript code as well.
+    ; The files that make up this namespace will be automatically copied
+    ; into the ClojureScript source path whenever they are modified.
+    :crossovers [example.crossover]
     :compiler {
       :output-file "war/javascripts/main.js"
       :optimizations :whitespace
