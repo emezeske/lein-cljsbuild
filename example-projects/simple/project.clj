@@ -7,7 +7,7 @@
   :dev-dependencies [[emezeske/lein-cljsbuild "0.0.1"]
                      [lein-ring "0.5.0"]]
   :cljsbuild {:source-dir "src-cljs"
-              :output-file "resources/public/js/main.js"
-              :optimizations :whitespace
-              :pretty-print true}
+              :compiler {:output-to "resources/public/js/main.js"
+                         :optimizations :whitespace
+                         :pretty-print true}}
   :ring {:handler example.routes/app})

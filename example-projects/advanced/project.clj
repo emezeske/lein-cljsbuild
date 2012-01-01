@@ -9,7 +9,7 @@
   :cljsbuild {:source-dir "src-cljs"
               :crossovers [{:from-dir "src-clj/example/crossover"
                             :to-dir "src-cljs/example/crossover"}] 
-              :output-file "resources/public/js/main.js"
-              :optimizations :whitespace
-              :pretty-print true}
+              :compiler {:output-to "resources/public/js/main.js"
+                         :optimizations :whitespace
+                         :pretty-print true}}
   :ring {:handler example.routes/app})

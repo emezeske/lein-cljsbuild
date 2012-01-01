@@ -46,13 +46,12 @@ of your `project.clj` file.  A simple project might look like this:
   :cljsbuild {
     ; The path to the top-level ClojureScript source directory:
     :source-dir "src-cljs"
-    ; The path to the JavaScript output file:
-    :output-file "war/javascripts/main.js"
-    ; Compiler optimization level.  May be :whitespace, :simple, or :advanced.
-    ; See the ClojureScript compiler documentation for details.
-    :optimizations :whitespace
-    ; Specifies whether the compiler will format the JavaScript output nicely.
-    :pretty-print true})
+    ; The standard ClojureScript compiler options:
+    ; (See the ClojureScript compiler documentation for details.)
+    :compiler {
+      :output-to "war/javascripts/main.js"
+      :optimizations :whitespace
+      :pretty-print true}})
 ```
 
 If you'd like your ClojureScript to be compiled whenever you run `lein compile`,
@@ -107,15 +106,17 @@ And your `project.clj` file looked like this:
   :source-path "src-clj"
   :cljsbuild {
     :source-dir "src-cljs"
-    :output-file "war/javascripts/main.js"
-    :optimizations :whitespace
-    :pretty-print true
     ; Each entry in the :crossovers vector describes a directory
     ; containing Clojure code that is meant to be used with the
     ; ClojureScript code as well.  Files in :from-dir are copied
     ; into :to-dir whenever they are modified.
-    :crossovers [{:from-dir "src-clj/example/crossover"
-                  :to-dir "src-cljs/example/crossover"}]})
+    :crossovers
+      [{:from-dir "src-clj/example/crossover"
+        :to-dir "src-cljs/example/crossover"}]
+    :compiler {
+      :output-file "war/javascripts/main.js"
+      :optimizations :whitespace
+      :pretty-print true}})
 ```
 
 Then lein-cljsbuild would copy files from `src-clj/example/crossover`

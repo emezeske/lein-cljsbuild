@@ -27,22 +27,18 @@
     (with-precision 2
       (str (/ (double elapsed-us) 1000000000) " seconds"))))
 
-(defn- compile-cljs [source-dir output-file optimizations pretty?]
-  (print (str "Compiling " output-file " from " source-dir "..."))
-  (flush)
-  (fs/mkdirs (fs/dirname output-file))
-  (let [started-at (. System (nanoTime))]
-    (try
-      (cljsc/build
-        source-dir
-        {:optimizations optimizations
-         :pretty-print pretty?
-         :output-to output-file
-         :output-dir tmpdir})
-      (println (str " Done in " (elapsed started-at) "."))
-      (catch Exception e
-        (println " Failed!")
-        (st/pst+ e)))))
+(defn- compile-cljs [source-dir compiler-options]
+  (let [output-file (:output-to compiler-options)]
+    (print (str "Compiling " output-file " from " source-dir "...")) 
+    (flush) 
+    (fs/mkdirs (fs/dirname output-file)) 
+    (let [started-at (. System (nanoTime))]
+      (try
+        (cljsc/build source-dir compiler-options)
+        (println (str " Done in " (elapsed started-at) "."))
+        (catch Exception e
+          (println " Failed!")
+          (st/pst+ e))))))
 
 (defn- is-macro-file? [file]
   (not (neg? (.indexOf (slurp file) ";*CLJSBUILD-MACRO-FILE*;"))))
@@ -99,10 +95,11 @@
               (spit to-file (filtered-crossover-file from-file))
               :updated)))))))
 
-(defn run-compiler [source-dir crossovers output-file optimizations pretty? watch?]
+(defn run-compiler [source-dir crossovers compiler-options watch?]
   (println "Compiler started.")
   (loop [last-input-mtimes {}]
-    (let [output-mtime (if (fs/exists? output-file) (fs/mtime output-file) 0)
+    (let [output-file (:output-to compiler-options)
+          output-mtime (if (fs/exists? output-file) (fs/mtime output-file) 0)
           ; Need to return *.clj as well as *.cljs because ClojureScript
           ; macros are written in Clojure.
           input-files (find-cljs source-dir #{"clj" "cljs"})
@@ -114,7 +111,7 @@
                 (not= last-input-mtimes input-mtimes) 
                 (some #(< output-mtime %) input-mtimes)) 
               crossover-updated?)
-        (compile-cljs source-dir output-file optimizations pretty?))
+        (compile-cljs source-dir compiler-options))
       (when watch?
         (Thread/sleep 100)
         (recur input-mtimes)))))
