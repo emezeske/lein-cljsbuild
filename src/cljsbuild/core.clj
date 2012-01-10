@@ -26,10 +26,12 @@
       (str (/ (double elapsed-us) 1000000000) " seconds"))))
 
 (defn- compile-cljs [cljs-path compiler-options]
-  (let [output-file (:output-to compiler-options)]
+  (let [output-file (:output-to compiler-options)
+        output-dir (fs/dirname output-file)]
     (print (str "Compiling " output-file " from " cljs-path "...")) 
     (flush) 
-    (fs/mkdirs (fs/dirname output-file)) 
+    (when output-dir
+      (fs/mkdirs output-dir ))
     (let [started-at (. System (nanoTime))]
       (try
         (cljsc/build cljs-path compiler-options)
