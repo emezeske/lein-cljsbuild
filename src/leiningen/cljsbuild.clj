@@ -4,6 +4,15 @@
     [robert.hooke :as hooke]
     [leiningen.compile :as lcompile]))
 
+; TODO: These are really the same as the :dependencies for the
+;       lein-cljsbuild project itself (e.g. in the toplevel project
+;       file).  I haven't yet figured out a clean way to DRY them.
+(def cljsbuild-dependencies
+  '[[org.clojure/clojure "1.3.0"]
+    [fs "0.11.1"]
+    [emezeske/clojurescript "0.0.1-329708bdd0"]
+    [clj-stacktrace "0.2.3"]])
+
 (def default-compiler
   {:output-to "main.js"
    :optimizations :whitespace
@@ -75,7 +84,7 @@
           (lcompile/eval-in-project
             {:local-repo-classpath true
              :extra-classpath-dirs [(:source-path options)] 
-             :dependencies (:dependencies project)}
+             :dependencies cljsbuild-dependencies}
             `(cljsbuild.core/run-compiler
                ~(:source-path project)
                ~(:source-path options)

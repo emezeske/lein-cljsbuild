@@ -1,10 +1,10 @@
-(defproject cljsbuild-example-advanced "0.0.2"
+(defproject cljsbuild-example-advanced "0.0.3"
   :description "An advanced example of how to use lein-cljsbuild"
   :source-path "src-clj"
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [compojure "0.6.5"] 
                  [hiccup "0.3.7"]]
-  :dev-dependencies [[emezeske/lein-cljsbuild "0.0.2"]
+  :dev-dependencies [[emezeske/lein-cljsbuild "0.0.3"]
                      [lein-ring "0.5.0"]]
   :cljsbuild {:source-path "src-cljs"
               :crossovers [example.crossover]
