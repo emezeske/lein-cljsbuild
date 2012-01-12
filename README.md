@@ -215,3 +215,8 @@ And thus the macros can be shared.
 Source Copyright © Evan Mezeske, 2011-2012.
 Released under the Eclipse Public License - v 1.0.
 See the file COPYING.
+
+## Contributors
+
+* Evan Mezeske **(Author)** (evan@mezeske.com)
+* Shantanu Kumar (kumar.shantanu@gmail.com)
