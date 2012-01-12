@@ -49,7 +49,7 @@ of your `project.clj` file.  A simple project might look like this:
     ; The standard ClojureScript compiler options:
     ; (See the ClojureScript compiler documentation for details.)
     :compiler {
-      :output-to "war/javascripts/main.js"
+      :output-to "war/javascripts/main.js"  ; default: main.js in current directory
       :optimizations :whitespace
       :pretty-print true}})
 ```
@@ -114,7 +114,7 @@ And your `project.clj` file looks like this:
     ; into the ClojureScript source path whenever they are modified.
     :crossovers [example.crossover]
     :compiler {
-      :output-file "war/javascripts/main.js"
+      :output-to "war/javascripts/main.js"  ; default: main.js in current directory
       :optimizations :whitespace
       :pretty-print true}})
 ```
@@ -212,6 +212,6 @@ And thus the macros can be shared.
 
 ##  License
 
-Source Copyright © Evan Mezeske, 2011.
+Source Copyright © Evan Mezeske, 2011-2012.
 Released under the Eclipse Public License - v 1.0.
 See the file COPYING.
