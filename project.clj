@@ -1,4 +1,4 @@
-(defproject emezeske/lein-cljsbuild "0.0.5"
+(defproject emezeske/lein-cljsbuild "0.0.6"
   :description "ClojureScript Autobuilder Plugin"
   :url "http://github.com/emezeske/lein-cljsbuild"
   :license {:name "Eclipse Public License - v 1.0"
@@ -8,6 +8,6 @@
   ;       Figure out some way to DRY them.
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [fs "0.11.1"]
-                 [emezeske/clojurescript "0.0.2-0df1bc4d7b"]
+                 [emezeske/clojurescript "0.0.3-f2d58284a8"]
                  [clj-stacktrace "0.2.3"]] 
   :eval-in-leiningen true)

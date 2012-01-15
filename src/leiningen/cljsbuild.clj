@@ -10,7 +10,7 @@
 (def cljsbuild-dependencies
   '[[org.clojure/clojure "1.3.0"]
     [fs "0.11.1"]
-    [emezeske/clojurescript "0.0.2-0df1bc4d7b"]
+    [emezeske/clojurescript "0.0.3-f2d58284a8"]
     [clj-stacktrace "0.2.3"]])
 
 (def default-compiler
