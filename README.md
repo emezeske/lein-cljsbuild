@@ -35,6 +35,9 @@ Make sure you pull down the jar file:
 See the `example-projects` directory for a couple of simple examples
 of how to use lein-cljsbuild.
 
+Also, see the `example.project.clj` file in this directory for an
+exhaustive list of all options supported by lein-cljsbuild.
+
 ## Configuration
 
 The lein-cljsbuild configuration is specified under the `:cljsbuild` section
