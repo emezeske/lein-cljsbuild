@@ -4,7 +4,7 @@
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [compojure "0.6.5"] 
                  [hiccup "0.3.7"]]
-  :dev-dependencies [[emezeske/lein-cljsbuild "0.0.6"]
+  :dev-dependencies [[lein-cljsbuild "0.0.6"]
                      [lein-ring "0.5.0"]]
   :cljsbuild {:source-path "src-cljs"
               :compiler {:output-to "resources/public/js/main.js"
