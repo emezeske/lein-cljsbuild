@@ -36,7 +36,7 @@
       (try
         (cljsc/build cljs-path compiler-options)
         (println (str " Done in " (elapsed started-at) "."))
-        (catch Exception e
+        (catch Throwable e
           (println " Failed!")
           (st/pst+ e))))))
 
