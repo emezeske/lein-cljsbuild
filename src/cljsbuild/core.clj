@@ -1,10 +1,11 @@
 (ns cljsbuild.core
+  (:use
+    [clojure.java.io :only [resource]]
+    [clj-stacktrace.repl :only [pst+]]
+    [cljs.closure :only [build]]) 
   (:require
     [clojure.string :as string]
-    [clojure.set :as cset]
-    [clj-stacktrace.repl :as st]
-    [fs :as fs] 
-    [cljs.closure :as cljsc]))
+    [fs :as fs]))
 
 (defn- filter-cljs [files types]
   (let [ext #(last (string/split % #"\."))]
@@ -34,11 +35,11 @@
       (fs/mkdirs output-dir ))
     (let [started-at (. System (nanoTime))]
       (try
-        (cljsc/build cljs-path compiler-options)
+        (build cljs-path compiler-options)
         (println (str " Done in " (elapsed started-at) "."))
         (catch Throwable e
           (println " Failed!")
-          (st/pst+ e))))))
+          (pst+ e))))))
 
 (defn- is-macro-file? [file]
   (not (neg? (.indexOf (slurp file) ";*CLJSBUILD-MACRO-FILE*;"))))
