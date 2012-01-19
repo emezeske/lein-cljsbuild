@@ -5,17 +5,21 @@
     [cljs.closure :only [build]]) 
   (:require
     [clojure.string :as string]
-    [fs :as fs]))
+    [fs.core :as fs]))
 
 (defn- filter-cljs [files types]
   (let [ext #(last (string/split % #"\."))]
     (filter #(types (ext %)) files)))
 
+(defn- join-paths [& paths]
+  (apply str (interpose "/" paths)))
+
 (defn- find-dir-cljs [root files types]
-  (for [cljs (filter-cljs files types)] (fs/join root cljs)))
+  (for [cljs (filter-cljs files types)]
+    (join-paths root cljs)))
 
 (defn- find-cljs [dir types]
-  (let [iter (fs/iterdir dir)]
+  (let [iter (fs/iterate-dir dir)]
     (mapcat
       (fn [[root _ files]]
         (find-dir-cljs root files types))
@@ -28,11 +32,11 @@
 
 (defn- compile-cljs [cljs-path compiler-options]
   (let [output-file (:output-to compiler-options)
-        output-dir (fs/dirname output-file)]
+        output-dir (fs/parent output-file)]
     (print (str "Compiling " output-file " from " cljs-path "...")) 
     (flush) 
     (when output-dir
-      (fs/mkdirs output-dir ))
+      (fs/mkdirs output-dir))
     (let [started-at (. System (nanoTime))]
       (try
         (build cljs-path compiler-options)
@@ -41,6 +45,8 @@
           (println " Failed!")
           (pst+ e))))))
 
+; TODO: Hmm, now that macro files are in the CLASSPATH, perhaps
+;       they should not be copied over the the cljs dir at all?
 (defn- is-macro-file? [file]
   (not (neg? (.indexOf (slurp file) ";*CLJSBUILD-MACRO-FILE*;"))))
 
@@ -57,10 +63,10 @@
 
 (defn- crossover-to [cljs-path [from-parent from-resource]]
   (let [subpath (string/replace-first
-                  (fs/abspath (.getPath from-resource))
-                  (fs/abspath from-parent) "")
-        to-file (fs/normpath
-                  (fs/join (fs/abspath cljs-path) subpath))]
+                  (fs/absolute-path (.getPath from-resource))
+                  (fs/absolute-path from-parent) "")
+        to-file (fs/normalized-path
+                  (join-paths (fs/absolute-path cljs-path) subpath))]
     (if (is-macro-file? from-resource)
       to-file
       (string/replace to-file #"\.clj$" ".cljs"))))
@@ -70,7 +76,7 @@
 
 (defn- ns-to-path [ns]
   (let [underscored (string/replace (str ns) #"-" "_")]
-    (apply fs/join
+    (apply join-paths
       (string/split underscored #"\."))))
 
 (defn- fail [& args]
@@ -83,7 +89,7 @@
     ; by file.
     (if (= (.getProtocol dir) "file")
       (let [path (.getPath dir)
-            dirs (map #(as-url (str "file://" %)) (find-cljs path #{"clj"}))]
+            dirs (map #(as-url (str "file:" %)) (find-cljs path #{"clj"}))]
         dirs)
       [dir])))
 
@@ -93,8 +99,9 @@
       (subs uri-path 0 (- (.length uri-path) n)))
     nil))
 
-(defn- find-crossover-resources [ns-path]
-  (let [as-dir (resource ns-path)
+(defn- find-crossover-resources [crossover]
+  (let [ns-path (ns-to-path crossover)
+        as-dir (resource ns-path)
         dir-parent (truncate-uri-path as-dir (.length ns-path))
         recurse-dirs (recurse-resource-dir as-dir)
         ns-file-path (str ns-path ".clj")
@@ -114,34 +121,30 @@
         ; We can't determine the mtime for jar resources; they'll just
         ; be copied once and that's it.
         (= "file" (.getProtocol from-resource))
-        (> (fs/mtime (.getPath from-resource)) (fs/mtime to-file))))))
+        (> (fs/mod-time (.getPath from-resource)) (fs/mod-time to-file))))))
 
 (defn- copy-crossovers [cljs-path crossovers]
   (dofor [crossover crossovers]
-    (do
-      (when (map? crossover)
-        (fail "Sorry, crossovers now need to be specified by namespace rather than the old :from-dir/:to-dir map.")) 
-      (let [ns-path (ns-to-path crossover)
-            from-resources (find-crossover-resources ns-path)]
-        (when (empty? from-resources)
-          (fail "Unable to find crossover: " crossover))
-        (let [to-files (map (partial crossover-to cljs-path) from-resources)]
-          (doseq [dir (distinct (map fs/dirname to-files))]
-            (fs/mkdirs dir)) 
-          (dofor [[[_ from-resource] to-file] (zipmap from-resources to-files)]
-            (when (crossover-needs-update? from-resource to-file)
-              (spit to-file (filtered-crossover-file from-resource))
-              :updated)))))))
+    (let [from-resources (find-crossover-resources crossover)]
+      (when (empty? from-resources)
+        (fail "Unable to find crossover: " crossover))
+      (let [to-files (map (partial crossover-to cljs-path) from-resources)]
+        (doseq [dir (distinct (map fs/parent to-files))]
+          (fs/mkdirs dir))
+        (dofor [[[_ from-resource] to-file] (zipmap from-resources to-files)]
+          (when (crossover-needs-update? from-resource to-file)
+            (spit to-file (filtered-crossover-file from-resource))
+            :updated))))))
 
 (defn run-compiler [cljs-path crossovers compiler-options watch?]
-  (println "Compiler started.")
+  (println "Compiling ClojureScript.")
   (loop [last-input-mtimes {}]
     (let [output-file (:output-to compiler-options)
-          output-mtime (if (fs/exists? output-file) (fs/mtime output-file) 0)
+          output-mtime (if (fs/exists? output-file) (fs/mod-time output-file) 0)
           ; Need to return *.clj as well as *.cljs because ClojureScript
           ; macros are written in Clojure.
           input-files (find-cljs cljs-path #{"clj" "cljs"})
-          input-mtimes (map fs/mtime input-files)
+          input-mtimes (map fs/mod-time input-files)
           crossover-updated? (some #{:updated}
                                (flatten
                                  (copy-crossovers cljs-path crossovers)))]
@@ -154,3 +157,13 @@
       (when watch?
         (Thread/sleep 100)
         (recur input-mtimes)))))
+
+(defn cleanup-files [cljs-path crossovers compiler-options]
+  (println "Deleting generated files.")
+  (fs/delete (:output-to compiler-options))
+  (fs/delete-dir (:output-dir compiler-options))
+  (doseq [crossover crossovers]
+    (let [from-resources (find-crossover-resources crossover)
+          to-files (map (partial crossover-to cljs-path) from-resources)]
+      (doseq [file to-files]
+        (fs/delete file)))))

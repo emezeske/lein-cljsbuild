@@ -57,8 +57,9 @@ of your `project.clj` file.  A simple project might look like this:
       :pretty-print true}})
 ```
 
-If you'd like your ClojureScript to be compiled whenever you run `lein compile`,
-you can also add the following entry to your defproject config:
+If you'd like your ClojureScript to be compiled when you run `lein compile`, and
+deleted when you run `lein clean`, you can also add the following entry to your
+defproject config:
 
 ```clojure
 :hooks [leiningen.cljsbuild]
@@ -75,6 +76,11 @@ automatically rebuild them.  This is recommended for development, as it
 avoids the time-consuming JVM startup for each build:
 
     $ lein cljsbuild auto
+
+To delete all of the JavaScript and ClojureScript files that lein-cljsbuild
+automatically generated during compilation, run:
+
+    $ lein cljsbuild clean
 
 ## Sharing Code Between Clojure and ClojureScript
 

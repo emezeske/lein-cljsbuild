@@ -6,6 +6,7 @@
                  [hiccup "0.3.7"]]
   :dev-dependencies [[lein-cljsbuild "0.0.7"]
                      [lein-ring "0.5.0"]]
+  :hooks [leiningen.cljsbuild]
   :cljsbuild {:source-path "src-cljs"
               :crossovers [example.crossover]
               :compiler {:output-to "resources/public/js/main.js"
