@@ -1,6 +1,6 @@
 (ns cljsbuild.core
   (:use
-    [clojure.java.io :only [resource]]
+    [clojure.java.io :only [as-url resource]]
     [clj-stacktrace.repl :only [pst+]]
     [cljs.closure :only [build]]) 
   (:require
@@ -55,14 +55,13 @@
     "; " file "\n\n"
     (string/replace (slurp file) ";*CLJSBUILD-REMOVE*;" "")))
 
-(defn- crossover-to [clj-path cljs-path from-file]
-  (let [abspath (fs/abspath from-file)
-        subpath (string/replace-first
-                  (fs/abspath from-file)
-                  (fs/abspath clj-path) "")
+(defn- crossover-to [cljs-path [from-parent from-resource]]
+  (let [subpath (string/replace-first
+                  (fs/abspath (.getPath from-resource))
+                  (fs/abspath from-parent) "")
         to-file (fs/normpath
                   (fs/join (fs/abspath cljs-path) subpath))]
-    (if (is-macro-file? from-file)
+    (if (is-macro-file? from-resource)
       to-file
       (string/replace to-file #"\.clj$" ".cljs"))))
 
@@ -77,34 +76,64 @@
 (defn- fail [& args]
   (throw (Exception. (apply str args))))
 
-(defn- copy-crossovers [clj-path cljs-path crossovers]
+(defn- recurse-resource-dir [dir]
+  (if dir
+    ; We can't determine the contents of a jar dir.  Thus, crossover files
+    ; in jars cannot be specified recursively; they have to be named file
+    ; by file.
+    (if (= (.getProtocol dir) "file")
+      (let [path (.getPath dir)
+            dirs (map #(as-url (str "file://" %)) (find-cljs path #{"clj"}))]
+        dirs)
+      [dir])))
+
+(defn- truncate-uri-path [uri n]
+  (if uri
+    (let [uri-path (.getPath uri)]
+      (subs uri-path 0 (- (.length uri-path) n)))
+    nil))
+
+(defn- find-crossover-resources [ns-path]
+  (let [as-dir (resource ns-path)
+        dir-parent (truncate-uri-path as-dir (.length ns-path))
+        recurse-dirs (recurse-resource-dir as-dir)
+        ns-file-path (str ns-path ".clj")
+        as-file (resource ns-file-path)
+        file-parent (truncate-uri-path as-file (.length ns-file-path))
+        resources (conj
+                    (map vector (repeat dir-parent) recurse-dirs)
+                    [file-parent as-file])]
+    (distinct
+      (remove #(nil? (second %)) resources))))
+
+(defn- crossover-needs-update? [from-resource to-file]
+  (let [exists (fs/exists? to-file)]
+    (or
+      (not exists)
+      (and
+        ; We can't determine the mtime for jar resources; they'll just
+        ; be copied once and that's it.
+        (= "file" (.getProtocol from-resource))
+        (> (fs/mtime (.getPath from-resource)) (fs/mtime to-file))))))
+
+(defn- copy-crossovers [cljs-path crossovers]
   (dofor [crossover crossovers]
     (do
       (when (map? crossover)
         (fail "Sorry, crossovers now need to be specified by namespace rather than the old :from-dir/:to-dir map.")) 
       (let [ns-path (ns-to-path crossover)
-            clj-ns-path (fs/join clj-path ns-path)
-            isdir? (fs/directory? clj-ns-path)
-            clj-ns-file (str clj-ns-path ".clj")
-            isfile? (fs/file? clj-ns-file)]
-        (when (and (not isdir?) (not isfile?))
-          (fail "Invalid crossover: " crossover))
-        (let [from-files (if isdir?
-                           (find-cljs clj-ns-path #{"clj"})
-                           [clj-ns-file])
-              to-files (map (partial crossover-to clj-path cljs-path) from-files)]
-          (doseq [dir (map fs/dirname to-files)]
+            from-resources (find-crossover-resources ns-path)]
+        (when (empty? from-resources)
+          (fail "Unable to find crossover: " crossover))
+        (let [to-files (map (partial crossover-to cljs-path) from-resources)]
+          (doseq [dir (distinct (map fs/dirname to-files))]
             (fs/mkdirs dir)) 
-          (dofor [[from-file to-file] (zipmap from-files to-files)]
-            (when
-              (or
-                (not (fs/exists? to-file))
-                (> (fs/mtime from-file) (fs/mtime to-file)))
-              (do
-                (spit to-file (filtered-crossover-file from-file))
-                :updated))))))))
+          (dofor [[[_ from-resource] to-file] (zipmap from-resources to-files)]
+            (when (crossover-needs-update? from-resource to-file)
+              (spit to-file (filtered-crossover-file from-resource))
+              :updated)))))))
 
-(defn run-compiler [clj-path cljs-path crossovers compiler-options watch?]
+(defn run-compiler [cljs-path crossovers compiler-options watch?]
   (println "Compiler started.")
   (loop [last-input-mtimes {}]
     (let [output-file (:output-to compiler-options)
@@ -115,7 +144,7 @@
           input-mtimes (map fs/mtime input-files)
           crossover-updated? (some #{:updated}
                                (flatten
-                                 (copy-crossovers clj-path cljs-path crossovers)))]
+                                 (copy-crossovers cljs-path crossovers)))]
       (when (or
               (and
                 (not= last-input-mtimes input-mtimes) 

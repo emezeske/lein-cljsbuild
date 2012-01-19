@@ -83,10 +83,12 @@
               compat-cljsbuild)))
           (lcompile/eval-in-project
             {:local-repo-classpath true
-             :extra-classpath-dirs [(:source-path options)] 
+             :source-path (:source-path project)
+             :extra-classpath-dirs (conj
+                                     (:extra-classpath-dirs project)
+                                     (:source-path options))
              :dependencies cljsbuild-dependencies}
             `(cljsbuild.core/run-compiler
-               ~(:source-path project)
                ~(:source-path options)
                '~(:crossovers options)
                ~(:compiler options)
