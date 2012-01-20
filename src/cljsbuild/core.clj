@@ -7,6 +7,14 @@
     [clojure.string :as string]
     [fs.core :as fs]))
 
+(def lock (Object.))
+
+(defn- println-safe
+  [& args]
+  (locking lock
+    (apply println args)
+    (flush)))
+
 (defn- join-paths [& paths]
   (apply str (interpose "/" paths)))
 
@@ -54,16 +62,16 @@
 (defn- compile-cljs [cljs-path compiler-options]
   (let [output-file (:output-to compiler-options)
         output-dir (fs/parent output-file)]
-    (print (str "Compiling " output-file " from " cljs-path "..."))
+    (println-safe (str "Compiling " output-file " from " cljs-path "..."))
     (flush)
     (when output-dir
       (fs/mkdirs output-dir))
     (let [started-at (. System (nanoTime))]
       (try
         (build cljs-path compiler-options)
-        (println (str " Done in " (elapsed started-at) "."))
+        (println-safe (str output-file " compiled in " (elapsed started-at) "."))
         (catch Throwable e
-          (println " Failed!")
+          (println-safe " Failed!")
           (pst+ e))))))
 
 (defn- is-macro-file? [file]
@@ -137,8 +145,13 @@
         (spit to-file (filtered-crossover-file from-resource))
         :updated))))
 
+(defn in-threads
+  "Given a seq and a function, applies the function to each item in a different thread
+and returns a seq of the results. Launches all the threads at once."
+  [f s]
+  (doall (map deref (doall (map #(future (f %)) s)))))
+
 (defn run-compiler [cljs-path crossovers compiler-options watch?]
-  (println "Compiling ClojureScript.")
   (loop [last-dependency-mtimes {}]
     (let [output-file (:output-to compiler-options)
           output-mtime (if (fs/exists? output-file) (fs/mod-time output-file) 0)
@@ -163,7 +176,6 @@
         (recur dependency-mtimes)))))
 
 (defn cleanup-files [cljs-path crossovers compiler-options]
-  (println "Deleting generated files.")
   (fs/delete (:output-to compiler-options))
   (fs/delete-dir (:output-dir compiler-options))
   (let [from-resources (find-crossovers crossovers)
