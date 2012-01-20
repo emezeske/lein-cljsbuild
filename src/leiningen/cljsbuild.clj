@@ -65,13 +65,13 @@
             (assoc-in {} dest value)))))
     (keys relocations)))
 
-(defn- run-local-project [project options form]
+(defn- run-local-project [project option-seq form]
   (lcompile/eval-in-project
     {:local-repo-classpath true
      :source-path (:source-path project)
-     :extra-classpath-dirs (conj
+     :extra-classpath-dirs (concat
                              (:extra-classpath-dirs project)
-                             (:source-path options))
+                             (map :source-path option-seq))
      :dependencies cljsbuild-dependencies}
     form
     nil
@@ -79,20 +79,40 @@
     '(require 'cljsbuild.core))
   exit-success)
 
-(defn- run-compiler [project options watch?]
-  (run-local-project project options
-    `(cljsbuild.core/run-compiler
-       ~(:source-path options)
-       '~(:crossovers options)
-       ~(:compiler options)
-       ~watch?)))
+(defn- run-compiler [project option-seq watch?]
+  (run-local-project project option-seq
+                     `(do
+                        (println "Compiling ClojureScript")
+                        (cljsbuild.core/in-threads
+                           (fn [opts#] (cljsbuild.core/run-compiler
+                                        (:source-path opts#)
+                                        (:crossovers opts#)
+                                        (:compiler opts#)
+                                        ~watch?))
+                           '~option-seq)
+                          (shutdown-agents))))
 
-(defn- cleanup-files [project options]
-  (run-local-project project options
-    `(cljsbuild.core/cleanup-files
-       ~(:source-path options)
-       '~(:crossovers options)
-       ~(:compiler options))))
+(defn- cleanup-files [project option-seq]
+  (run-local-project project option-seq
+                     `(do
+                        (println "Deleting generated files.")
+                        (cljsbuild.core/in-threads
+                         (fn [opts#] (cljsbuild.core/cleanup-files
+                                      (:source-path opts#)
+                                      (:crossovers opts#)
+                                      (:compiler opts#)))
+                         '~option-seq)
+                        (shutdown-agents))))
+
+(defn- normalize-options
+  "Sets default options and accounts for backwards compatibility"
+  [orig-options]
+  (let [compat-options (backwards-compat orig-options)]
+    (when (not= orig-options compat-options)
+      (warn (str
+             "your deprecated :cljsbuild config was interpreted as:\n"
+             compat-options)))
+    (deep-merge default-options compat-options)))
 
 (defn cljsbuild
   "Run the cljsbuild plugin.
@@ -106,22 +126,19 @@ Usage: lein cljsbuild [once|auto|clean]
     (usage)
     exit-failure)
   ([project mode]
-    (let [orig-options (:cljsbuild project)]
-      (when (nil? orig-options)
-        (warn "no :cljsbuild entry found in project definition."))
-      (let [compat-options (backwards-compat orig-options)
-            options (deep-merge default-options compat-options)]
-        (when (not= orig-options compat-options)
-          (warn (str
-            "your deprecated :cljsbuild config was interpreted as:\n"
-            compat-options)))
-        (case mode
-          "once" (run-compiler project options false)
-          "auto" (run-compiler project options true)
-          "clean" (cleanup-files project options)
-          (do
-            (usage)
-            exit-failure))))))
+     (when (nil? (:cljsbuild project))
+       (warn "no :cljsbuild entry found in project definition."))
+     (let [raw-options (:cljsbuild project)
+           option-seq (if (map? raw-options)
+                        [(normalize-options raw-options)]
+                        (map normalize-options raw-options))]
+       (case mode
+             "once" (run-compiler project option-seq false)
+             "auto" (run-compiler project option-seq true)
+             "clean" (cleanup-files project option-seq)
+             (do
+               (usage)
+               exit-failure)))))
 
 (defn compile-hook [task & args]
   (cljsbuild (first args) "once")
