@@ -95,7 +95,13 @@
        ~(:compiler options))))
 
 (defn cljsbuild
-  ; TODO: Add a decent docstring.
+  "Run the cljsbuild plugin.
+
+Usage: lein cljsbuild [once|auto|clean]
+
+  once   Compile the ClojureScript project once.
+  auto   Automatically recompile when files are modified.
+  clean  Remove automatically generated files."
   ([project]
     (usage)
     exit-failure)
