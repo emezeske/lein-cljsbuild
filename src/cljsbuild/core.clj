@@ -2,17 +2,38 @@
   (:use
     [clojure.java.io :only [as-url resource]]
     [clj-stacktrace.repl :only [pst+]]
-    [cljs.closure :only [build]]) 
+    [cljs.closure :only [build]])
   (:require
     [clojure.string :as string]
     [fs.core :as fs]))
 
+(defn- join-paths [& paths]
+  (apply str (interpose "/" paths)))
+
+(defn- separate [pred coll]
+  (let [separated (group-by pred coll)]
+    [(separated true) (separated false)]))
+
+(defmacro dofor [seq-exprs body-expr]
+  `(doall (for ~seq-exprs ~body-expr)))
+
+(defn- fail [& args]
+  (throw (Exception. (apply str args))))
+
+(defn- truncate-uri-path [uri n]
+  (if uri
+    (let [uri-path (.getPath uri)]
+      (subs uri-path 0 (- (.length uri-path) n)))
+    nil))
+
+(defn- ns-to-path [ns]
+  (let [underscored (string/replace (str ns) #"-" "_")]
+    (apply join-paths
+      (string/split underscored #"\."))))
+
 (defn- filter-cljs [files types]
   (let [ext #(last (string/split % #"\."))]
     (filter #(types (ext %)) files)))
-
-(defn- join-paths [& paths]
-  (apply str (interpose "/" paths)))
 
 (defn- find-dir-cljs [root files types]
   (for [cljs (filter-cljs files types)]
@@ -33,8 +54,8 @@
 (defn- compile-cljs [cljs-path compiler-options]
   (let [output-file (:output-to compiler-options)
         output-dir (fs/parent output-file)]
-    (print (str "Compiling " output-file " from " cljs-path "...")) 
-    (flush) 
+    (print (str "Compiling " output-file " from " cljs-path "..."))
+    (flush)
     (when output-dir
       (fs/mkdirs output-dir))
     (let [started-at (. System (nanoTime))]
@@ -45,8 +66,6 @@
           (println " Failed!")
           (pst+ e))))))
 
-; TODO: Hmm, now that macro files are in the CLASSPATH, perhaps
-;       they should not be copied over the the cljs dir at all?
 (defn- is-macro-file? [file]
   (not (neg? (.indexOf (slurp file) ";*CLJSBUILD-MACRO-FILE*;"))))
 
@@ -67,20 +86,7 @@
                   (fs/absolute-path from-parent) "")
         to-file (fs/normalized-path
                   (join-paths (fs/absolute-path cljs-path) subpath))]
-    (if (is-macro-file? from-resource)
-      to-file
-      (string/replace to-file #"\.clj$" ".cljs"))))
-
-(defmacro dofor [seq-exprs body-expr]
-  `(doall (for ~seq-exprs ~body-expr)))
-
-(defn- ns-to-path [ns]
-  (let [underscored (string/replace (str ns) #"-" "_")]
-    (apply join-paths
-      (string/split underscored #"\."))))
-
-(defn- fail [& args]
-  (throw (Exception. (apply str args))))
+    (string/replace to-file #"\.clj$" ".cljs")))
 
 (defn- recurse-resource-dir [dir]
   (if dir
@@ -88,18 +94,11 @@
     ; in jars cannot be specified recursively; they have to be named file
     ; by file.
     (if (= (.getProtocol dir) "file")
-      (let [path (.getPath dir)
-            dirs (map #(as-url (str "file:" %)) (find-cljs path #{"clj"}))]
-        dirs)
+      (let [files (find-cljs (.getPath dir) #{"clj"})]
+        (map #(as-url (str "file:" %)) files))
       [dir])))
 
-(defn- truncate-uri-path [uri n]
-  (if uri
-    (let [uri-path (.getPath uri)]
-      (subs uri-path 0 (- (.length uri-path) n)))
-    nil))
-
-(defn- find-crossover-resources [crossover]
+(defn- find-crossover [crossover]
   (let [ns-path (ns-to-path crossover)
         as-dir (resource ns-path)
         dir-parent (truncate-uri-path as-dir (.length ns-path))
@@ -110,8 +109,14 @@
         resources (conj
                     (map vector (repeat dir-parent) recurse-dirs)
                     [file-parent as-file])]
-    (distinct
-      (remove #(nil? (second %)) resources))))
+    (when (empty? resources)
+      (fail "Unable to find crossover: " crossover))
+    resources))
+
+(defn- find-crossovers [crossovers]
+  (distinct
+    (remove #(nil? (second %))
+      (mapcat find-crossover crossovers))))
 
 (defn- crossover-needs-update? [from-resource to-file]
   (let [exists (fs/exists? to-file)]
@@ -123,47 +128,45 @@
         (= "file" (.getProtocol from-resource))
         (> (fs/mod-time (.getPath from-resource)) (fs/mod-time to-file))))))
 
-(defn- copy-crossovers [cljs-path crossovers]
-  (dofor [crossover crossovers]
-    (let [from-resources (find-crossover-resources crossover)]
-      (when (empty? from-resources)
-        (fail "Unable to find crossover: " crossover))
-      (let [to-files (map (partial crossover-to cljs-path) from-resources)]
-        (doseq [dir (distinct (map fs/parent to-files))]
-          (fs/mkdirs dir))
-        (dofor [[[_ from-resource] to-file] (zipmap from-resources to-files)]
-          (when (crossover-needs-update? from-resource to-file)
-            (spit to-file (filtered-crossover-file from-resource))
-            :updated))))))
+(defn- copy-crossovers [cljs-path from-resources]
+  (let [to-files (map (partial crossover-to cljs-path) from-resources)]
+    (doseq [dir (distinct (map fs/parent to-files))]
+      (fs/mkdirs dir))
+    (dofor [[[_ from-resource] to-file] (zipmap from-resources to-files)]
+      (when (crossover-needs-update? from-resource to-file)
+        (spit to-file (filtered-crossover-file from-resource))
+        :updated))))
 
 (defn run-compiler [cljs-path crossovers compiler-options watch?]
   (println "Compiling ClojureScript.")
-  (loop [last-input-mtimes {}]
+  (loop [last-dependency-mtimes {}]
     (let [output-file (:output-to compiler-options)
           output-mtime (if (fs/exists? output-file) (fs/mod-time output-file) 0)
-          ; Need to return *.clj as well as *.cljs because ClojureScript
-          ; macros are written in Clojure.
-          input-files (find-cljs cljs-path #{"clj" "cljs"})
-          input-mtimes (map fs/mod-time input-files)
+          crossover-resources (find-crossovers crossovers)
+          [crossover-macros crossover-plains] (separate
+                                                #(is-macro-file? (second %))
+                                                crossover-resources)
+          crossover-macro-files (map #(.getPath (second %)) crossover-macros)
+          cljs-files (find-cljs cljs-path #{"cljs"})
+          dependency-mtimes (map fs/mod-time
+                              (concat crossover-macro-files cljs-files))
           crossover-updated? (some #{:updated}
-                               (flatten
-                                 (copy-crossovers cljs-path crossovers)))]
+                               (copy-crossovers cljs-path crossover-plains))]
       (when (or
               (and
-                (not= last-input-mtimes input-mtimes) 
-                (some #(< output-mtime %) input-mtimes)) 
+                (not= last-dependency-mtimes dependency-mtimes)
+                (some #(< output-mtime %) dependency-mtimes))
               crossover-updated?)
         (compile-cljs cljs-path compiler-options))
       (when watch?
         (Thread/sleep 100)
-        (recur input-mtimes)))))
+        (recur dependency-mtimes)))))
 
 (defn cleanup-files [cljs-path crossovers compiler-options]
   (println "Deleting generated files.")
   (fs/delete (:output-to compiler-options))
   (fs/delete-dir (:output-dir compiler-options))
-  (doseq [crossover crossovers]
-    (let [from-resources (find-crossover-resources crossover)
-          to-files (map (partial crossover-to cljs-path) from-resources)]
-      (doseq [file to-files]
-        (fs/delete file)))))
+  (let [from-resources (find-crossovers crossovers)
+        to-files (map (partial crossover-to cljs-path) from-resources)]
+    (doseq [file to-files]
+      (fs/delete file))))
