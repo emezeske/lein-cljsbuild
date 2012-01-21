@@ -7,9 +7,14 @@
   :dev-dependencies [[lein-cljsbuild "0.0.7"]
                      [lein-ring "0.5.0"]]
   :hooks [leiningen.cljsbuild]
-  :cljsbuild {:source-path "src-cljs"
-              :crossovers [example.crossover]
-              :compiler {:output-to "resources/public/js/main.js"
-                         :optimizations :whitespace
-                         :pretty-print true}}
+  :cljsbuild [{:source-path "src-cljs"
+               :crossovers [example.crossover]
+               :compiler {:output-to "resources/public/js/main-debug.js"
+                          :optimizations :whitespace
+                          :pretty-print true}}
+              {:source-path "src-cljs"
+               :crossovers [example.crossover]
+               :compiler {:output-to "resources/public/js/main.js"
+                          :optimizations :advanced
+                          :pretty-print false}}]
   :ring {:handler example.routes/app})
