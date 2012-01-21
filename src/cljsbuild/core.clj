@@ -159,7 +159,11 @@ and returns a seq of the results. Launches all the threads at once."
           [crossover-macros crossover-plains] (separate
                                                 #(is-macro-file? (second %))
                                                 crossover-resources)
-          crossover-macro-files (map #(.getPath (second %)) crossover-macros)
+          ; Filter out non-file macro namespaces, as we can't get the mtime
+          ; for a namespace that comes from e.g. a jar file.
+          crossover-macro-files (map #(.getPath %)
+                                  (filter #(= "file" (.getProtocol %))
+                                    (map second crossover-macros)))
           cljs-files (find-cljs cljs-path #{"cljs"})
           dependency-mtimes (map fs/mod-time
                               (concat crossover-macro-files cljs-files))
