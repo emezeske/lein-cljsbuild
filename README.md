@@ -16,14 +16,14 @@ your Clojure server-side project and your ClojureScript client-side project.
 
 You can install the plugin via lein:
 
-    $ lein plugin install lein-cljsbuild 0.0.7
+    $ lein plugin install lein-cljsbuild 0.0.8
 
 Or by adding lein-cljs to your `project.clj` file in the `:dev-dependencies`
 section:
 
 ```clojure
 (defproject lein-cljsbuild-example "1.2.3"
-  :dev-dependencies [[lein-cljsbuild "0.0.7"]])
+  :dev-dependencies [[lein-cljsbuild "0.0.8"]])
 ```
 
 Make sure you pull down the jar file:
@@ -45,7 +45,7 @@ of your `project.clj` file.  A simple project might look like this:
 
 ```clojure
 (defproject lein-cljsbuild-example "1.2.3"
-  :dev-dependencies [[lein-cljsbuild "0.0.7"]]
+  :dev-dependencies [[lein-cljsbuild "0.0.8"]]
   :cljsbuild {
     ; The path to the top-level ClojureScript source directory:
     :source-path "src-cljs"
@@ -90,7 +90,7 @@ ClojureScript project, and will build all of them in parallel:
 
 ```clojure
 (defproject lein-cljsbuild-example "1.2.3"
-  :dev-dependencies [[lein-cljsbuild "0.0.7"]]
+  :dev-dependencies [[lein-cljsbuild "0.0.8"]]
   :cljsbuild
     [{:source-path "src-cljs-main"
       :compiler {:output-to "main.js"}}
@@ -147,7 +147,7 @@ And your `project.clj` file looks like this:
 
 ```clojure
 (defproject lein-cljsbuild-example "1.2.3"
-  :dev-dependencies [[lein-cljsbuild "0.0.7"]]
+  :dev-dependencies [[lein-cljsbuild "0.0.8"]]
   :source-path "src-clj"
   :cljsbuild {
     :source-path "src-cljs"
