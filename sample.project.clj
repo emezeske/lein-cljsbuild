@@ -10,12 +10,15 @@
   :dependencies [[org.clojure/clojure "1.3.0"]]
   ; Your project should depend on lein-cljsbuild, to ensure that
   ; the right version of the plugin is installed.
-  :dev-dependencies [[lein-cljsbuild "0.0.7"]]
+  :dev-dependencies [[lein-cljsbuild "0.0.8"]]
   ; The standard Leiningen :source-path option is used by lein-cljsbuild
   ; to determine the source directory from which crossover files will
   ; be copied.  Leiningen defaults to "src".
   :source-path "src-clj"
   ; All lein-cljsbuild-specific configuration is under the :cljsbuild key.
+  ; Note that this could also be a vector of configuration maps, in which
+  ; case each map will be treated as a separate, independent, ClojureScript
+  ; project.
   :cljsbuild {
     ; The path under which lein-cljsbuild will look for ClojureScript
     ; files to compile.  Defaults to "src-cljs".

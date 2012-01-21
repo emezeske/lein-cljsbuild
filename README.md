@@ -38,7 +38,7 @@ of how to use lein-cljsbuild.
 Also, see the `sample.project.clj` file in this directory for an
 exhaustive list of all options supported by lein-cljsbuild.
 
-## Configuration
+## Basic Configuration
 
 The lein-cljsbuild configuration is specified under the `:cljsbuild` section
 of your `project.clj` file.  A simple project might look like this:
@@ -81,6 +81,29 @@ To delete all of the JavaScript and ClojureScript files that lein-cljsbuild
 automatically generated during compilation, run:
 
     $ lein cljsbuild clean
+
+## Multiple Build Configurations
+
+If, instead of providing a map for the `:cljsbuild` settings, a sequence of
+maps is provided, lein-cljsbuild will treat each map as a separate
+ClojureScript project, and will build all of them in parallel:
+
+```clojure
+(defproject lein-cljsbuild-example "1.2.3"
+  :dev-dependencies [[lein-cljsbuild "0.0.7"]]
+  :cljsbuild
+    [{:source-path "src-cljs-main"
+      :compiler {:output-to "main.js"}}
+     {:source-path "src-cljs-other"
+      :compiler {:output-to "other.js"}}])
+```
+
+This is extremely convenient for doing library development in ClojureScript.
+This allows cljsbuild to compile in all four optimization levels at once, for
+easier testing, or to compile a test suite alongside the library code.
+
+See the `example-projects/advanced` directory for a working example of a
+project that uses this feature.
 
 ## Sharing Code Between Clojure and ClojureScript
 
