@@ -263,3 +263,4 @@ See the file COPYING.
 
 * Evan Mezeske **(Author)** (evan@mezeske.com)
 * Shantanu Kumar (kumar.shantanu@gmail.com)
+* Luke VanderHart (http://github.com/levand)
