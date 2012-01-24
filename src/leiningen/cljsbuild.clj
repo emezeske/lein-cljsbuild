@@ -1,9 +1,12 @@
 (ns leiningen.cljsbuild
   "Compile ClojureScript source into a JavaScript file."
   (:require
-    [robert.hooke :as hooke]
-    [leiningen.compile :as lcompile]
-    [leiningen.clean :as lclean]))
+   [clojure.java.io :as io]
+   [clojure.string :as s]
+   [robert.hooke :as hooke]
+   [leiningen.compile :as lcompile]
+   [leiningen.clean :as lclean]
+   [leiningen.jar :as ljar]))
 
 ; TODO: These are really the same as the :dependencies for the
 ;       lein-cljsbuild project itself (e.g. in the toplevel project
@@ -114,6 +117,16 @@
              compat-options)))
     (deep-merge default-options compat-options)))
 
+(defn- extract-options
+  "Given a project, returns a seq of cljsbuild option maps."
+  [project]
+  (when (nil? (:cljsbuild project))
+    (warn "no :cljsbuild entry found in project definition."))
+  (let [raw-options (:cljsbuild project)]
+    (if (map? raw-options)
+      [(normalize-options raw-options)]
+      (map normalize-options raw-options))))
+
 (defn cljsbuild
   "Run the cljsbuild plugin.
 
@@ -126,12 +139,7 @@ Usage: lein cljsbuild [once|auto|clean]
     (usage)
     exit-failure)
   ([project mode]
-     (when (nil? (:cljsbuild project))
-       (warn "no :cljsbuild entry found in project definition."))
-     (let [raw-options (:cljsbuild project)
-           option-seq (if (map? raw-options)
-                        [(normalize-options raw-options)]
-                        (map normalize-options raw-options))]
+     (let [option-seq (extract-options project)]
        (case mode
              "once" (run-compiler project option-seq false)
              "auto" (run-compiler project option-seq true)
@@ -139,6 +147,40 @@ Usage: lein cljsbuild [once|auto|clean]
              (do
                (usage)
                exit-failure)))))
+
+(defn- file-bytes
+  "Reads a file into a byte array"
+  [file]
+  (with-open [fis (java.io.FileInputStream. file)]
+    (let [ba (byte-array (.length file))]
+      (.read fis ba)
+      ba)))
+
+(defn- relative-path
+  "Given two normalized path strings, returns a path string of the second relative to the first."
+  [parent child]
+  (s/replace (s/replace child parent "") #"^[\\/]" ""))
+
+;; The reason we return a :bytes filespec is that it's the only way of
+;; specifying a file's destination path inside the jar and is contents
+;; independently. Obviously this presents issues if there are any very
+;; large files - this should be fixable in leiningen 2.0.
+(defn- path-filespecs
+  "Given a path, returns a seq of filespecs representing files on the path."
+  [path]
+  (let [dir (io/file path)
+        files (file-seq dir)]
+    (for [file (filter #(not (.isDirectory %)) files)]
+      {:type :bytes
+       :path (relative-path (.getCanonicalPath dir) (.getCanonicalPath file))
+       :bytes (file-bytes file)})))
+
+(defn- get-filespecs
+  "Returns a seq of filespecs for cljs dirs (as passed to leiningen.jar/write-jar)"
+  [project]
+  (let [builds (extract-options project)
+        paths (map :source-path (filter :jar builds))]
+    (mapcat path-filespecs paths)))
 
 (defn compile-hook [task & args]
   (cljsbuild (first args) "once")
@@ -148,5 +190,9 @@ Usage: lein cljsbuild [once|auto|clean]
   (cljsbuild (first args) "clean")
   (apply task args))
 
+(defn jar-hook [task & [project out-file filespecs]]
+  (apply task [project out-file (concat filespecs (get-filespecs project))]))
+
 (hooke/add-hook #'lcompile/compile compile-hook)
 (hooke/add-hook #'lclean/clean clean-hook)
+(hooke/add-hook #'ljar/write-jar jar-hook)
