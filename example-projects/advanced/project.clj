@@ -7,8 +7,8 @@
   :dev-dependencies [[lein-cljsbuild "0.0.9"]
                      [lein-ring "0.5.0"]]
   :hooks [leiningen.cljsbuild]
-  :jar true
   :cljsbuild [{:source-path "src-cljs"
+               :jar true
                :crossovers [example.crossover]
                :compiler {:output-to "resources/public/js/main-debug.js"
                           :optimizations :whitespace
