@@ -59,23 +59,8 @@ of your `project.clj` file.  A simple project might look like this:
       :pretty-print true}})
 ```
 
-## Hooks
-
-If you'd like your ClojureScript to be compiled when you run `lein compile`, and
-deleted when you run `lein clean`, add the following entry to your project
-configuration:
-
-```clojure
-:hooks [leiningen.cljsbuild]
-```
-
-Note that this is also required for lein-cljsbuild to hook into the `lein jar`
-task.  For that to work, you will also need to explicitly enable the `jar` hook
-by adding the following entry to your :cljsbuild configuration map:
-
-```clojure
-:jar true
-```
+For an exhaustive list of the configuration options supported by lein-cljsbuild,
+see the `sample.project.clj` file in this directory.
 
 ##  Usage
 
@@ -93,6 +78,24 @@ To delete all of the JavaScript and ClojureScript files that lein-cljsbuild
 automatically generated during compilation, run:
 
     $ lein cljsbuild clean
+
+## Hooks
+
+If you'd like your ClojureScript to be compiled when you run `lein compile`, and
+deleted when you run `lein clean`, add the following entry to your project
+configuration:
+
+```clojure
+:hooks [leiningen.cljsbuild]
+```
+
+Note that this is also required for lein-cljsbuild to hook into the `lein jar`
+task.  For that to work, you will also need to explicitly enable the `jar` hook
+by adding the following entry to your :cljsbuild configuration map:
+
+```clojure
+:jar true
+```
 
 ## Multiple Build Configurations
 
