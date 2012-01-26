@@ -12,14 +12,16 @@ your Clojure server-side project and your ClojureScript client-side project.
 
   [1]: https://github.com/ibdknox/cljs-watch
 
+## Requirements
+
+The lein-cljsbuild plugin works with [Leiningen] [2] version `1.6.2` or higher.
+
+  [2]: https://github.com/technomancy/leiningen/blob/master/README.md
+
 ## Installation
 
-You can install the plugin via lein:
-
-    $ lein plugin install lein-cljsbuild 0.0.9
-
-Or by adding lein-cljs to your `project.clj` file in the `:dev-dependencies`
-section:
+You can install the plugin by adding lein-cljsbuild to your `project.clj` file
+in the `:dev-dependencies` section:
 
 ```clojure
 (defproject lein-cljsbuild-example "1.2.3"
@@ -57,12 +59,22 @@ of your `project.clj` file.  A simple project might look like this:
       :pretty-print true}})
 ```
 
+## Hooks
+
 If you'd like your ClojureScript to be compiled when you run `lein compile`, and
-deleted when you run `lein clean`, you can also add the following entry to your
-defproject config:
+deleted when you run `lein clean`, add the following entry to your project
+configuration:
 
 ```clojure
 :hooks [leiningen.cljsbuild]
+```
+
+Note that this is also required for lein-cljsbuild to hook into the `lein jar`
+task.  For that to work, you will also need to explicitly enable the `jar` hook
+by adding the following entry to your :cljsbuild configuration map:
+
+```clojure
+:jar true
 ```
 
 ##  Usage
