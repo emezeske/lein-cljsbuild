@@ -68,6 +68,12 @@
             (assoc-in {} dest value)))))
     (keys relocations)))
 
+(defn- merge-dependencies [project-dependencies]
+  (let [project (into {} project-dependencies)
+        cljsbuild (into {} cljsbuild-dependencies)]
+    (map vec
+      (merge project cljsbuild))))
+
 (defn- run-local-project [project option-seq form]
   (lcompile/eval-in-project
     {:local-repo-classpath true
@@ -75,7 +81,8 @@
      :extra-classpath-dirs (concat
                              (:extra-classpath-dirs project)
                              (map :source-path option-seq))
-     :dependencies cljsbuild-dependencies}
+     :dependencies (merge-dependencies (:dependencies project))
+     :dev-dependencies (:dev-dependencies project)}
     form
     nil
     nil
