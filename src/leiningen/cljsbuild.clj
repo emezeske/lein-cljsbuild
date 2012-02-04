@@ -69,9 +69,10 @@
     (keys relocations)))
 
 (defn- merge-dependencies [project-dependencies]
-  (let [project (into {} project-dependencies)
-        cljsbuild (into {} cljsbuild-dependencies)]
-    (map vec
+  (let [dependency-map #(into {} (map (juxt first rest) %))
+        project (dependency-map project-dependencies)
+        cljsbuild (dependency-map cljsbuild-dependencies)]
+    (map (fn [[k v]] (vec (cons k v)))
       (merge project cljsbuild))))
 
 (defn- run-local-project [project option-seq form]
