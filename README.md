@@ -25,7 +25,7 @@ in the `:dev-dependencies` section:
 
 ```clojure
 (defproject lein-cljsbuild-example "1.2.3"
-  :dev-dependencies [[lein-cljsbuild "0.0.10"]])
+  :dev-dependencies [[lein-cljsbuild "0.0.11"]])
 ```
 
 Make sure you pull down the jar file:
@@ -47,7 +47,7 @@ of your `project.clj` file.  A simple project might look like this:
 
 ```clojure
 (defproject lein-cljsbuild-example "1.2.3"
-  :dev-dependencies [[lein-cljsbuild "0.0.10"]]
+  :dev-dependencies [[lein-cljsbuild "0.0.11"]]
   :cljsbuild {
     ; The path to the top-level ClojureScript source directory:
     :source-path "src-cljs"
@@ -105,7 +105,7 @@ ClojureScript project, and will build all of them in parallel:
 
 ```clojure
 (defproject lein-cljsbuild-example "1.2.3"
-  :dev-dependencies [[lein-cljsbuild "0.0.10"]]
+  :dev-dependencies [[lein-cljsbuild "0.0.11"]]
   :cljsbuild
     [{:source-path "src-cljs-main"
       :compiler {:output-to "main.js"}}
@@ -162,7 +162,7 @@ And your `project.clj` file looks like this:
 
 ```clojure
 (defproject lein-cljsbuild-example "1.2.3"
-  :dev-dependencies [[lein-cljsbuild "0.0.10"]]
+  :dev-dependencies [[lein-cljsbuild "0.0.11"]]
   :source-path "src-clj"
   :cljsbuild {
     :source-path "src-cljs"
