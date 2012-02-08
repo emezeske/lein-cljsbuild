@@ -13,7 +13,7 @@
 ;       file).  I haven't yet figured out a clean way to DRY them.
 (def cljsbuild-dependencies
   '[[org.clojure/clojure "1.3.0"]
-    [org.clojure/clojurescript "0.0-927"]
+    [org.clojure/clojurescript "0.0-971"]
     [fs "1.1.2"]
     [clj-stacktrace "0.2.4"]])
 
