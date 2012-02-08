@@ -1,4 +1,4 @@
-(defproject cljsbuild-example-advanced "0.0.11"
+(defproject cljsbuild-example-advanced "0.0.12"
   :description "An advanced example of how to use lein-cljsbuild"
   :source-path "src-clj"
   :dependencies [[org.clojure/clojure "1.3.0"]
@@ -12,7 +12,7 @@
                                               com.sun.jdmk/jmxtools
                                               com.sun.jmx/jmxri]]]
 
-  :dev-dependencies [[lein-cljsbuild "0.0.11"]
+  :dev-dependencies [[lein-cljsbuild "0.0.12"]
                      [lein-ring "0.5.0"]]
   :hooks [leiningen.cljsbuild]
   :cljsbuild [{:source-path "src-cljs"
