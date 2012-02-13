@@ -3,6 +3,7 @@ pom.xml
 lib
 classes/
 lein-cljsbuild-*.*.*
+cljsbuild-*.*.*
 example-projects/*/*.jar
 example-projects/*/resources
 example-projects/*/.clojurescript-output
