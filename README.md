@@ -14,18 +14,29 @@ your Clojure server-side project and your ClojureScript client-side project.
 
 ## Requirements
 
-The lein-cljsbuild plugin works with [Leiningen] [2] version `1.6.2` or higher.
+The lein-cljsbuild plugin works with [Leiningen] [2] version `1.6.2` or higher,
+although 1.7.0 or higher is recommended.
 
   [2]: https://github.com/technomancy/leiningen/blob/master/README.md
 
 ## Installation
 
-You can install the plugin by adding lein-cljsbuild to your `project.clj` file
-in the `:dev-dependencies` section:
+If you're using Leiningen `1.7.0` or newer, you can install the plugin by
+adding lein-cljsbuild to your `project.clj` file in the `:plugins` section:
 
 ```clojure
+; Using Leiningen 1.7.0 or newer:
 (defproject lein-cljsbuild-example "1.2.3"
-  :dev-dependencies [[lein-cljsbuild "0.0.12"]])
+  :plugins [[lein-cljsbuild "0.0.13"]])
+```
+
+For versions of Leiningen older than `1.7.0` (not recommended), add
+lein-cljsbuild to the `:dev-dependencies` section instead:
+
+```clojure
+; Using Leiningen 1.6.x or older:
+(defproject lein-cljsbuild-example "1.2.3"
+  :dev-dependencies [[lein-cljsbuild "0.0.13"]])
 ```
 
 Make sure you pull down the jar file:
@@ -47,7 +58,7 @@ of your `project.clj` file.  A simple project might look like this:
 
 ```clojure
 (defproject lein-cljsbuild-example "1.2.3"
-  :dev-dependencies [[lein-cljsbuild "0.0.12"]]
+  :plugins [[lein-cljsbuild "0.0.13"]]
   :cljsbuild {
     ; The path to the top-level ClojureScript source directory:
     :source-path "src-cljs"
@@ -105,7 +116,7 @@ ClojureScript project, and will build all of them in parallel:
 
 ```clojure
 (defproject lein-cljsbuild-example "1.2.3"
-  :dev-dependencies [[lein-cljsbuild "0.0.12"]]
+  :plugins [[lein-cljsbuild "0.0.13"]]
   :cljsbuild
     [{:source-path "src-cljs-main"
       :compiler {:output-to "main.js"}}
@@ -162,7 +173,7 @@ And your `project.clj` file looks like this:
 
 ```clojure
 (defproject lein-cljsbuild-example "1.2.3"
-  :dev-dependencies [[lein-cljsbuild "0.0.12"]]
+  :plugins [[lein-cljsbuild "0.0.13"]]
   :source-path "src-clj"
   :cljsbuild {
     :source-path "src-cljs"

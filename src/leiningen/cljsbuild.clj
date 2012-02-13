@@ -8,14 +8,8 @@
    [leiningen.clean :as lclean]
    [leiningen.jar :as ljar]))
 
-; TODO: These are really the same as the :dependencies for the
-;       lein-cljsbuild project itself (e.g. in the toplevel project
-;       file).  I haven't yet figured out a clean way to DRY them.
 (def cljsbuild-dependencies
-  '[[org.clojure/clojure "1.3.0"]
-    [org.clojure/clojurescript "0.0-971"]
-    [fs "1.1.2"]
-    [clj-stacktrace "0.2.4"]])
+  '[[cljsbuild "0.0.1"]])
 
 (def default-compiler
   {:output-to "main.js"

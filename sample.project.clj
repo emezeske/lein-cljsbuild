@@ -8,9 +8,9 @@
   ; Your project must use Clojure 1.3 or above to support
   ; ClojureScript compilation.
   :dependencies [[org.clojure/clojure "1.3.0"]]
-  ; Your project should depend on lein-cljsbuild, to ensure that
+  ; Your project should plugin-depend on lein-cljsbuild, to ensure that
   ; the right version of the plugin is installed.
-  :dev-dependencies [[lein-cljsbuild "0.0.12"]]
+  :plugins [[lein-cljsbuild "0.0.13"]]
   ; The standard Leiningen :source-path option is used by lein-cljsbuild
   ; to determine the source directory from which crossover files will
   ; be copied.  Leiningen defaults to "src".
