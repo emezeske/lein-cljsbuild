@@ -143,6 +143,8 @@
     (dofor [[[_ from-resource] to-file] (zipmap from-resources to-files)]
       (when (crossover-needs-update? from-resource to-file)
         (spit to-file (filtered-crossover-file from-resource))
+        ; Mark the file as read-only, to hopefully warn the user not to modify it.
+        (fs/chmod "-w" to-file)
         :updated))))
 
 (defn in-threads
