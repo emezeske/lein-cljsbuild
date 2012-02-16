@@ -27,7 +27,7 @@ adding lein-cljsbuild to your `project.clj` file in the `:plugins` section:
 ```clojure
 ; Using Leiningen 1.7.0 or newer:
 (defproject lein-cljsbuild-example "1.2.3"
-  :plugins [[lein-cljsbuild "0.0.13"]])
+  :plugins [[lein-cljsbuild "0.1.0"]])
 ```
 
 For versions of Leiningen older than `1.7.0` (not recommended), add
@@ -36,7 +36,7 @@ lein-cljsbuild to the `:dev-dependencies` section instead:
 ```clojure
 ; Using Leiningen 1.6.x or older:
 (defproject lein-cljsbuild-example "1.2.3"
-  :dev-dependencies [[lein-cljsbuild "0.0.13"]])
+  :dev-dependencies [[lein-cljsbuild "0.1.0"]])
 ```
 
 Make sure you pull down the jar file:
@@ -58,7 +58,7 @@ of your `project.clj` file.  A simple project might look like this:
 
 ```clojure
 (defproject lein-cljsbuild-example "1.2.3"
-  :plugins [[lein-cljsbuild "0.0.13"]]
+  :plugins [[lein-cljsbuild "0.1.0"]]
   :cljsbuild {
     ; The path to the top-level ClojureScript source directory:
     :source-path "src-cljs"
@@ -116,7 +116,7 @@ ClojureScript project, and will build all of them in parallel:
 
 ```clojure
 (defproject lein-cljsbuild-example "1.2.3"
-  :plugins [[lein-cljsbuild "0.0.13"]]
+  :plugins [[lein-cljsbuild "0.1.0"]]
   :cljsbuild
     [{:source-path "src-cljs-main"
       :compiler {:output-to "main.js"}}
@@ -173,7 +173,7 @@ And your `project.clj` file looks like this:
 
 ```clojure
 (defproject lein-cljsbuild-example "1.2.3"
-  :plugins [[lein-cljsbuild "0.0.13"]]
+  :plugins [[lein-cljsbuild "0.1.0"]]
   :source-path "src-clj"
   :cljsbuild {
     :source-path "src-cljs"
