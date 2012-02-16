@@ -5,7 +5,8 @@ classes/
 lein-cljsbuild-*.*.*
 cljsbuild-*.*.*
 example-projects/*/*.jar
-example-projects/*/resources
+example-projects/simple/resources
+example-projects/advanced/resources/public/js
 example-projects/*/.clojurescript-output
 example-projects/*/classes
 example-projects/*/lib

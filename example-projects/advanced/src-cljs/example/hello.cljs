@@ -2,4 +2,5 @@
   (:require
     [example.crossover.shared :as shared]))
 
-(js/alert (shared/make-example-text))
+(defn ^:export say-hello [] 
+  (js/alert (shared/make-example-text))) 

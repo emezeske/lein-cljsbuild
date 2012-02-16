@@ -53,6 +53,9 @@ exhaustive list of all options supported by lein-cljsbuild.
 
 ## Basic Configuration
 
+**TODO** Document the new :builds configuration, as well as :repl-listen-port
+and :repl-launch-commands.
+
 The lein-cljsbuild configuration is specified under the `:cljsbuild` section
 of your `project.clj` file.  A simple project might look like this:
 

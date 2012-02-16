@@ -2,6 +2,7 @@
   "Compile ClojureScript source into a JavaScript file."
   (:require
    [clojure.java.io :as io]
+   [clojure.pprint :as pprint]
    [clojure.string :as s]
    [robert.hooke :as hooke]
    [leiningen.compile :as lcompile]
@@ -11,22 +12,22 @@
 (def cljsbuild-dependencies
   '[[cljsbuild "0.1.0"]])
 
-(def default-compiler
+(def repl-output-dir ".lein-cljsbuild-repl")
+
+(def default-global-options
+  {:repl-launch-commands {}
+   :repl-listen-port 9000})
+
+(def default-compiler-options
   {:output-to "main.js"
    :optimizations :whitespace
    :pretty-print true
-   :output-dir ".clojurescript-output"})
+   :output-dir ".lein-cljsbuild-compiler"})
 
-(def default-options
+(def default-build-options
   {:source-path "src-cljs"
    :crossovers [] 
-   :compiler default-compiler})
-
-(def relocations
-  {:source-dir [:source-path] 
-   :output-file [:compiler :output-to]
-   :optimizations [:compiler :optimizations] 
-   :pretty-print [:compiler :pretty-print]})
+   :compiler default-compiler-options})
 
 (def exit-success 0)
 
@@ -40,7 +41,7 @@
   (apply printerr "WARNING:" args))
 
 (defn- usage []
-  (printerr "Usage: lein cljsbuild [once|auto|clean]"))
+  (printerr "Usage: lein cljsbuild [once|auto|clean|repl-listen|repl-launch|repl-rhino]"))
 
 (declare deep-merge-item)
 
@@ -52,16 +53,6 @@
     (deep-merge a b)
     b))
 
-(defn- backwards-compat [cljsbuild]
-  (apply dissoc
-    (apply deep-merge cljsbuild
-      (for [[source dest] relocations]
-        (when-let [value (source cljsbuild)]
-          (warn source "is deprecated.")
-          (when (nil? (get-in cljsbuild dest))
-            (assoc-in {} dest value)))))
-    (keys relocations)))
-
 (defn- merge-dependencies [project-dependencies]
   (let [dependency-map #(into {} (map (juxt first rest) %))
         project (dependency-map project-dependencies)
@@ -69,55 +60,114 @@
     (map (fn [[k v]] (vec (cons k v)))
       (merge project cljsbuild))))
 
-(defn- run-local-project [project option-seq form]
+(defn- run-local-project [project builds requires form]
   (lcompile/eval-in-project
     {:local-repo-classpath true
      :source-path (:source-path project)
      :extra-classpath-dirs (concat
                              (:extra-classpath-dirs project)
-                             (map :source-path option-seq))
+                             (map :source-path builds))
      :dependencies (merge-dependencies (:dependencies project))
      :dev-dependencies (:dev-dependencies project)}
     form
     nil
     nil
-    '(require 'cljsbuild.core))
+    requires)
   exit-success)
 
-(defn- run-compiler [project option-seq watch?]
-  (run-local-project project option-seq
-                     `(do
-                        (println "Compiling ClojureScript")
-                        (cljsbuild.core/in-threads
-                           (fn [opts#] (cljsbuild.core/run-compiler
-                                        (:source-path opts#)
-                                        (:crossovers opts#)
-                                        (:compiler opts#)
-                                        ~watch?))
-                           '~option-seq)
-                          (shutdown-agents))))
+(defn- run-compiler [project {:keys [builds]} watch?]
+  (run-local-project project builds
+    '(require 'cljsbuild.compiler)
+    `(do
+      (println "Compiling ClojureScript.")
+      (cljsbuild.compiler/in-threads
+        (fn [opts#]
+          (cljsbuild.compiler/run-compiler
+            (:source-path opts#)
+            (:crossovers opts#)
+            (:compiler opts#)
+            ~watch?))
+        '~builds)
+        (shutdown-agents))))
 
-(defn- cleanup-files [project option-seq]
-  (run-local-project project option-seq
-                     `(do
-                        (println "Deleting generated files.")
-                        (cljsbuild.core/in-threads
-                         (fn [opts#] (cljsbuild.core/cleanup-files
-                                      (:source-path opts#)
-                                      (:crossovers opts#)
-                                      (:compiler opts#)))
-                         '~option-seq)
-                        (shutdown-agents))))
+(defn- cleanup-files [project {:keys [builds]}]
+  (run-local-project project builds
+    '(require 'cljsbuild.compiler)
+    `(do
+      (println "Deleting generated files.")
+      (cljsbuild.compiler/in-threads
+        (fn [opts#]
+          (cljsbuild.compiler/cleanup-files
+            (:source-path opts#)
+            (:crossovers opts#)
+            (:compiler opts#)))
+      '~builds)
+      (shutdown-agents))))
+
+(defn- run-repl-listen [project {:keys [builds repl-listen-port]}]
+  (run-local-project project builds
+    '(require 'cljsbuild.repl.listen)
+    `(do
+      (println (str "Running REPL, listening on port " ~repl-listen-port "."))
+      (cljsbuild.repl.listen/run-repl-listen
+        ~repl-listen-port
+        ~repl-output-dir)
+      (shutdown-agents))))
+
+(defn- run-repl-launch [project {:keys [builds repl-listen-port repl-launch-commands]} args]
+  (when (< (count args) 1)
+    (throw (Exception. "Must supply a launch command identifier.")))
+  (let [launch-name (first args)
+        command-args (rest args)
+        command-base (repl-launch-commands launch-name)]
+    (when (nil? command-base)
+      (throw (Exception. (str "Unknown REPL launch command: " launch-name))))
+    (let [command (concat command-base command-args)]
+      (run-local-project project builds
+        '(require 'cljsbuild.repl.listen)
+        `(do
+          (println "Running REPL and launching command:" '~command)
+          (cljsbuild.repl.listen/run-repl-launch
+            ~repl-listen-port
+            ~repl-output-dir
+            '~command)
+          (shutdown-agents))))))
+
+(defn- run-repl-rhino [project {:keys [builds]}]
+  (run-local-project project builds 
+    '(require 'cljsbuild.repl.rhino)
+    `(do
+      (println "Running Rhino-based REPL.")
+      (cljsbuild.repl.rhino/run-repl-rhino))))
+
+(defn- set-default-build-options [options]
+  (deep-merge default-build-options options))
+
+(defn- set-default-global-options [options]
+  (deep-merge default-global-options
+    (assoc options :builds
+      (map set-default-build-options (:builds options)))))
+
+(defn- warn-deprecated [options]
+  (warn "your deprecated :cljsbuild config was interpreted as:")
+  (pprint/pprint options *err*)
+  (printerr
+    "See https://github.com/emezeske/lein-cljsbuild/blob/master/README.md"
+    "for details on the new format.")
+  options)
 
 (defn- normalize-options
-  "Sets default options and accounts for backwards compatibility"
-  [orig-options]
-  (let [compat-options (backwards-compat orig-options)]
-    (when (not= orig-options compat-options)
-      (warn (str
-             "your deprecated :cljsbuild config was interpreted as:\n"
-             compat-options)))
-    (deep-merge default-options compat-options)))
+  "Sets default options and accounts for backwards compatibility."
+  [options]
+  (cond
+    (and (map? options) (nil? (:builds options)))
+      (warn-deprecated
+        [{:builds (set-default-build-options options)}])
+    (seq? options)
+      (warn-deprecated
+        [{:builds (map set-default-build-options options)}])
+    :else
+      (set-default-global-options options)))
 
 (defn- extract-options
   "Given a project, returns a seq of cljsbuild option maps."
@@ -125,30 +175,37 @@
   (when (nil? (:cljsbuild project))
     (warn "no :cljsbuild entry found in project definition."))
   (let [raw-options (:cljsbuild project)]
-    (if (map? raw-options)
-      [(normalize-options raw-options)]
-      (map normalize-options raw-options))))
+    (normalize-options raw-options)))
 
 (defn cljsbuild
   "Run the cljsbuild plugin.
 
-Usage: lein cljsbuild [once|auto|clean]
+Usage: lein cljsbuild <command>
 
-  once   Compile the ClojureScript project once.
-  auto   Automatically recompile when files are modified.
-  clean  Remove automatically generated files."
+Available commands:
+
+  once          Compile the ClojureScript project once.
+  auto          Automatically recompile when files are modified.
+  clean         Remove automatically generated files.
+
+  repl-listen   Run a REPL that will listen for incoming connections.
+  repl-launch   Run a REPL and launch a custom command to connect to it.
+  repl-rhino    Run a Rhino-based REPL."
   ([project]
     (usage)
     exit-failure)
-  ([project mode]
-     (let [option-seq (extract-options project)]
+  ([project mode & args]
+     (let [options (extract-options project)]
        (case mode
-             "once" (run-compiler project option-seq false)
-             "auto" (run-compiler project option-seq true)
-             "clean" (cleanup-files project option-seq)
-             (do
-               (usage)
-               exit-failure)))))
+         "once" (run-compiler project options false)
+         "auto" (run-compiler project options true)
+         "clean" (cleanup-files project options)
+         "repl-listen" (run-repl-listen project options)
+         "repl-launch" (run-repl-launch project options args)
+         "repl-rhino" (run-repl-rhino project options)
+         (do
+           (usage)
+           exit-failure)))))
 
 (defn- file-bytes
   "Reads a file into a byte array"

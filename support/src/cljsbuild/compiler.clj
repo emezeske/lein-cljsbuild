@@ -1,4 +1,4 @@
-(ns cljsbuild.core
+(ns cljsbuild.compiler
   (:use
     [clojure.java.io :only [as-url resource]]
     [clj-stacktrace.repl :only [pst+]]

@@ -14,6 +14,11 @@ Set up and start the server like this:
     $ lein cljsbuild once
     $ lein ring server
 
+**TODO** Document the new REPL support.
+
+lein trampoline cljsbuild repl-launch firefox-naked
+lein trampoline cljsbuild repl-launch phantom-naked
+
 [1]: https://github.com/mmcgrana/ring
 [2]: https://github.com/weavejester/compojure
 [3]: https://github.com/emezeske/lein-cljsbuild
