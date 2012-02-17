@@ -1,9 +1,11 @@
 # cljsbuild-example-advanced
 
 This is an example web application that uses [Ring][1], [Compojure][2],
-and [lein-cljsbuild][3]. It demonstrates the use of lein-cljsbuild to
-build ClojureScript into JavaScript.  It also shows how to share code
-between Clojure and ClojureScript, including macros.
+and [lein-cljsbuild][3]. It demonstrates several things:
+
+1. The use of lein-cljsbuild to build ClojureScript into JavaScript.
+2. How to share code between Clojure and ClojureScript, including macros.
+3. How to use lein-cljsbuild's various REPL commands.
 
 To play around with this example project, you will first need
 [Leiningen][4] installed.

@@ -11,7 +11,6 @@
                                               javax.jms/jms
                                               com.sun.jdmk/jmxtools
                                               com.sun.jmx/jmxri]]]
-
   :dev-dependencies [[lein-ring "0.5.0"]]
   :plugins [[lein-cljsbuild "0.1.0"]]
   :hooks [leiningen.cljsbuild]
