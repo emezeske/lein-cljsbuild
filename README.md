@@ -1,7 +1,8 @@
 # lein-cljsbuild
 
 This is a leiningen plugin that makes it easy (and quick) to compile
-ClojureScript source into JavaScript.  It's similar to [cljs-watch] [1],
+ClojureScript source into JavaScript.  It's similar to
+[cljs-watch] (https://github.com/ibdknox/cljs-watch)
 but is driven via lein instead of via a standalone executable.  This means
 that your project can depend on a specific version of lein-cljsbuild, fetch
 it via `lein deps`, and you don't have to install any special executables into
@@ -10,14 +11,12 @@ your `PATH`.
 Also, this plugin has built-in support for seamlessly sharing code between
 your Clojure server-side project and your ClojureScript client-side project.
 
-  [1]: https://github.com/ibdknox/cljs-watch
-
 ## Requirements
 
-The lein-cljsbuild plugin works with [Leiningen] [2] version `1.6.2` or higher,
+The lein-cljsbuild plugin works with
+[Leiningen] (https://github.com/technomancy/leiningen/blob/master/README.md)
+version `1.6.2` or higher,
 although 1.7.0 or higher is recommended.
-
-  [2]: https://github.com/technomancy/leiningen/blob/master/README.md
 
 ## Installation
 
@@ -177,9 +176,8 @@ a particular web page served by your application.  So, you would launch your app
 launch `repl-listen`, and then browse to that page.  It would then connect to the REPL,
 enabling you to execute commands in the context of that page.
 
-For more information on this approach, see the [ClojureScript Wiki] [3].
-
-  [3] https://github.com/clojure/clojurescript/wiki/Quick-Start
+For more information on this approach, see the
+[ClojureScript Wiki] (https://github.com/clojure/clojurescript/wiki/Quick-Start).
 
 ### repl-launch
 
@@ -223,9 +221,9 @@ The target URL could be selected like so:
 
 For more ideas on how to use `repl-launch`, take a look at `example-projects/advanced`.
 It has several examples of useful launch commands, with descriptions in its README.
-Note that, in particular, the possibilities with [PhantomJS] [4] are very intriguing.
-
-  [4] http://www.phantomjs.org/
+Note that, in particular, the possibilities with
+[PhantomJS] (http://www.phantomjs.org)
+are very intriguing.
 
 ## Sharing Code Between Clojure and ClojureScript
 
