@@ -24,7 +24,7 @@ although 1.7.0 or higher is recommended.
 If you're using Leiningen `1.7.0` or newer, you can install the plugin by
 adding lein-cljsbuild to your `project.clj` file in the `:plugins` section:
 
-```clojure
+```clj
 ; Using Leiningen 1.7.0 or newer:
 (defproject lein-cljsbuild-example "1.2.3"
   :plugins [[lein-cljsbuild "0.1.0"]])
@@ -33,7 +33,7 @@ adding lein-cljsbuild to your `project.clj` file in the `:plugins` section:
 For versions of Leiningen older than `1.7.0` (not recommended), add
 lein-cljsbuild to the `:dev-dependencies` section instead:
 
-```clojure
+```clj
 ; Using Leiningen 1.6.x or older:
 (defproject lein-cljsbuild-example "1.2.3"
   :dev-dependencies [[lein-cljsbuild "0.1.0"]])
@@ -56,7 +56,7 @@ exhaustive list of all options supported by lein-cljsbuild.
 The lein-cljsbuild configuration is specified under the `:cljsbuild` section
 of your `project.clj` file.  A simple project might look like this:
 
-```clojure
+```clj
 (defproject lein-cljsbuild-example "1.2.3"
   :plugins [[lein-cljsbuild "0.1.0"]]
   :cljsbuild {
@@ -97,7 +97,7 @@ If you'd like your ClojureScript to be compiled when you run `lein compile`, and
 deleted when you run `lein clean`, add the following entry to your project
 configuration:
 
-```clojure
+```clj
 :hooks [leiningen.cljsbuild]
 ```
 
@@ -105,7 +105,7 @@ Note that this is also required for lein-cljsbuild to hook into the `lein jar`
 task.  For that to work, you will also need to explicitly enable the `jar` hook
 by adding the following entry to your :cljsbuild configuration map:
 
-```clojure
+```clj
 :jar true
 ```
 
@@ -115,7 +115,7 @@ If the `:builds` sequence contains more than one map lein-cljsbuild
 will treat each map as a separate ClojureScript compiler configuration,
 and will build all of them in parallel:
 
-```clojure
+```clj
 (defproject lein-cljsbuild-example "1.2.3"
   :plugins [[lein-cljsbuild "0.1.0"]]
   :cljsbuild {
@@ -164,7 +164,7 @@ usable.
 
 From your application, you can connect to the REPL with code such as this:
 
-```clojure
+```clj
 (ns lein-cljsbuild-example.repl
    (:require [clojure.browser.repl :as repl]))
 ; Use of "localhost" will only work for local development.
@@ -194,7 +194,7 @@ Of course, this won't work until you've told lein-cljsbuild what to launch.  Mul
 launch presets may be created, and thus the `<launch-id>` parameter is used to select
 between them.  To configure a launch preset, add an entry to the `:repl-launch-commands` map:
 
-```clojure
+```clj
 (defproject lein-cljsbuild-example "1.2.3"
   :plugins [[lein-cljsbuild "0.1.0"]]
   :cljsbuild {
@@ -212,7 +212,7 @@ will be run in the background, and presumably the page it loads will connect to 
 Note that any additional arguments following the `<launch-id>` will be passed to the
 launch command.  Thus, with a configuration such as:
 
-```clojure
+```clj
 :repl-launch-commands
   {"my-other-launch" ["firefox" "-jsconsole"}
 ```
@@ -267,7 +267,7 @@ Assuming that your top-level directory structure looks something like this:
 
 And your `project.clj` file looks like this:
 
-```clojure
+```clj
 (defproject lein-cljsbuild-example "1.2.3"
   :plugins [[lein-cljsbuild "0.1.0"]]
   :source-path "src-clj"
@@ -331,7 +331,7 @@ directory, and that all of the macros are in a file called
 
 Add this magical comment to any crossover files that contain macros:
 
-```clojure
+```clj
 ;*CLJSBUILD-MACRO-FILE*;
 ```
 
@@ -344,14 +344,14 @@ macro file is not included in any of the crossover namespaces.
 In any crossover Clojure file, lein-cljsbuild will automatically erase the
 following string (if it appears):
 
-```clojure
+```clj
 ;*CLJSBUILD-REMOVE*;
 ```
 
 This magic can be used to generate a `ns` statement that will work in both
 Clojure and ClojureScript:
 
-```clojure
+```clj
 (ns example.crossover.some_stuff
   (:require;*CLJSBUILD-REMOVE*;-macros
     [example.crossover.macros :as macros]))
@@ -359,7 +359,7 @@ Clojure and ClojureScript:
 
 Thus, after removing comments, Clojure will see:
 
-```clojure
+```clj
 (ns example.crossover.some_stuff
   (:require
     [example.crossover.macros :as macros]))
@@ -368,7 +368,7 @@ Thus, after removing comments, Clojure will see:
 However, lein-cljsbuild will remove the `;*CLJSBUILD-REMOVE*;` string entirely,
 before copying the file.  Thus, ClojureScript will see:
 
-```clojure
+```clj
 (ns example.crossover.some_stuff
   (:require-macros
     [example.crossover.macros :as macros]))
