@@ -17,20 +17,21 @@
   :hooks [leiningen.cljsbuild]
   :cljsbuild {
     :repl-listen-port 9000
-    ; TODO: Add some way to test the firefox and phantom launch commands.
-    :repl-launch-commands {"firefox" ["firefox"]
-                           "firefox-naked" ["firefox" "resources/public/html/naked.html"] 
-                           "phantom" ["phantomjs" "phantom/page-repl.js"]
-                           "phantom-naked" ["phantomjs" "phantom/page-repl.js" "resources/public/html/naked.html"]}
-    :builds [{:source-path "src-cljs"
-              :jar true
-              :crossovers [example.crossover]
-              :compiler {:output-to "resources/public/js/main-debug.js"
-                         :optimizations :whitespace
-                         :pretty-print true}}
-             {:source-path "src-cljs"
-              :crossovers [example.crossover]
-              :compiler {:output-to "resources/public/js/main.js"
-                         :optimizations :advanced
-                         :pretty-print false}}]} 
+    :repl-launch-commands
+      {"firefox" ["firefox"]
+       "firefox-naked" ["firefox" "resources/public/html/naked.html"]
+       "phantom" ["phantomjs" "phantom/page-repl.js"]
+       "phantom-naked" ["phantomjs" "phantom/page-repl.js" "resources/public/html/naked.html"]}
+    :builds [
+      {:source-path "src-cljs"
+       :jar true
+       :crossovers [example.crossover]
+       :compiler {:output-to "resources/public/js/main-debug.js"
+                  :optimizations :whitespace
+                  :pretty-print true}}
+      {:source-path "src-cljs"
+       :crossovers [example.crossover]
+       :compiler {:output-to "resources/public/js/main.js"
+                  :optimizations :advanced
+                  :pretty-print false}}]}
   :ring {:handler example.routes/app})

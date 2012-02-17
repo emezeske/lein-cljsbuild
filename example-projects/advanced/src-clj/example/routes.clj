@@ -8,6 +8,7 @@
 
 (defroutes main-routes
   (GET "/" [] (index-page))
+  (GET "/repl-demo" [] (repl-demo-page))
   (route/resources "/")
   (route/not-found "Page not found"))
 

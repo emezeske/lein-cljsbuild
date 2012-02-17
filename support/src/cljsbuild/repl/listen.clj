@@ -34,6 +34,8 @@
       (let [{:keys [process out err]} @bg
             delim (string/join (take 80 (repeat "-")))
             header #(str delim "\n" % "\n" delim)]
+        ; FIXME: This is ugly, and doesn't always work (sigh).  I often have to
+        ;        resort to Ctrl+C to kill the console.
         (.destroy process)
         (.waitFor process) 
         (when (not= (.length out) 0)

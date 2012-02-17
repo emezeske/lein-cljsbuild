@@ -16,7 +16,14 @@ Set up and start the server like this:
 
 **TODO** Document the new REPL support.
 
+lein ring server-headless 3000 &
+lein trampoline cljsbuild repl-launch firefox http://localhost:3000/repl-demo
+
+lein ring server-headless 3000 &
+lein trampoline cljsbuild repl-launch phantom http://localhost:3000/repl-demo
+
 lein trampoline cljsbuild repl-launch firefox-naked
+
 lein trampoline cljsbuild repl-launch phantom-naked
 
 [1]: https://github.com/mmcgrana/ring

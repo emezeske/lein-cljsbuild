@@ -13,6 +13,7 @@
   '[[cljsbuild "0.1.0"]])
 
 (def repl-output-dir ".lein-cljsbuild-repl")
+(def default-compiler-output-dir ".lein-cljsbuild-compiler")
 
 (def default-global-options
   {:repl-launch-commands {}
@@ -21,8 +22,7 @@
 (def default-compiler-options
   {:output-to "main.js"
    :optimizations :whitespace
-   :pretty-print true
-   :output-dir ".lein-cljsbuild-compiler"})
+   :pretty-print true})
 
 (def default-build-options
   {:source-path "src-cljs"
@@ -143,6 +143,18 @@
 (defn- set-default-build-options [options]
   (deep-merge default-build-options options))
 
+(defn- set-default-output-dirs [options]
+  (let [output-dir-key [:compiler :output-dir]
+        builds
+         (for [[build counter] (map vector (:builds options) (range))]
+           (if (get-in build output-dir-key)
+             build
+             (assoc-in build output-dir-key
+               (str default-compiler-output-dir "-" counter))))]
+    (if (apply distinct? (map #(get-in % output-dir-key) builds))
+      (assoc options :builds builds)
+      (throw (Exception. "Compiler :output-dir options must be distinct.")))))
+
 (defn- set-default-global-options [options]
   (deep-merge default-global-options
     (assoc options :builds
@@ -159,15 +171,16 @@
 (defn- normalize-options
   "Sets default options and accounts for backwards compatibility."
   [options]
-  (cond
-    (and (map? options) (nil? (:builds options)))
-      (warn-deprecated
-        [{:builds (set-default-build-options options)}])
-    (seq? options)
-      (warn-deprecated
-        [{:builds (map set-default-build-options options)}])
-    :else
-      (set-default-global-options options)))
+  (set-default-output-dirs
+    (cond
+      (and (map? options) (nil? (:builds options)))
+        (warn-deprecated
+          [{:builds (set-default-build-options options)}])
+      (seq? options)
+        (warn-deprecated
+          [{:builds (map set-default-build-options options)}])
+      :else
+        (set-default-global-options options))))
 
 (defn- extract-options
   "Given a project, returns a seq of cljsbuild option maps."

@@ -61,11 +61,16 @@
 
 (defn- compile-cljs [cljs-path compiler-options]
   (let [output-file (:output-to compiler-options)
-        output-dir (fs/parent output-file)]
+        output-file-dir (fs/parent output-file)]
     (println-safe (str "Compiling " output-file " from " cljs-path "..."))
     (flush)
-    (when output-dir
-      (fs/mkdirs output-dir))
+    ; FIXME: I do not trust the ClojureScript compiler's cljs/js caching in the
+    ;        output-dir.  It seems to forget to rebuild things sometimes, and
+    ;        it's a PITA to debug.  This probably slows down compilation, but
+    ;        for the moment it is better than the alternative.
+    (fs/delete-dir (:output-dir compiler-options))
+    (when output-file-dir
+      (fs/mkdirs output-file-dir))
     (let [started-at (. System (nanoTime))]
       (try
         (build cljs-path compiler-options)
