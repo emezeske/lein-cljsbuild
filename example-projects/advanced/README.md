@@ -39,7 +39,8 @@ allowing you to execute arbitrary ClojureScript code in the context of the `repl
 There's also a launcher configured for a "naked" page.  This is just a simple static
 HTML page that will connect to the REPL.  This is convenient when you want to run
 a ClojureScript REPL with access to your project, but don't need a specific page to
-be loaded at the time:
+be loaded at the time.  The biggest advantage to the "naked" launcher is that you don't
+need to have your app running in the background:
 
     $ lein trampoline cljsbuild repl-launch firefox-naked
 
@@ -63,7 +64,8 @@ where you don't need to open a full browser UI.
 
 As with the Firefox example, there's a launch configured for a "naked" page.  This is probably
 the most convenient way to launch a REPL when you just want to try running a couple snippets
-of ClojureScript code:
+of ClojureScript code.  As with the "firefox-naked" launcher, you don't need your app to be
+running in the background:
 
     $ lein trampoline cljsbuild repl-launch phantom-naked
 
