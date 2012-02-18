@@ -1,22 +1,19 @@
 # lein-cljsbuild
 
-This is a leiningen plugin that makes it easy (and quick) to compile
-ClojureScript source into JavaScript.  It's similar to
-[cljs-watch] (https://github.com/ibdknox/cljs-watch)
-but is driven via lein instead of via a standalone executable.  This means
-that your project can depend on a specific version of lein-cljsbuild, fetch
-it via `lein deps`, and you don't have to install any special executables into
-your `PATH`.
+This is a Leiningen plugin that makes it quick and easy to automatically compile
+your ClojureScript code into Javascript whenever you make changes to it.  It's simple
+to install and allows you to configure the ClojureScript compiler from within your
+`project.clj` file.
 
-Also, this plugin has built-in support for seamlessly sharing code between
-your Clojure server-side project and your ClojureScript client-side project.
+Beyond basic compiler support, lein-cljsbuild can optionally help with a few other things:
+    * [Sharing code between Clojure and ClojureScript] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/doc/REPL.md)
+    * [Launching REPLs for interactive development] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/doc/CROSSOVERS.md)
 
 ## Requirements
 
 The lein-cljsbuild plugin works with
 [Leiningen] (https://github.com/technomancy/leiningen/blob/master/README.md)
-version `1.6.2` or higher,
-although 1.7.0 or higher is recommended.
+version `1.6.2` or higher, although `1.7.0` or higher is recommended.
 
 ## Installation
 
@@ -44,11 +41,17 @@ Make sure you pull down the jar file:
 
 ## Just Give Me a Damned Example Already!
 
-See the `example-projects` directory for a couple of simple examples
-of how to use lein-cljsbuild.
+See the
+[example-projects] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/example-projects)
+directory for a couple of simple examples of how to use lein-cljsbuild.  The
+[simple project] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/example-projects/simple)
+shows a dead-simple "compile only" configuration, which is a good place to start.  The
+[advanced project] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/example-projects/advanced)
+contains examples of how to use the extended features of the plugin.
 
-Also, see the `sample.project.clj` file in this directory for an
-exhaustive list of all options supported by lein-cljsbuild.
+Also, see the
+[sample.project.clj] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/sample.project.clj)
+file for an exhaustive list of all options supported by lein-cljsbuild.
 
 ## Basic Configuration
 
@@ -70,10 +73,11 @@ of your `project.clj` file.  A simple project might look like this:
           :pretty-print true}}]})
 ```
 
-For an exhaustive list of the configuration options supported by lein-cljsbuild,
-see the `sample.project.clj` file in this directory.
+For an exhaustive list of the configuration options supported by lein-cljsbuild, see the
+[sample.project.clj] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/sample.project.clj)
+file.
 
-##  Usage
+## Basic Usage
 
 Once the plugin is installed, you can build the ClojureScript once:
 
@@ -129,250 +133,23 @@ This is extremely convenient for doing library development in ClojureScript.
 This allows cljsbuild to compile in all four optimization levels at once, for
 easier testing, or to compile a test suite alongside the library code.
 
-See the `example-projects/advanced` directory for a working example of a
-project that uses this feature.
+See the
+[example-projects/advanced] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/example-projects/advanced)
+directory for a working example of a project that uses this feature.
 
 ## REPL Support
 
 Lein-cljsbuild has built-in support for launching ClojureScript REPLs in a variety
-of ways.  Note as of Leiningen 1.x, all plugin REPL commands must be launched
-via `lein trampoline` to work correctly.
+of ways.  See the
+[REPL documentation] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/doc/REPL.md)
+for more details.
 
-### repl-rhino
-
-The simplest REPL uses Rhino to evaluate the JavaScript that results from compiling
-your ClojureScript input.  This REPL does not have access to your project's namespaces,
-and is not evaluated in a browser context.  It is, however, useful for running simple
-pure-ClojureScript commands.  It is also the only REPL option that does not require
-your application to provide additional support code:
-
-    $ lein trampoline cljsbuild repl-rhino
-
-### repl-listen
-
-The next REPL is more sophisticated.  With support from your application, it is possible
-to use `repl-listen` to run a REPL with access to your application's ClojureScript namespaces.
-The REPL may be started as follows:
-
-    $ lein trampoline cljsbuild repl-listen
-
-This will open a REPL, which will listen on a TCP port for a ClojureScript application
-to connect to it.  By default, it will listen on port `9000`, although this may be changed
-via the `:repl-listen-port` option.  Until a connection is received, the REPL will not be
-usable.
-
-From your application, you can connect to the REPL with code such as this:
-
-```clj
-(ns lein-cljsbuild-example.repl
-   (:require [clojure.browser.repl :as repl]))
-; Use of "localhost" will only work for local development.
-; Change the port to match the :repl-listen-port.
-(repl/connect "http://localhost:9000/repl")
-```
-
-For instance, you might include the above call to `repl/connect` in the code for
-a particular web page served by your application.  So, you would launch your application,
-launch `repl-listen`, and then browse to that page.  It would then connect to the REPL,
-enabling you to execute commands in the context of that page.
-
-For more information on this approach, see the
-[ClojureScript Wiki] (https://github.com/clojure/clojurescript/wiki/Quick-Start).
-
-### repl-launch
-
-Finally, the most sophisticated REPL.  Like `repl-listen`, `repl-launch` requires
-application support code to function.  The difference between `repl-listen` and `repl-launch`
-is that the latter may be configured to automatically launch the browser after starting
-the REPL.  This REPL is launched as follows:
-
-    $ lein trampoline cljsbuild repl-launch <launch-id>
-
-Of course, this won't work until you've told lein-cljsbuild what to launch.  Multiple
-launch presets may be created, and thus the `<launch-id>` parameter is used to select
-between them.  To configure a launch preset, add an entry to the `:repl-launch-commands` map:
-
-```clj
-(defproject lein-cljsbuild-example "1.2.3"
-  :plugins [[lein-cljsbuild "0.1.0"]]
-  :cljsbuild {
-    :repl-listen-port 9000
-    :repl-launch-commands
-      {"my-launch" ["firefox" "-jsconsole" "http://localhost/my-page"]})
-```
-
-With this configuration, the launch preset is identified by `my-launch`.  When a REPL
-is started with this launch preset, `firefox -jsconsole http://localhost/my-page`
-will be run in the background, and presumably the page it loads will connect to the REPL:
-
-    $ lein trampoline cljsbuild repl-launch my-launch
-
-Note that any additional arguments following the `<launch-id>` will be passed to the
-launch command.  Thus, with a configuration such as:
-
-```clj
-:repl-launch-commands
-  {"my-other-launch" ["firefox" "-jsconsole"}
-```
-
-The target URL could be selected like so:
-
-    $ lein trampoline cljsbuild repl-launch my-other-launch http://localhost/another-page
-
-For more ideas on how to use `repl-launch`, take a look at `example-projects/advanced`.
-It has several examples of useful launch commands, with descriptions in its README.
-Note that, in particular, the possibilities with
-[PhantomJS] (http://www.phantomjs.org)
-are very intriguing.
-
-## Sharing Code Between Clojure and ClojureScript
+# Sharing Code Between Clojure and ClojureScript
 
 Sharing code with lein-cljsbuild is accomplished via the configuration
-of "crossovers".  A crossover specifies a Clojure namespace, the content
-of which should be copied into your ClojureScript project.  This can be any
-namespace that is available via the Java CLASSPATH, which includes your
-project's main :source-path by default.
-
-When a crossover namespace is provided by your current project (either via the
-main :source-dir or one of the :extra-classpath-dirs in your project.clj file),
-the files that make up that namespace (recursively) will be monitored for changes,
-and will be copied to the ClojureScript project whenever modified.
-
-Crossover namespaces provided by jar files cannot be searched recursively, and
-thus must be specified on a per-file basis.  They are copied over once, when
-lein-cljsbuild begins compilation, and are not monitored for changes.
-
-Of course, remember that since the namespace will be used by both Clojure
-and ClojureScript, it will need to only use the subset of features provided by
-both languages.
-
-Assuming that your top-level directory structure looks something like this:
-
-<pre>
-├── src-clj
-│   └── example
-│       ├── core.clj
-│       ├── something.clj
-│       └── crossover
-│           ├── some_stuff.clj
-│           └── some_other_stuff.clj
-└── src-cljs
-    └── example
-        ├── core.cljs
-        ├── whatever.cljs
-        └── util.cljs
-</pre>
-
-And your `project.clj` file looks like this:
-
-```clj
-(defproject lein-cljsbuild-example "1.2.3"
-  :plugins [[lein-cljsbuild "0.1.0"]]
-  :source-path "src-clj"
-  :cljsbuild {
-    :builds [{
-      :source-path "src-cljs"
-      ; Each entry in the :crossovers vector describes a Clojure namespace
-      ; that is meant to be used with the ClojureScript code as well.
-      ; The files that make up this namespace will be automatically copied
-      ; into the ClojureScript source path whenever they are modified.
-      :crossovers [example.crossover]
-      :compiler {
-        :output-to "war/javascripts/main.js"  ; default: main.js in current directory
-        :optimizations :whitespace
-        :pretty-print true}}]})
-```
-
-Then lein-cljsbuild would copy files from `src-clj/example/crossover`
-to `src-cljs/example/crossover`, and you'd end up with this:
-
-<pre>
-├── src-clj
-│   └── example
-│       ├── a_file.clj
-│       ├── core.clj
-│       └── crossover
-│           ├── some_stuff.clj
-│           └── some_other_stuff.clj
-└── src-cljs
-    └── example
-        ├── a_different_file.cljs
-        ├── crossover
-        │   ├── some_stuff.cljs
-        │   └── some_other_stuff.cljs
-        ├── whatever.cljs
-        └── util.cljs
-</pre>
-
-With this setup, you would probably want to add `src-cljs/example/crossover`
-to your `.gitignore` file (or equivalent), as its contents are updated automatically
-by lein-cljsbuild.
-
-## Sharing Macros Between Clojure and ClojureScript
-
-In ClojureScript, macros are still written in Clojure, and can not be written
-in the same file as actual ClojureScript code.  Also, to use them in a ClojureScript
-namespace, they must be required via `:require-macros` rather than the usual `:require`.
-
-This makes using the crossover feature to share macros between Clojure and ClojureScript
-a bit difficult, but lein-cljsbuild has some special constructs to make it possible.
-
-Three things need to be done to use lein-cljsbuild to share macros.
-
-### 1. Keep Macros in Separate Files
-
-These examples assume that your project uses the  `src-clj/example/crossover`
-directory, and that all of the macros are in a file called
-`src-clj/example/crossover/macros.clj`.
-
-### 2. Tell lein-cljsbuild Which Files Contain Macros
-
-Add this magical comment to any crossover files that contain macros:
-
-```clj
-;*CLJSBUILD-MACRO-FILE*;
-```
-
-This tells lein-cljsbuild to refrain from copying the `.clj` files
-into the ClojureScript directory.  This step can be skipped if the
-macro file is not included in any of the crossover namespaces.
-
-### 3. Use Black Magic to Require Macros Specially
-
-In any crossover Clojure file, lein-cljsbuild will automatically erase the
-following string (if it appears):
-
-```clj
-;*CLJSBUILD-REMOVE*;
-```
-
-This magic can be used to generate a `ns` statement that will work in both
-Clojure and ClojureScript:
-
-```clj
-(ns example.crossover.some_stuff
-  (:require;*CLJSBUILD-REMOVE*;-macros
-    [example.crossover.macros :as macros]))
-```
-
-Thus, after removing comments, Clojure will see:
-
-```clj
-(ns example.crossover.some_stuff
-  (:require
-    [example.crossover.macros :as macros]))
-```
-
-However, lein-cljsbuild will remove the `;*CLJSBUILD-REMOVE*;` string entirely,
-before copying the file.  Thus, ClojureScript will see:
-
-```clj
-(ns example.crossover.some_stuff
-  (:require-macros
-    [example.crossover.macros :as macros]))
-```
-
-And thus the macros can be shared.
+of "crossovers".  See the
+[crossovers documentation] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/doc/CROSSOVERS.md)
+for more details.
 
 ##  License
 
