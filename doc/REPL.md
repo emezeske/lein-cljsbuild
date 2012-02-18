@@ -47,7 +47,7 @@ For more information on this approach, see the
 
 ## repl-launch
 
-Finally, the most sophisticated REPL.  Like `repl-listen`, `repl-launch` requires
+This is the most sophisticated REPL.  Like `repl-listen`, `repl-launch` requires
 application support code to function.  The difference between `repl-listen` and `repl-launch`
 is that the latter may be configured to automatically launch the browser after starting
 the REPL.  This REPL is launched as follows:
