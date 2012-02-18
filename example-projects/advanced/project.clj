@@ -13,14 +13,19 @@
                                               com.sun.jmx/jmxri]]]
   :dev-dependencies [[lein-ring "0.5.0"]]
   :plugins [[lein-cljsbuild "0.1.0"]]
+  ; Enable the "lein clean" and "lein compile" hooks.
   :hooks [leiningen.cljsbuild]
   :cljsbuild {
+    ; Configure the REPL support; see the README.md file for more details.
     :repl-listen-port 9000
     :repl-launch-commands
       {"firefox" ["firefox"]
        "firefox-naked" ["firefox" "resources/public/html/naked.html"]
        "phantom" ["phantomjs" "phantom/page-repl.js"]
        "phantom-naked" ["phantomjs" "phantom/page-repl.js" "resources/public/html/naked.html"]}
+    ; Configure two separate builds; one with few optimizations for
+    ; development/debugging, and one with many optimizations for
+    ; production use.
     :builds [
       {:source-path "src-cljs"
        :jar true
