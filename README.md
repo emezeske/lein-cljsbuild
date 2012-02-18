@@ -1,7 +1,7 @@
 # lein-cljsbuild
 
 This is a Leiningen plugin that makes it quick and easy to automatically compile
-your ClojureScript code into Javascript whenever you make changes to it.  It's simple
+your ClojureScript code into Javascript whenever you modify it.  It's simple
 to install and allows you to configure the ClojureScript compiler from within your
 `project.clj` file.
 
