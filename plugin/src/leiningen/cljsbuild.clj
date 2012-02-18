@@ -1,13 +1,14 @@
 (ns leiningen.cljsbuild
   "Compile ClojureScript source into a JavaScript file."
   (:require
-   [clojure.java.io :as io]
-   [clojure.pprint :as pprint]
-   [clojure.string :as s]
-   [robert.hooke :as hooke]
-   [leiningen.compile :as lcompile]
-   [leiningen.clean :as lclean]
-   [leiningen.jar :as ljar]))
+    [clojure.java.io :as io]
+    [clojure.pprint :as pprint]
+    [clojure.string :as s]
+    [fs.core :as fs]
+    [robert.hooke :as hooke]
+    [leiningen.compile :as lcompile]
+    [leiningen.clean :as lclean]
+    [leiningen.jar :as ljar]))
 
 (def cljsbuild-dependencies
   '[[cljsbuild "0.1.0"]])
@@ -91,6 +92,7 @@
         (shutdown-agents))))
 
 (defn- cleanup-files [project {:keys [builds]}]
+  (fs/delete-dir repl-output-dir)
   (run-local-project project builds
     '(require 'cljsbuild.compiler)
     `(do
