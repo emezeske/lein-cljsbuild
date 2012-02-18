@@ -6,8 +6,8 @@ to install and allows you to configure the ClojureScript compiler from within yo
 `project.clj` file.
 
 Beyond basic compiler support, lein-cljsbuild can optionally help with a few other things:
-    * [Sharing code between Clojure and ClojureScript] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/doc/REPL.md)
-    * [Launching REPLs for interactive development] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/doc/CROSSOVERS.md)
+* [Sharing code between Clojure and ClojureScript] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/doc/CROSSOVER.md)
+* [Launching REPLs for interactive development] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/doc/REPL.md)
 
 ## Requirements
 
