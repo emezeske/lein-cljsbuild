@@ -7,7 +7,7 @@ namespace that is available via the Java CLASSPATH, which includes your
 project's main :source-path by default.
 
 When a crossover namespace is provided by your current project (either via the
-main :source-dir or one of the :extra-classpath-dirs in your project.clj file),
+main `:source-dir` or one of the `:extra-classpath-dirs` in your project.clj file),
 the files that make up that namespace (recursively) will be monitored for changes,
 and will be copied to the ClojureScript project whenever modified.
 

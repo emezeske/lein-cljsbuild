@@ -85,7 +85,8 @@ The target URL could be selected like so:
 
     $ lein trampoline cljsbuild repl-launch my-other-launch http://localhost/another-page
 
-For more ideas on how to use `repl-launch`, take a look at `example-projects/advanced`.
+For more ideas on how to use `repl-launch`, take a look at the
+[advanced example project] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/example-projects/advanced)
 It has several examples of useful launch commands, with descriptions in its README.
 Note that, in particular, the possibilities with
 [PhantomJS] (http://www.phantomjs.org)
