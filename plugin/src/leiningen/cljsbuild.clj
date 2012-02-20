@@ -25,11 +25,8 @@
    :crossover-path "crossover-cljs"
    :crossovers []})
 
-; TODO
-; Document the new crossovers beahvior.... :crossover-path
-; Add a :crossover-jar boolean option?
-; Write a "migrating from 0.0.x to 0.1.x" doc... :(
-; TODO
+; TODO Add a :crossover-jar boolean option?
+; TODO Write a "migrating from 0.0.x to 0.1.x" doc... :(
 
 (def default-compiler-options
   {:output-to "main.js"
@@ -50,7 +47,7 @@
 (defn- warn [& args]
   (apply printerr "WARNING:" args))
 
-; TODO Dedupliclate this with the docstring below.
+; TODO Dedupliclate this with the docstring below?
 (defn- usage []
   (printerr "Usage: lein cljsbuild [once|auto|clean|test|repl-listen|repl-launch|repl-rhino]"))
 
