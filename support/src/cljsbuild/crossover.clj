@@ -60,17 +60,20 @@
         ns-file-path (str ns-path ".clj")
         as-file (resource ns-file-path)
         file-parent (truncate-uri-path as-file (.length ns-file-path))
-        resources (conj
-                    (map vector (repeat dir-parent) recurse-dirs)
-                    [file-parent as-file])]
+        all-resources (conj
+                        (map vector (repeat dir-parent) recurse-dirs)
+                        [file-parent as-file])
+        resources (remove
+                    (fn [[_ file]]
+                      (or (nil? file) (is-macro-file? file)))
+                    all-resources)]
     (when (empty? resources)
       (fail "Unable to find crossover: " crossover))
     resources))
 
 (defn- find-crossovers [crossovers]
   (distinct
-    (remove (fn [[_ file]] (or (nil? file) (is-macro-file? file)))
-      (mapcat find-crossover crossovers))))
+    (mapcat find-crossover crossovers)))
 
 (defn- crossover-needs-update? [from-resource to-file]
   (let [exists (fs/exists? to-file)]
