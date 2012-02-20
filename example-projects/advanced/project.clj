@@ -25,6 +25,7 @@
        "phantom-naked" ["phantomjs" "phantom/repl.js" "resources/private/html/naked.html"]}
     :test-commands
       {"unit" ["phantomjs" "phantom/unit-test.js" "resources/private/html/unit-test.html"]}
+    ; TODO Comment out of date
     ; Configure two separate builds; one with few optimizations for
     ; development/debugging, and one with many optimizations for
     ; production use.
