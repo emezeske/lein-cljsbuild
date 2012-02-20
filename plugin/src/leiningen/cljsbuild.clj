@@ -15,7 +15,6 @@
   '[[cljsbuild "0.1.0"]])
 
 (def repl-output-path ".lein-cljsbuild-repl")
-(def crossover-path ".lein-cljsbuild-crossover")
 (def compiler-output-dir-base ".lein-cljsbuild-compiler-")
 
 (def default-global-options
@@ -23,10 +22,8 @@
    :repl-listen-port 9000
    :test-commands {}
    :crossover-path "crossover-cljs"
+   :crossover-jar false
    :crossovers []})
-
-; TODO Add a :crossover-jar boolean option?
-; TODO Write a "migrating from 0.0.x to 0.1.x" doc... :(
 
 (def default-compiler-options
   {:output-to "main.js"
@@ -35,6 +32,7 @@
 
 (def default-build-options
   {:source-path "src-cljs"
+   :jar false
    :compiler default-compiler-options})
 
 (def exit-success 0)
@@ -122,7 +120,7 @@
           (:compiler opts#)))
       '~builds)))
 
-(defn- run-tests [project {:keys [test-commands builds]} args]
+(defn- run-tests [project {:keys [test-commands crossover-path builds]} args]
   (when (> (count args) 1)
     (throw (Exception. "Only expected zero or one arguments.")))
   (let [selected-tests (if (empty? args)
@@ -285,8 +283,12 @@ Available commands:
 (defn- get-filespecs
   "Returns a seq of filespecs for cljs dirs (as passed to leiningen.jar/write-jar)"
   [project]
-  (let [builds (extract-options project)
-        paths (map :source-path (filter :jar builds))]
+  (let [options (extract-options project)
+        builds (:builds options)
+        build-paths (map :source-path (filter :jar builds))
+        paths (if (:crossover-jar options)
+                (conj build-paths (:crossover-path options))
+                build-paths)]
     (mapcat path-filespecs paths)))
 
 (defn compile-hook [task & args]

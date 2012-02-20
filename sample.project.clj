@@ -44,8 +44,9 @@
     ; "Sharing Code Between Clojure and Clojurescript" section for more details.
     ; Defaults to the empty vector [].
     :crossovers [example.crossover]
-    ; TODO: Document :crossovers-jar once that's added.
-    ; :crossovers-jar true
+    ; TODO: Document :crossover-jar once that's added.
+    ; :crossover-jar true
+    ; :crossover-path true
     ; The :builds option should be set to a sequence of maps.  Each
     ; map will be treated as a separate, independent, ClojureScript
     ; compiler configuration

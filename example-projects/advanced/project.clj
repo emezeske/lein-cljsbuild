@@ -30,6 +30,7 @@
     ; development/debugging, and one with many optimizations for
     ; production use.
     :crossovers [example.crossover]
+    :crossover-jar true
     :builds [
       {:source-path "src-cljs"
        :jar true
