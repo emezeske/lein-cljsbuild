@@ -6,11 +6,19 @@ if (phantom.args.length != 1) {
 var page = new WebPage();
 var url = phantom.args[0];
 
+page.onConsoleMessage = function (message) {
+    console.log("App console: " + message);
+};
+
+console.log("Loading URL: " + url);
+
 page.open(url, function (status) {
     if (status != "success") {
         console.log('Failed to open ' + url);
         phantom.exit(1);
     }
 
-    // TODO: Should anything else happen here?
+    console.log("Loaded successfully.");
+
+    // TODO: Somehow gracefully exit when the REPL is closed?
 });

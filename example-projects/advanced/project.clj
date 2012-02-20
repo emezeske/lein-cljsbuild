@@ -20,22 +20,27 @@
     :repl-listen-port 9000
     :repl-launch-commands
       {"firefox" ["firefox"]
-       "firefox-naked" ["firefox" "resources/public/html/naked.html"]
-       "phantom" ["phantomjs" "phantom/page-repl.js"]
-       "phantom-naked" ["phantomjs" "phantom/page-repl.js" "resources/public/html/naked.html"]}
+       "firefox-naked" ["firefox" "resources/private/html/naked.html"]
+       "phantom" ["phantomjs" "phantom/repl.js"]
+       "phantom-naked" ["phantomjs" "phantom/repl.js" "resources/private/html/naked.html"]}
+    :test-commands
+      {"unit" ["phantomjs" "phantom/unit-test.js" "resources/private/html/unit-test.html"]}
     ; Configure two separate builds; one with few optimizations for
     ; development/debugging, and one with many optimizations for
     ; production use.
+    :crossovers [example.crossover]
     :builds [
       {:source-path "src-cljs"
        :jar true
-       :crossovers [example.crossover]
        :compiler {:output-to "resources/public/js/main-debug.js"
                   :optimizations :whitespace
                   :pretty-print true}}
       {:source-path "src-cljs"
-       :crossovers [example.crossover]
        :compiler {:output-to "resources/public/js/main.js"
                   :optimizations :advanced
-                  :pretty-print false}}]}
+                  :pretty-print false}}
+      {:source-path "test-cljs"
+       :compiler {:output-to "resources/private/js/unit-test.js"
+                  :optimizations :whitespace
+                  :pretty-print true}}]}
   :ring {:handler example.routes/app})

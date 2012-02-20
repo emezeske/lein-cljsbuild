@@ -5,20 +5,31 @@
     [clojure.pprint :as pprint]
     [clojure.string :as s]
     [fs.core :as fs]
-    [robert.hooke :as hooke]
-    [leiningen.compile :as lcompile]
     [leiningen.clean :as lclean]
-    [leiningen.jar :as ljar]))
+    [leiningen.compile :as lcompile]
+    [leiningen.jar :as ljar]
+    [leiningen.test :as ltest]
+    [robert.hooke :as hooke]))
 
 (def cljsbuild-dependencies
   '[[cljsbuild "0.1.0"]])
 
-(def repl-output-dir ".lein-cljsbuild-repl")
-(def default-compiler-output-dir ".lein-cljsbuild-compiler")
+(def repl-output-path ".lein-cljsbuild-repl")
+(def crossover-path ".lein-cljsbuild-crossover")
+(def compiler-output-dir-base ".lein-cljsbuild-compiler-")
 
 (def default-global-options
   {:repl-launch-commands {}
-   :repl-listen-port 9000})
+   :repl-listen-port 9000
+   :test-commands {}
+   :crossover-path "crossover-cljs"
+   :crossovers []})
+
+; TODO
+; Document the new crossovers beahvior.... :crossover-path
+; Add a :crossover-jar boolean option?
+; Write a "migrating from 0.0.x to 0.1.x" doc... :(
+; TODO
 
 (def default-compiler-options
   {:output-to "main.js"
@@ -27,11 +38,9 @@
 
 (def default-build-options
   {:source-path "src-cljs"
-   :crossovers [] 
    :compiler default-compiler-options})
 
 (def exit-success 0)
-
 (def exit-failure 1)
 
 (defn- printerr [& args]
@@ -41,8 +50,9 @@
 (defn- warn [& args]
   (apply printerr "WARNING:" args))
 
+; TODO Dedupliclate this with the docstring below.
 (defn- usage []
-  (printerr "Usage: lein cljsbuild [once|auto|clean|repl-listen|repl-launch|repl-rhino]"))
+  (printerr "Usage: lein cljsbuild [once|auto|clean|test|repl-listen|repl-launch|repl-rhino]"))
 
 (declare deep-merge-item)
 
@@ -61,62 +71,89 @@
     (map (fn [[k v]] (vec (cons k v)))
       (merge project cljsbuild))))
 
-(defn- run-local-project [project builds requires form]
+(defn- run-local-project [project crossover-path builds requires form]
   (lcompile/eval-in-project
     {:local-repo-classpath true
      :source-path (:source-path project)
      :extra-classpath-dirs (concat
                              (:extra-classpath-dirs project)
-                             (map :source-path builds))
+                             (map :source-path builds)
+                             [crossover-path])
      :dependencies (merge-dependencies (:dependencies project))
      :dev-dependencies (:dev-dependencies project)}
-    form
+     `(do
+       ~form
+       (shutdown-agents))
     nil
     nil
     requires)
   exit-success)
 
-(defn- run-compiler [project {:keys [builds]} watch?]
-  (run-local-project project builds
-    '(require 'cljsbuild.compiler)
+(defn- run-compiler [project {:keys [crossover-path crossovers builds]} watch?]
+  (println "Compiling ClojureScript.")
+  ; If crossover-path does not exist before eval-in-project is called,
+  ; the files it contains won't be classloadable, for some reason.
+  (fs/mkdirs crossover-path)
+  (run-local-project project crossover-path builds
+    '(require 'cljsbuild.compiler 'cljsbuild.crossover 'cljsbuild.util)
     `(do
-      (println "Compiling ClojureScript.")
-      (cljsbuild.compiler/in-threads
-        (fn [opts#]
-          (cljsbuild.compiler/run-compiler
-            (:source-path opts#)
-            (:crossovers opts#)
-            (:compiler opts#)
-            ~watch?))
-        '~builds)
-        (shutdown-agents))))
+      (letfn [(copy-crossovers# []
+                (cljsbuild.crossover/copy-crossovers
+                  ~crossover-path
+                  '~crossovers))]
+        (copy-crossovers#)
+        (when ~watch?
+          (cljsbuild.util/once-every 1000 "copying crossovers" copy-crossovers#))
+        (cljsbuild.util/in-threads
+          (fn [opts#]
+            (cljsbuild.compiler/run-compiler
+              (:source-path opts#)
+              ~crossover-path
+              (:compiler opts#)
+              ~watch?))
+          '~builds)))))
 
-(defn- cleanup-files [project {:keys [builds]}]
-  (fs/delete-dir repl-output-dir)
-  (run-local-project project builds
-    '(require 'cljsbuild.compiler)
-    `(do
-      (println "Deleting generated files.")
-      (cljsbuild.compiler/in-threads
-        (fn [opts#]
-          (cljsbuild.compiler/cleanup-files
-            (:source-path opts#)
-            (:crossovers opts#)
-            (:compiler opts#)))
-      '~builds)
-      (shutdown-agents))))
+(defn- cleanup-files [project {:keys [crossover-path builds]}]
+  (println "Deleting ClojureScript-related generated files.")
+  (fs/delete-dir repl-output-path)
+  (fs/delete-dir crossover-path)
+  (run-local-project project crossover-path builds
+    '(require 'cljsbuild.clean 'cljsbuild.util)
+    `(cljsbuild.util/in-threads
+      (fn [opts#]
+        (cljsbuild.clean/cleanup-files
+          (:compiler opts#)))
+      '~builds)))
 
-(defn- run-repl-listen [project {:keys [builds repl-listen-port]}]
-  (run-local-project project builds
+(defn- run-tests [project {:keys [test-commands builds]} args]
+  (when (> (count args) 1)
+    (throw (Exception. "Only expected zero or one arguments.")))
+  (let [selected-tests (if (empty? args)
+                         (do
+                           (println "Running all ClojureScript tests.")
+                           (vec (vals test-commands)))
+                         (do
+                           (println "Running ClojureScript test:" (first args))
+                           [(test-commands (first args))]))]
+  (run-local-project project crossover-path builds
+    '(require 'cljsbuild.test)
+    `(cljsbuild.test/run-tests ~selected-tests))))
+
+(defn- run-compiler-and-tests [project options args]
+  (let [compile-result (run-compiler project options false)]
+    (if (not= compile-result exit-success)
+      compile-result
+      (run-tests project options args))))
+
+(defn- run-repl-listen [project {:keys [crossover-path builds repl-listen-port]}]
+  (println (str "Running ClojureScript REPL, listening on port " repl-listen-port "."))
+  (run-local-project project crossover-path builds
     '(require 'cljsbuild.repl.listen)
-    `(do
-      (println (str "Running REPL, listening on port " ~repl-listen-port "."))
-      (cljsbuild.repl.listen/run-repl-listen
-        ~repl-listen-port
-        ~repl-output-dir)
-      (shutdown-agents))))
+    `(cljsbuild.repl.listen/run-repl-listen
+      ~repl-listen-port
+      ~repl-output-path)))
 
-(defn- run-repl-launch [project {:keys [builds repl-listen-port repl-launch-commands]} args]
+(defn- run-repl-launch [project {:keys [crossover-path builds repl-listen-port repl-launch-commands]} args]
   (when (< (count args) 1)
     (throw (Exception. "Must supply a launch command identifier.")))
   (let [launch-name (first args)
@@ -125,22 +162,19 @@
     (when (nil? command-base)
       (throw (Exception. (str "Unknown REPL launch command: " launch-name))))
     (let [command (concat command-base command-args)]
-      (run-local-project project builds
+      (println "Running ClojureScript REPL and launching command:" command)
+      (run-local-project project crossover-path builds
         '(require 'cljsbuild.repl.listen)
-        `(do
-          (println "Running REPL and launching command:" '~command)
-          (cljsbuild.repl.listen/run-repl-launch
+        `(cljsbuild.repl.listen/run-repl-launch
             ~repl-listen-port
-            ~repl-output-dir
-            '~command)
-          (shutdown-agents))))))
+            ~repl-output-path
+            '~command)))))
 
-(defn- run-repl-rhino [project {:keys [builds]}]
-  (run-local-project project builds 
+(defn- run-repl-rhino [project {:keys [crossover-path builds]}]
+  (println "Running Rhino-based ClojureScript REPL.")
+  (run-local-project project crossover-path builds 
     '(require 'cljsbuild.repl.rhino)
-    `(do
-      (println "Running Rhino-based REPL.")
-      (cljsbuild.repl.rhino/run-repl-rhino))))
+    `(cljsbuild.repl.rhino/run-repl-rhino)))
 
 (defn- set-default-build-options [options]
   (deep-merge default-build-options options))
@@ -152,10 +186,10 @@
            (if (get-in build output-dir-key)
              build
              (assoc-in build output-dir-key
-               (str default-compiler-output-dir "-" counter))))]
+               (str compiler-output-dir-base counter))))]
     (if (apply distinct? (map #(get-in % output-dir-key) builds))
       (assoc options :builds builds)
-      (throw (Exception. "Compiler :output-dir options must be distinct.")))))
+      (throw (Exception. (str "All " output-dir-key " options must be distinct."))))))
 
 (defn- set-default-global-options [options]
   (deep-merge default-global-options
@@ -202,6 +236,7 @@ Available commands:
   once          Compile the ClojureScript project once.
   auto          Automatically recompile when files are modified.
   clean         Remove automatically generated files.
+  test          Run ClojureScript tests.
 
   repl-listen   Run a REPL that will listen for incoming connections.
   repl-launch   Run a REPL and launch a custom command to connect to it.
@@ -215,6 +250,7 @@ Available commands:
          "once" (run-compiler project options false)
          "auto" (run-compiler project options true)
          "clean" (cleanup-files project options)
+         "test" (run-compiler-and-tests project options args)
          "repl-listen" (run-repl-listen project options)
          "repl-launch" (run-repl-launch project options args)
          "repl-rhino" (run-repl-rhino project options)
@@ -257,16 +293,26 @@ Available commands:
     (mapcat path-filespecs paths)))
 
 (defn compile-hook [task & args]
-  (cljsbuild (first args) "once")
-  (apply task args))
+  (let [compile-result (apply task args)]
+    (if (not= compile-result exit-success)
+      compile-result
+      (run-compiler (first args) (extract-options (first args)) false))))
+
+(defn test-hook [task & args]
+  (let [test-results [(apply task args) 
+                      (run-tests (first args) (extract-options (first args)) [])]]
+    (if (every? #(= % exit-success) test-results)
+      exit-success
+      exit-failure)))
 
 (defn clean-hook [task & args]
-  (cljsbuild (first args) "clean")
-  (apply task args))
+  (apply task args)
+  (cleanup-files (first args) (extract-options (first args))))
 
 (defn jar-hook [task & [project out-file filespecs]]
   (apply task [project out-file (concat filespecs (get-filespecs project))]))
 
 (hooke/add-hook #'lcompile/compile compile-hook)
+(hooke/add-hook #'ltest/test test-hook)
 (hooke/add-hook #'lclean/clean clean-hook)
 (hooke/add-hook #'ljar/write-jar jar-hook)

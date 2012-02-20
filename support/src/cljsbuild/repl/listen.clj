@@ -1,10 +1,10 @@
 (ns cljsbuild.repl.listen
   (:require
-    [clojure.string :as string]
-    [clojure.java.shell :as shell]
     [cljs.repl :as repl]
-    [cljs.repl.browser :as browser])
-  (:import (java.io InputStreamReader OutputStreamWriter)))
+    [cljs.repl.browser :as browser]
+    [clojure.string :as string])
+  (:import
+    (java.io InputStreamReader OutputStreamWriter)))
 
 (defn run-repl-listen [port output-dir]
   (let [env (browser/repl-env :port (Integer. port) :working-dir output-dir)]
@@ -18,12 +18,12 @@
 (defn- start-bg-command [command]
   (Thread/sleep 1000) 
   (let [process (.exec (Runtime/getRuntime) (into-array command))]
-    (.close (.getOutputStream process)) 
+    ; TODO: Maybe do something better with output; just stream it out?
     (with-open [stdout (.getInputStream process)
                 stderr (.getErrorStream process)]
       (let [[out err]
-              (for [stream [stdout stderr]]
-                (apply str (map char (stream-seq (InputStreamReader. stream "UTF-8")))))]
+             (for [stream [stdout stderr]]
+               (apply str (map char (stream-seq (InputStreamReader. stream "UTF-8")))))]
         {:process process :out out :err err}))))
 
 (defn run-repl-launch [port output-dir command]
@@ -45,5 +45,6 @@
           (println (header "Standard error from launched command:"))
           (println err)))
       (catch Exception e
+        ; TODO: destroy the process if it was started!
         (binding [*out* *err*]
           (println "Launching command failed:" e))))))

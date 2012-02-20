@@ -7,7 +7,7 @@ cljsbuild-*.*.*
 example-projects/*/*.jar
 example-projects/simple/resources
 example-projects/advanced/resources/public/js
-example-projects/*/.clojurescript-output
+example-projects/advanced/resources/private/js
+example-projects/advanced/crossover-cljs
 example-projects/*/classes
 example-projects/*/lib
-example-projects/*/src-cljs/example/crossover
