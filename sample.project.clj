@@ -35,6 +35,17 @@
        "firefox-naked" ["firefox" "resources/public/html/naked.html"]
        "phantom" ["phantomjs" "phantom/page-repl.js"]
        "phantom-naked" ["phantomjs" "phantom/page-repl.js" "resources/public/html/naked.html"]}
+    ; TODO: Document
+    :test-commands
+      {"unit" ["phantomjs" "phantom/unit-test.js" "resources/private/html/unit-test.html"]}
+    ; TODO Fix the below description.
+    ; A list of namespaces that should be copied from the Clojure :source-path
+    ; into the ClojureScript :source-path.  See the README file's
+    ; "Sharing Code Between Clojure and Clojurescript" section for more details.
+    ; Defaults to the empty vector [].
+    :crossovers [example.crossover]
+    ; TODO: Document :crossovers-jar once that's added.
+    ; :crossovers-jar true
     ; The :builds option should be set to a sequence of maps.  Each
     ; map will be treated as a separate, independent, ClojureScript
     ; compiler configuration
@@ -42,11 +53,6 @@
       ; The path under which lein-cljsbuild will look for ClojureScript
       ; files to compile.  Defaults to "src-cljs".
       :source-path "src-cljs"
-      ; A list of namespaces that should be copied from the Clojure :source-path
-      ; into the ClojureScript :source-path.  See the README file's
-      ; "Sharing Code Between Clojure and Clojurescript" section for more details.
-      ; Defaults to the empty vector [].
-      :crossovers [example.crossover]
       ; Set this key to make lein-cljsbuild hook into the "lein jar" task, and
       ; add the ClojureScript files to the jar that is created.
       :jar true

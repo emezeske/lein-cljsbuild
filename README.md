@@ -97,21 +97,33 @@ automatically generated during compilation, run:
 
 ## Hooks
 
-If you'd like your ClojureScript to be compiled when you run `lein compile`, and
-deleted when you run `lein clean`, add the following entry to your project
-configuration:
+Some common lein-cljsbuild tasks can hook into the main Leiningen tasks
+to enable ClojureScript support in each of them.  The following tasks are
+supported:
+
+    $ lein compile
+    $ lein clean
+    $ lein test
+    $ lein jar
+
+To enable ClojureScript support for these tasks, add the following entry to
+your project configuration:
 
 ```clj
 :hooks [leiningen.cljsbuild]
 ```
 
 Note that this is also required for lein-cljsbuild to hook into the `lein jar`
-task.  For that to work, you will also need to explicitly enable the `jar` hook
-by adding the following entry to your :cljsbuild configuration map:
+Note that by default the `lein jar` task does *not* package your ClojureScript
+code in the JAR file.  This feature needs to be explicitly enabled by adding
+the following entry to each of the `:builds` that you want included in the
+JAR file.
 
 ```clj
 :jar true
 ```
+
+**TODO: Document :crossovers-jar once that's added.**
 
 ## Multiple Build Configurations
 
@@ -143,6 +155,12 @@ directory for a working example of a project that uses this feature.
 Lein-cljsbuild has built-in support for launching ClojureScript REPLs in a variety
 of ways.  See the
 [REPL documentation] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/doc/REPL.md)
+for more details.
+
+## Testing Support
+
+Lein-cljsbuild has built-in support for running ClojureScript tests.  See the
+[testing documentation] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/doc/TESTING.md)
 for more details.
 
 # Sharing Code Between Clojure and ClojureScript
