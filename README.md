@@ -8,6 +8,7 @@ to install and allows you to configure the ClojureScript compiler from within yo
 Beyond basic compiler support, lein-cljsbuild can optionally help with a few other things:
 
 * [Launching REPLs for interactive development] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/doc/REPL.md)
+* [Launching ClojureScript tests] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/doc/TESTING.md)
 * [Sharing code between Clojure and ClojureScript] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/doc/CROSSOVERS.md)
 
 ## Requirements
