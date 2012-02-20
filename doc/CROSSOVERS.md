@@ -1,9 +1,5 @@
 # Sharing Code Between Clojure and ClojureScript
 
-**TODO** Fix docs W.R.T. the :crossovers option moving around.
-**TODO: Document :crossovers-jar.**
-**TODO: Document :crossovers-path.**
-
 Sharing code with lein-cljsbuild is accomplished via the configuration
 of "crossovers".  A crossover specifies a Clojure namespace, the content
 of which should be copied into your ClojureScript project.  This can be any
@@ -26,18 +22,13 @@ both languages.
 Assuming that your top-level directory structure looks something like this:
 
 <pre>
-├── src-clj
-│   └── example
-│       ├── core.clj
-│       ├── something.clj
-│       └── crossover
-│           ├── some_stuff.clj
-│           └── some_other_stuff.clj
-└── src-cljs
+└── src-clj
     └── example
-        ├── core.cljs
-        ├── whatever.cljs
-        └── util.cljs
+        ├── core.clj
+        ├── something.clj
+        └── crossover
+            ├── some_stuff.clj
+            └── some_other_stuff.clj
 </pre>
 
 And your `project.clj` file looks like this:
@@ -47,21 +38,20 @@ And your `project.clj` file looks like this:
   :plugins [[lein-cljsbuild "0.1.0"]]
   :source-path "src-clj"
   :cljsbuild {
-    :builds [{
-      :source-path "src-cljs"
-      ; Each entry in the :crossovers vector describes a Clojure namespace
-      ; that is meant to be used with the ClojureScript code as well.
-      ; The files that make up this namespace will be automatically copied
-      ; into the ClojureScript source path whenever they are modified.
-      :crossovers [example.crossover]
-      :compiler {
-        :output-to "war/javascripts/main.js"  ; default: main.js in current directory
-        :optimizations :whitespace
-        :pretty-print true}}]})
+    ; Each entry in the :crossovers vector describes a Clojure namespace
+    ; that is meant to be used with the ClojureScript code as well.
+    ; The files that make up this namespace will be automatically copied
+    ; into the ClojureScript source path whenever they are modified.
+    :crossovers [example.crossover]
+    ; Set the path into which the crossover namespaces will be copied.
+    :crossover-path "crossover-cljs"
+    ; Set this to true to allow the :crossover-path to be copied into
+    ; the JAR file (if hooks are enabled).
+    :crossover-jar false})
 ```
 
 Then lein-cljsbuild would copy files from `src-clj/example/crossover`
-to `src-cljs/example/crossover`, and you'd end up with this:
+to `crossover-cljs`, and you'd end up with this:
 
 <pre>
 ├── src-clj
@@ -71,17 +61,19 @@ to `src-cljs/example/crossover`, and you'd end up with this:
 │       └── crossover
 │           ├── some_stuff.clj
 │           └── some_other_stuff.clj
-└── src-cljs
+└── crossover-cljs
     └── example
-        ├── a_different_file.cljs
-        ├── crossover
-        │   ├── some_stuff.cljs
-        │   └── some_other_stuff.cljs
-        ├── whatever.cljs
-        └── util.cljs
+        └── crossover
+            ├── some_stuff.cljs
+            └── some_other_stuff.cljs
 </pre>
 
-With this setup, you would probably want to add `src-cljs/example/crossover`
+Notice that the files in the `crossover-cljs` directory have had their extensions
+modified so that they will be seen by the ClojureScript compiler.  The `crossover-cljs`
+directory will automatically be added to the classpath for the ClojureScript compiler,
+so your other ClojureScript code should be able to reference it via a regular `(ns)` form.
+
+With this setup, you would probably want to add `crossover-cljs`
 to your `.gitignore` file (or equivalent), as its contents are updated automatically
 by lein-cljsbuild.
 
@@ -111,20 +103,20 @@ Add this magical comment to any crossover files that contain macros:
 ```
 
 This tells lein-cljsbuild to refrain from copying the `.clj` files
-into the ClojureScript directory.  This step can be skipped if the
+into the `:crossover-path`.  This step can be skipped if the
 macro file is not included in any of the crossover namespaces.
 
 ## 3. Use Black Magic to Require Macros Specially
 
 In any crossover Clojure file, lein-cljsbuild will automatically erase the
-following string (if it appears):
+following string when copying the Clojure file into the `:crossover-path`:
 
 ```clj
 ;*CLJSBUILD-REMOVE*;
 ```
 
-This magic can be used to generate a `ns` statement that will work in both
-Clojure and ClojureScript:
+This magic can be used to generate a `ns` statement that can successfully
+reference a macro namespace from both Clojure and ClojureScript:
 
 ```clj
 (ns example.crossover.some_stuff

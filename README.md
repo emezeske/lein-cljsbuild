@@ -123,6 +123,15 @@ JAR file.
 :jar true
 ```
 
+If you are using the
+[crossovers] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/doc/CROSSOVERS.md)
+feature, and want the `:crossover-path` included in the JAR file, add this entry to your
+top-level `:cljsbuild` configuration:
+
+```clj
+:crossover-jar true
+```
+
 ## Multiple Build Configurations
 
 If the `:builds` sequence contains more than one map lein-cljsbuild
