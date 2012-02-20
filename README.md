@@ -114,7 +114,6 @@ your project configuration:
 :hooks [leiningen.cljsbuild]
 ```
 
-Note that this is also required for lein-cljsbuild to hook into the `lein jar`
 Note that by default the `lein jar` task does *not* package your ClojureScript
 code in the JAR file.  This feature needs to be explicitly enabled by adding
 the following entry to each of the `:builds` that you want included in the
@@ -123,8 +122,6 @@ JAR file.
 ```clj
 :jar true
 ```
-
-**TODO: Document :crossovers-jar once that's added.**
 
 ## Multiple Build Configurations
 

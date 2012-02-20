@@ -25,37 +25,36 @@
     :repl-listen-port 9000
     ; The keys in this map identify repl-launch commands.  The values are
     ; sequences representing shell commands like [command, arg1, arg2, ...].
-    ; When you run something like:
-    ;     $ lein trampoline cljsbuild repl-launch <id> [args...]
-    ; The <id> will be used to look up a command to run to connect to the REPL.
-    ; Any args past <id> will be appended to the command.
-    ; Defaults to an empty map.
+    ; Defaults to the empty map.
     :repl-launch-commands
       {"firefox" ["firefox"]
        "firefox-naked" ["firefox" "resources/public/html/naked.html"]
        "phantom" ["phantomjs" "phantom/page-repl.js"]
        "phantom-naked" ["phantomjs" "phantom/page-repl.js" "resources/public/html/naked.html"]}
-    ; TODO: Document
+    ; The keys in this map identify test commands.  The values are sequences
+    ; representing shell commands like [command, arg1, arg2, ...].
+    ; Defaults to the empty map.
     :test-commands
       {"unit" ["phantomjs" "phantom/unit-test.js" "resources/private/html/unit-test.html"]}
-    ; TODO Fix the below description.
-    ; A list of namespaces that should be copied from the Clojure :source-path
-    ; into the ClojureScript :source-path.  See the README file's
-    ; "Sharing Code Between Clojure and Clojurescript" section for more details.
-    ; Defaults to the empty vector [].
+    ; A list of namespaces that should be copied from the Clojure classpath into
+    ; the :crossover-dir, with some changes for ClojureScript compatibility. See
+    ; doc/CROSSOVERS.md for more details. Defaults to the empty vector [].
     :crossovers [example.crossover]
-    ; TODO: Document :crossover-jar once that's added.
-    ; :crossover-jar true
-    ; :crossover-path true
+    ; The directory into which the :crossovers namespaces should be copied.
+    ; Defaults to "crossover-cljs".
+    :crossover-path "crossover-cljs"
+    ; If hooks are enabled, this flag determines whether files from :crossover-dir
+    ; are added to the JAR file created by "lein jar".
+    :crossover-jar true
     ; The :builds option should be set to a sequence of maps.  Each
     ; map will be treated as a separate, independent, ClojureScript
-    ; compiler configuration
+    ; compiler configuration.
     :builds [{
       ; The path under which lein-cljsbuild will look for ClojureScript
       ; files to compile.  Defaults to "src-cljs".
       :source-path "src-cljs"
-      ; Set this key to make lein-cljsbuild hook into the "lein jar" task, and
-      ; add the ClojureScript files to the jar that is created.
+      ; If hooks are enabled, this flag determines whether files from this
+      ; :source-path are added to the JAR file created by "lein jar".
       :jar true
       ; The :compiler options are passed directly to the ClojureScript compiler.
       :compiler {

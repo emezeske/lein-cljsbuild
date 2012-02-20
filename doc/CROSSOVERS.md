@@ -1,6 +1,8 @@
 # Sharing Code Between Clojure and ClojureScript
 
 **TODO** Fix docs W.R.T. the :crossovers option moving around.
+**TODO: Document :crossovers-jar.**
+**TODO: Document :crossovers-path.**
 
 Sharing code with lein-cljsbuild is accomplished via the configuration
 of "crossovers".  A crossover specifies a Clojure namespace, the content
