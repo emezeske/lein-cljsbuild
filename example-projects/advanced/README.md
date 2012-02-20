@@ -21,6 +21,14 @@ Set up and start the server like this:
 
 Now, point your web browser at `http://localhost:3000`, and see the web app in action!
 
+## Running the Tests
+
+To run the unit tests:
+
+    $ lein cljsbuild test
+
+TODO: More explanation.
+
 ## Connecting Firefox to a REPL
 
 First, start the Ring server in the background:
