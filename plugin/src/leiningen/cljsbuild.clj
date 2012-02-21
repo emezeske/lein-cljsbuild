@@ -9,7 +9,7 @@
    [leiningen.jar :as ljar]))
 
 (def cljsbuild-dependencies
-  '[[cljsbuild "0.0.13"]])
+  '[[cljsbuild "0.0.14"]])
 
 (def default-compiler
   {:output-to "main.js"

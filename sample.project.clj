@@ -10,7 +10,7 @@
   :dependencies [[org.clojure/clojure "1.3.0"]]
   ; Your project should plugin-depend on lein-cljsbuild, to ensure that
   ; the right version of the plugin is installed.
-  :plugins [[lein-cljsbuild "0.0.13"]]
+  :plugins [[lein-cljsbuild "0.0.14"]]
   ; The standard Leiningen :source-path option is used by lein-cljsbuild
   ; to determine the source directory from which crossover files will
   ; be copied.  Leiningen defaults to "src".
