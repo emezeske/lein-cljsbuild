@@ -142,10 +142,14 @@
       (fs/mkdirs dir))
     (dofor [[[_ from-resource] to-file] (zipmap from-resources to-files)]
       (when (crossover-needs-update? from-resource to-file)
-        (spit to-file (filtered-crossover-file from-resource))
-        ; Mark the file as read-only, to hopefully warn the user not to modify it.
-        (fs/chmod "-w" to-file)
-        :updated))))
+        (let [temp-file (str to-file ".tmp")]
+          ; Write a temp file and atomically rename to the real file
+          ; to prevent the compiler from reading a half-written file
+          (spit temp-file (filtered-crossover-file from-resource))
+          (fs/rename temp-file to-file)
+          ; Mark the file as read-only, to hopefully warn the user not to modify it.
+          (fs/chmod "-w" to-file)
+          :updated)))))
 
 (defn in-threads
   "Given a seq and a function, applies the function to each item in a different thread
