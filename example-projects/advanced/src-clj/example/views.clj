@@ -4,14 +4,28 @@
   (:use
     [hiccup core page-helpers]))
 
+; When using {:optimizations :whitespace}, the Google Closure compiler combines
+; its JavaScript inputs into a single file, which obviates the need for a "deps.js"
+; file for dependencies.  However, true to ":whitespace", the compiler does not remove
+; the code that tries to fetch the (nonexistent) "deps.js" file.  Thus, we have to turn
+; off that feature here by setting CLOSURE_NO_DEPS.
+;
+; Note that this would not be necessary for :simple or :advanced optimizations.
+(defn- run-clojurescript [path init]
+  (list
+    (javascript-tag "var CLOSURE_NO_DEPS = true;")
+    (include-js path)
+    (javascript-tag init)))
+
 (defn index-page []
   (html5
     [:head
       [:title (shared/make-example-text)] ]
     [:body
       [:h1 (shared/make-example-text)]
-      (include-js "/js/main-debug.js")
-      (javascript-tag "example.hello.say_hello()")]))
+      (run-clojurescript
+        "/js/main-debug.js"
+        "example.hello.say_hello()")]))
 
 (defn repl-demo-page []
   (html5
@@ -36,5 +50,6 @@ lein trampoline cljsbuild repl-listen"]
 > (console.log (reduce + [1 2 3 4 5]))
 > (load-namespace 'goog.dom)
 > (goog.dom.setTextContent (goog.dom.getElement \"fun\") \"I changed something....\") "]
-      (include-js "/js/main-debug.js")
-      (javascript-tag "example.repl.connect()")))
+      (run-clojurescript
+        "/js/main-debug.js"
+        "example.repl.connect()")))
