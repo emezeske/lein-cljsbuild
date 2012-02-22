@@ -40,7 +40,7 @@
 
 (defn- printerr [& args]
   (binding [*out* *err*]
-    (apply println args)))  
+    (apply println args)))
 
 (defn- warn [& args]
   (apply printerr "WARNING:" args))
@@ -66,21 +66,56 @@
     (map (fn [[k v]] (vec (cons k v)))
       (merge project cljsbuild))))
 
-(defn- run-local-project [project crossover-path builds requires form]
-  (lcompile/eval-in-project
-    {:local-repo-classpath true
-     :source-path (:source-path project)
+(defn make-subproject [project crossover-path builds]
+  {:local-repo-classpath true
+   :dependencies (merge-dependencies (:dependencies project))
+   :dev-dependencies (:dev-dependencies project)})
+
+(defn make-subproject-lein1 [project crossover-path builds]
+  (merge (make-subproject project crossover-path builds)
+    {:source-path (:source-path project)
      :extra-classpath-dirs (concat
                              (:extra-classpath-dirs project)
                              (map :source-path builds)
-                             [crossover-path])
-     :dependencies (merge-dependencies (:dependencies project))
-     :dev-dependencies (:dev-dependencies project)}
-     `(do
-       ~form
-       (shutdown-agents))
-    nil
-    nil
+                             [crossover-path])}))
+
+(defn make-subproject-lein2 [project crossover-path builds]
+  (let [source-path (:source-path project)
+        source-paths (if (string? source-path)
+                       [source-path]
+                       source-path)]
+    (merge (make-subproject project crossover-path builds)
+      {:source-path (concat
+                      source-paths
+                      (map :source-path builds)
+                      [crossover-path])
+       :resources-path (:resources-path project)})))
+
+(defn eval-in-project
+  "Support eval-in-project in both Leiningen 1.x and 2.x."
+  [project crossover-path builds form requires]
+  (let [[eip args]
+         (or (try (require 'leiningen.core.eval)
+                  [(resolve 'leiningen.core.eval/eval-in-project)
+                    [(make-subproject-lein2 project crossover-path builds)
+                     form
+                     requires]]
+                  (catch java.io.FileNotFoundException _))
+             (try (require 'leiningen.compile)
+                  [(resolve 'leiningen.compile/eval-in-project)
+                    [(make-subproject-lein1 project crossover-path builds)
+                     form
+                     nil
+                     nil
+                     requires]]
+                  (catch java.io.FileNotFoundException _)))]
+    (apply eip args)))
+
+(defn- run-local-project [project crossover-path builds requires form]
+  (eval-in-project project crossover-path builds
+    `(do
+      ~form
+      (shutdown-agents))
     requires)
   exit-success)
 
@@ -88,7 +123,8 @@
   (println "Compiling ClojureScript.")
   ; If crossover-path does not exist before eval-in-project is called,
   ; the files it contains won't be classloadable, for some reason.
-  (fs/mkdirs crossover-path)
+  (when (not (empty? crossovers))
+    (fs/mkdirs crossover-path))
   (run-local-project project crossover-path builds
     '(require 'cljsbuild.compiler 'cljsbuild.crossover 'cljsbuild.util)
     `(do
@@ -167,7 +203,7 @@
 
 (defn- run-repl-rhino [project {:keys [crossover-path builds]}]
   (println "Running Rhino-based ClojureScript REPL.")
-  (run-local-project project crossover-path builds 
+  (run-local-project project crossover-path builds
     '(require 'cljsbuild.repl.rhino)
     `(cljsbuild.repl.rhino/run-repl-rhino)))
 
@@ -181,13 +217,17 @@
       options))
 
 (defn- backwards-compat-crossovers [{:keys [builds crossovers] :as options}]
-  (assoc options
-    :crossovers (->> builds
-                  (mapcat :crossovers)
-                  (concat crossovers)
-                  (distinct)
-                  (vec))
-    :builds (map #(dissoc % :crossovers) builds)))
+  (let [all-crossovers (->> builds
+                         (mapcat :crossovers)
+                         (concat crossovers)
+                         (distinct)
+                         (vec))
+        no-crossovers (assoc options
+                        :builds (map #(dissoc % :crossovers) builds))]
+    (if (empty? all-crossovers)
+      no-crossovers
+      (assoc no-crossovers
+        :crossovers all-crossovers))))
 
 (defn- backwards-compat [options]
   (-> options
@@ -268,18 +308,18 @@ Available commands:
     (usage)
     exit-failure)
   ([project mode & args]
-     (let [options (extract-options project)]
-       (case mode
-         "once" (run-compiler project options false)
-         "auto" (run-compiler project options true)
-         "clean" (cleanup-files project options)
-         "test" (run-compiler-and-tests project options args)
-         "repl-listen" (run-repl-listen project options)
-         "repl-launch" (run-repl-launch project options args)
-         "repl-rhino" (run-repl-rhino project options)
-         (do
-           (usage)
-           exit-failure)))))
+    (let [options (extract-options project)]
+      (case mode
+        "once" (run-compiler project options false)
+        "auto" (run-compiler project options true)
+        "clean" (cleanup-files project options)
+        "test" (run-compiler-and-tests project options args)
+        "repl-listen" (run-repl-listen project options)
+        "repl-launch" (run-repl-launch project options args)
+        "repl-rhino" (run-repl-rhino project options)
+        (do
+          (usage)
+          exit-failure)))))
 
 (defn- file-bytes
   "Reads a file into a byte array"
@@ -326,7 +366,7 @@ Available commands:
       (run-compiler (first args) (extract-options (first args)) false))))
 
 (defn test-hook [task & args]
-  (let [test-results [(apply task args) 
+  (let [test-results [(apply task args)
                       (run-tests (first args) (extract-options (first args)) [])]]
     (if (every? #(= % exit-success) test-results)
       exit-success
@@ -339,7 +379,8 @@ Available commands:
 (defn jar-hook [task & [project out-file filespecs]]
   (apply task [project out-file (concat filespecs (get-filespecs project))]))
 
-(hooke/add-hook #'lcompile/compile compile-hook)
-(hooke/add-hook #'ltest/test test-hook)
-(hooke/add-hook #'lclean/clean clean-hook)
-(hooke/add-hook #'ljar/write-jar jar-hook)
+; FIXME: These seem to break things really badly for the advanced example project.
+;(hooke/add-hook #'lcompile/compile compile-hook)
+;(hooke/add-hook #'ltest/test test-hook)
+;(hooke/add-hook #'lclean/clean clean-hook)
+;(hooke/add-hook #'ljar/write-jar jar-hook)
