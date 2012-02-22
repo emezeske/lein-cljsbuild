@@ -171,6 +171,47 @@
     '(require 'cljsbuild.repl.rhino)
     `(cljsbuild.repl.rhino/run-repl-rhino)))
 
+(defn- backwards-compat-builds [options]
+  (cond
+    (and (map? options) (nil? (:builds options)))
+      {:builds [options]}
+    (seq? options)
+      {:builds options}
+    :else
+      options))
+
+(defn- backwards-compat-crossovers [{:keys [builds crossovers] :as options}]
+  (assoc options
+    :crossovers (->> builds
+                  (mapcat :crossovers)
+                  (concat crossovers)
+                  (distinct)
+                  (vec))
+    :builds (map #(dissoc % :crossovers) builds)))
+
+(defn- backwards-compat [options]
+  (-> options
+    backwards-compat-builds
+    backwards-compat-crossovers))
+
+(defn- warn-deprecated [options]
+  (letfn [(delim [] (printerr (apply str (take 80  (repeat "-")))))]
+    (delim)
+    (warn
+      (str
+        "your :cljsbuild configuration is in a deprecated format.  It has been\n"
+        "automatically converted it to the new format, which will be printed below.\n"
+        "It is recommended that you update your :cljsbuild configuration ASAP."))
+    (delim)
+    (pprint/pprint options *err*)
+    (delim)
+    (printerr
+      (str
+        "See https://github.com/emezeske/lein-cljsbuild/blob/master/README.md\n"
+        "for details on the new format."))
+    (delim)
+    options))
+
 (defn- set-default-build-options [options]
   (deep-merge default-build-options options))
 
@@ -186,32 +227,19 @@
       (assoc options :builds builds)
       (throw (Exception. (str "All " output-dir-key " options must be distinct."))))))
 
-(defn- set-default-global-options [options]
-  (deep-merge default-global-options
-    (assoc options :builds
-      (map set-default-build-options (:builds options)))))
-
-(defn- warn-deprecated [options]
-  (warn "your deprecated :cljsbuild config was interpreted as:")
-  (pprint/pprint options *err*)
-  (printerr
-    "See https://github.com/emezeske/lein-cljsbuild/blob/master/README.md"
-    "for details on the new format.")
-  options)
+(defn- set-default-options [options]
+  (set-default-output-dirs
+    (deep-merge default-global-options
+      (assoc options :builds
+        (map set-default-build-options (:builds options))))))
 
 (defn- normalize-options
   "Sets default options and accounts for backwards compatibility."
   [options]
-  (set-default-output-dirs
-    (cond
-      (and (map? options) (nil? (:builds options)))
-        (warn-deprecated
-          [{:builds (set-default-build-options options)}])
-      (seq? options)
-        (warn-deprecated
-          [{:builds (map set-default-build-options options)}])
-      :else
-        (set-default-global-options options))))
+  (let [compat (backwards-compat options)]
+    (when (not= options compat)
+      (warn-deprecated compat))
+    (set-default-options compat)))
 
 (defn- extract-options
   "Given a project, returns a seq of cljsbuild option maps."
