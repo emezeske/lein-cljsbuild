@@ -13,7 +13,7 @@
                                               com.sun.jmx/jmxri]]]
   :dev-dependencies [[lein-ring "0.5.4"]]
   :plugins [[lein-cljsbuild "0.1.0"]]
-  ; Enable the "lein clean" and "lein compile" hooks.
+  ; Enable the lein hooks for: clean, compile, test, and jar.
   :hooks [leiningen.cljsbuild]
   :cljsbuild {
     ; Configure the REPL support; see the README.md file for more details.
@@ -25,22 +25,25 @@
        "phantom-naked" ["phantomjs" "phantom/repl.js" "resources/private/html/naked.html"]}
     :test-commands
       {"unit" ["phantomjs" "phantom/unit-test.js" "resources/private/html/unit-test.html"]}
-    ; TODO Comment out of date
-    ; Configure two separate builds; one with few optimizations for
-    ; development/debugging, and one with many optimizations for
-    ; production use.
     :crossovers [example.crossover]
     :crossover-jar true
     :builds [
+      ; This build has the lowest level of optimizations, so it is
+      ; useful when debugging the app.
       {:source-path "src-cljs"
        :jar true
        :compiler {:output-to "resources/public/js/main-debug.js"
                   :optimizations :whitespace
                   :pretty-print true}}
+      ; This build has the highest level of optimizations, so it is
+      ; efficient when running the app in production.
       {:source-path "src-cljs"
        :compiler {:output-to "resources/public/js/main.js"
                   :optimizations :advanced
                   :pretty-print false}}
+      ; This build is for the ClojureScript unit tests that will
+      ; be run via PhantomJS.  See the phantom/unit-test.js file
+      ; for details on how it's run.
       {:source-path "test-cljs"
        :compiler {:output-to "resources/private/js/unit-test.js"
                   :optimizations :whitespace
