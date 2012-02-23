@@ -69,7 +69,8 @@
 (defn make-subproject [project crossover-path builds]
   {:local-repo-classpath true
    :dependencies (merge-dependencies (:dependencies project))
-   :dev-dependencies (:dev-dependencies project)})
+   :dev-dependencies (:dev-dependencies project)
+   :repositories (:repositories project)})
 
 (defn make-subproject-lein1 [project crossover-path builds]
   (merge (make-subproject project crossover-path builds)
