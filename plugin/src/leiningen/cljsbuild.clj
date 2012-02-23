@@ -120,7 +120,7 @@
   (println "Compiling ClojureScript.")
   ; If crossover-path does not exist before eval-in-project is called,
   ; the files it contains won't be classloadable, for some reason.
-  (when (not (empty? crossovers))
+  (when (not-empty crossovers)
     (fs/mkdirs crossover-path))
   (run-local-project project crossover-path builds
     '(require 'cljsbuild.compiler 'cljsbuild.crossover 'cljsbuild.util)
@@ -206,9 +206,9 @@
 
 (defn- backwards-compat-builds [options]
   (cond
-    (and (map? options) (nil? (:builds options)))
+    (and (map? options) (some #{:compiler :source-path} (keys options)))
       {:builds [options]}
-    (seq? options)
+    (vector? options)
       {:builds options}
     :else
       options))
@@ -220,7 +220,7 @@
                          (distinct)
                          (vec))
         no-crossovers (assoc options
-                        :builds (map #(dissoc % :crossovers) builds))]
+                        :builds (vec (map #(dissoc % :crossovers) builds)))]
     (if (empty? all-crossovers)
       no-crossovers
       (assoc no-crossovers
@@ -240,6 +240,7 @@
         "automatically converted it to the new format, which will be printed below.\n"
         "It is recommended that you update your :cljsbuild configuration ASAP."))
     (delim)
+    (printerr ":cljsbuild")
     (pprint/pprint options *err*)
     (delim)
     (printerr
