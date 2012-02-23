@@ -77,7 +77,8 @@
                              (:extra-classpath-dirs project)
                              (map :source-path option-seq))
      :dependencies (merge-dependencies (:dependencies project))
-     :dev-dependencies (:dev-dependencies project)}
+     :dev-dependencies (:dev-dependencies project)
+     :repositories (:repositories project)}
     form
     nil
     nil
