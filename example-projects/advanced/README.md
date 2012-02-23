@@ -1,7 +1,7 @@
 # cljsbuild-example-advanced
 
-This is an example web application that uses [lein-cljsbuild][3],
-[Ring][1], and [Compojure][2]. It demonstrates several things:
+This is an example web application that uses [lein-cljsbuild][1],
+[Ring][2], and [Compojure][3]. It demonstrates several things:
 
 1. The use of lein-cljsbuild to build ClojureScript into JavaScript.
 2. How to share code between Clojure and ClojureScript, including macros.
@@ -16,7 +16,6 @@ To play around with this example project, you will first need
 Set up and start the server like this:
 
     $ lein deps
-    $ lein cljsbuild once
     $ lein ring server-headless 3000
 
 Now, point your web browser at `http://localhost:3000`, and see the web app in action!
@@ -77,7 +76,7 @@ running in the background:
 
     $ lein trampoline cljsbuild repl-launch phantom-naked
 
-[1]: https://github.com/mmcgrana/ring
-[2]: https://github.com/weavejester/compojure
-[3]: https://github.com/emezeske/lein-cljsbuild
+[1]: https://github.com/emezeske/lein-cljsbuild
+[2]: https://github.com/mmcgrana/ring
+[3]: https://github.com/weavejester/compojure
 [4]: https://github.com/technomancy/leiningen

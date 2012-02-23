@@ -2,9 +2,9 @@
   :description "A simple example of how to use lein-cljsbuild"
   :source-path "src-clj"
   :dependencies [[org.clojure/clojure "1.3.0"]
-                 [compojure "0.6.5"] 
-                 [hiccup "0.3.7"]]
-  :dev-dependencies [[lein-ring "0.5.0"]]
+                 [compojure "1.0.1"]
+                 [hiccup "0.3.8"]]
+  :dev-dependencies [[lein-ring "0.5.4"]]
   :plugins [[lein-cljsbuild "0.1.0"]]
   :cljsbuild {
     :builds [{:source-path "src-cljs"

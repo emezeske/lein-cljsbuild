@@ -2,8 +2,8 @@
   :description "An advanced example of how to use lein-cljsbuild"
   :source-path "src-clj"
   :dependencies [[org.clojure/clojure "1.3.0"]
-                 [compojure "0.6.5"] 
-                 [hiccup "0.3.7"]
+                 [compojure "1.0.1"]
+                 [hiccup "0.3.8"]
                  ; NOTE: This log4j dependency is not actually used by the project;
                  ; it's just here to make sure that lein-cljsbuild handles complex
                  ; dependencies correctly.
@@ -11,7 +11,7 @@
                                               javax.jms/jms
                                               com.sun.jdmk/jmxtools
                                               com.sun.jmx/jmxri]]]
-  :dev-dependencies [[lein-ring "0.5.0"]]
+  :dev-dependencies [[lein-ring "0.5.4"]]
   :plugins [[lein-cljsbuild "0.1.0"]]
   ; Enable the "lein clean" and "lein compile" hooks.
   :hooks [leiningen.cljsbuild]
