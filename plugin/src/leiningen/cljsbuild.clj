@@ -81,16 +81,12 @@
                              [crossover-path])}))
 
 (defn make-subproject-lein2 [project crossover-path builds]
-  (let [source-path (:source-path project)
-        source-paths (if (string? source-path)
-                       [source-path]
-                       source-path)]
-    (merge (make-subproject project crossover-path builds)
-      {:source-path (concat
-                      source-paths
-                      (map :source-path builds)
-                      [crossover-path])
-       :resources-path (:resources-path project)})))
+  (merge (make-subproject project crossover-path builds)
+    {:source-paths (concat
+                     (:source-paths project)
+                     (map :source-path builds)
+                     [crossover-path])
+     :resources-path (:resources-path project)}))
 
 (defn eval-in-project
   "Support eval-in-project in both Leiningen 1.x and 2.x."
@@ -380,8 +376,9 @@ Available commands:
 (defn jar-hook [task & [project out-file filespecs]]
   (apply task [project out-file (concat filespecs (get-filespecs project))]))
 
-; FIXME: These seem to break things really badly for the advanced example project.
-;(hooke/add-hook #'lcompile/compile compile-hook)
-;(hooke/add-hook #'ltest/test test-hook)
-;(hooke/add-hook #'lclean/clean clean-hook)
-;(hooke/add-hook #'ljar/write-jar jar-hook)
+; FIXME: These hooks do NOT work with lein2.  It looks like hooks have changed
+;        significantly.  Do more research on the subject.
+(hooke/add-hook #'lcompile/compile #'compile-hook)
+(hooke/add-hook #'ltest/test #'test-hook)
+(hooke/add-hook #'lclean/clean #'clean-hook)
+(hooke/add-hook #'ljar/write-jar #'jar-hook)
