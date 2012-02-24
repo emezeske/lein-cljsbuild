@@ -189,3 +189,4 @@ See the file COPYING.
 * Shantanu Kumar (kumar.shantanu@gmail.com)
 * Luke VanderHart (http://github.com/levand)
 * Phil Hagelberg (phil@hagelb.org)
+* Daniel E. Renfer (duck@kronkltd.net)
