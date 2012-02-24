@@ -26,7 +26,18 @@ To run the unit tests:
 
     $ lein cljsbuild test
 
-TODO: More explanation.
+Note that if more than one test were configured in the project, the above command would
+run all tests.  To run the "unit" tests in isolation:
+
+    $ lein cljsbuild test unit
+
+The unit tests live in `test-cljs`.  They are written in ClojureScript, and thus must
+be compiled, so they have their own entry in the `:builds` configuration.  Note that
+all of the `:source-path` entries from the `:builds` are added to the classpath, so
+the tests can `:require` ClojureScript namespaces from, e.g., the `src-cljs` directory.
+
+The example configuration uses [PhantomJS] (http://www.phantomjs.org) to run the tests.
+See the `phantom/unit-test.js` file for details on how this works.
 
 ## Connecting Firefox to a REPL
 

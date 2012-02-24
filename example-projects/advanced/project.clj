@@ -19,11 +19,24 @@
     ; Configure the REPL support; see the README.md file for more details.
     :repl-listen-port 9000
     :repl-launch-commands
+      ; Launch command for connecting the page of choice to the REPL.
+      ; Only works if the page at URL automatically connects to the REPL,
+      ; like http://localhost:3000/repl-demo does.
+      ;     $ lein trampoline cljsbuild repl-launch firefox <URL>
       {"firefox" ["firefox"]
+      ; Launch command for interacting with your ClojureScript at a REPL,
+      ; without browsing to the app (a static HTML file is used).
+      ;     $ lein trampoline cljsbuild repl-launch firefox-naked
        "firefox-naked" ["firefox" "resources/private/html/naked.html"]
+      ; This is similar to "firefox" except it uses PhantomJS.
+      ;     $ lein trampoline cljsbuild repl-launch phantom <URL>
        "phantom" ["phantomjs" "phantom/repl.js"]
+      ; This is similar to "firefox-naked" except it uses PhantomJS.
+      ;     $ lein trampoline cljsbuild repl-launch phantom-naked
        "phantom-naked" ["phantomjs" "phantom/repl.js" "resources/private/html/naked.html"]}
     :test-commands
+      ; Test command for running the unit tests in "test-cljs" (see below).
+      ;     $ lein cljsbuild test
       {"unit" ["phantomjs" "phantom/unit-test.js" "resources/private/html/unit-test.html"]}
     :crossovers [example.crossover]
     :crossover-jar true

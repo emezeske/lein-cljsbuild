@@ -166,7 +166,7 @@ for more details.
 
 ## Testing Support
 
-Lein-cljsbuild has built-in support for running ClojureScript tests.  See the
+Lein-cljsbuild has built-in support for running external ClojureScript test processes.  See the
 [testing documentation] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/doc/TESTING.md)
 for more details.
 

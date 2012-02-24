@@ -25,7 +25,7 @@ page.open(url, function (status) {
     });
 
     // NOTE: PhantomJS 1.4.0 has a bug that prevents the exit codes
-    //        below from eing returned properly. :(
+    //        below from being returned properly. :(
     //
     // http://code.google.com/p/phantomjs/issues/detail?id=294
 
