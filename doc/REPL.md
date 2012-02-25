@@ -78,12 +78,25 @@ launch command.  Thus, with a configuration such as:
 
 ```clj
 :repl-launch-commands
-  {"my-other-launch" ["firefox" "-jsconsole"}
+  {"my-other-launch" ["firefox" "-jsconsole"]}
 ```
 
 The target URL could be selected like so:
 
     $ lein trampoline cljsbuild repl-launch my-other-launch http://localhost/another-page
+
+By default, your launch command's standard output and error streams will be streamed
+to the console.  This can be problematic, as it can spam your console session and
+disrupt things.  Thus, you may want to redirect the command's output to a file.
+
+If a keyword appears in the command vector, it and all following entries will be
+treated as an option map.  Currently, the only supported options are
+:stdout and :stderr, which allow you to redirect the command's output to files.
+
+```clj
+:repl-launch-commands
+  {"my-launch" ["firefox" :stdout "my-stdout.txt" :stderr "my-stderr"]}
+```
 
 For more ideas on how to use `repl-launch`, take a look at the
 [advanced example project] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.0/example-projects/advanced)

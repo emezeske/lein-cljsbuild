@@ -30,9 +30,18 @@
       {"firefox" ["firefox"]
        "firefox-naked" ["firefox" "resources/public/html/naked.html"]
        "phantom" ["phantomjs" "phantom/page-repl.js"]
-       "phantom-naked" ["phantomjs" "phantom/page-repl.js" "resources/public/html/naked.html"]}
+       ; If a keyword appears in the command vector, it and all following
+       ; entries will be treated as an option map.  Currently, the only
+       ; supported options are :stdout and :stderr, which allow you to
+       ; redirect the command's output to files.
+       "phantom-naked" ["phantomjs"
+                        "phantom/page-repl.js"
+                        "resources/public/html/naked.html"
+                        :stdout ".repl-phantom-naked-out"
+                        :stderr ".repl-phantom-naked-err"]}
     ; The keys in this map identify test commands.  The values are sequences
-    ; representing shell commands like [command, arg1, arg2, ...].
+    ; representing shell commands like [command, arg1, arg2, ...].  Note that
+    ; the :stdout and :stderr options work here as well.
     ; Defaults to the empty map.
     :test-commands
       {"unit" ["phantomjs" "phantom/unit-test.js" "resources/private/html/unit-test.html"]}
