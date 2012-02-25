@@ -197,3 +197,4 @@ See the file COPYING.
 * Luke VanderHart (http://github.com/levand)
 * Phil Hagelberg (phil@hagelb.org)
 * Daniel E. Renfer (duck@kronkltd.net)
+* Daniel Harper (http://djhworld.github.com)
