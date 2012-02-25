@@ -27,7 +27,7 @@ to connect to it.  By default, it will listen on port `9000`, although this may 
 via the `:repl-listen-port` option.  Until a connection is received, the REPL will not be
 usable.
 
-From your application, you can connect to the REPL with code such as this:
+From your application, you can connect to the REPL from your Clojurescript code with code such as this:
 
 ```clj
 (ns lein-cljsbuild-example.repl
