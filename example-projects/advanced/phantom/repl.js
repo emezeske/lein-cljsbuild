@@ -19,6 +19,4 @@ page.open(url, function (status) {
     }
 
     console.log("Loaded successfully.");
-
-    // TODO: Somehow gracefully exit when the REPL is closed?
 });
