@@ -52,3 +52,10 @@
                      requires]]
                   (catch java.io.FileNotFoundException _)))]
     (apply eip args)))
+
+(defn prepping? []
+ (try
+   (require 'leiningen.core.eval)
+   (deref (resolve 'leiningen.core.eval/*prepping?*))
+   (catch java.io.FileNotFoundException _
+     false)))

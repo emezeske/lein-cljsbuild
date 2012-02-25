@@ -11,6 +11,7 @@
     [leiningen.help :as lhelp]
     [leiningen.jar :as ljar]
     [leiningen.test :as ltest]
+    [leiningen.trampoline :as ltrampoline]
     [robert.hooke :as hooke]))
 
 ; TODO: lein2: All temporary output files, etc, should go into (:target-path project),
@@ -68,6 +69,13 @@
     '(require 'cljsbuild.test)
     `(cljsbuild.test/run-tests ~selected-tests))))
 
+(defmacro require-trampoline [& forms]
+  `(if ltrampoline/*trampoline?*
+    (do ~@forms)
+    (do
+      (println "REPL subcommands must be run via \"lein trampoline cljsbuild <command>\".")
+      exit-failure)))
+
 (defn- once
   "Compile the ClojureScript project once."
   [project options]
@@ -105,39 +113,42 @@
 (defn- repl-listen
   "Run a REPL that will listen for incoming connections."
   [project {:keys [crossover-path builds repl-listen-port]}]
-  (println (str "Running ClojureScript REPL, listening on port " repl-listen-port "."))
-  (run-local-project project crossover-path builds
-    '(require 'cljsbuild.repl.listen)
-    `(cljsbuild.repl.listen/run-repl-listen
-      ~repl-listen-port
-      ~repl-output-path)))
+  (require-trampoline
+    (println (str "Running ClojureScript REPL, listening on port " repl-listen-port "."))
+    (run-local-project project crossover-path builds
+      '(require 'cljsbuild.repl.listen)
+      `(cljsbuild.repl.listen/run-repl-listen
+        ~repl-listen-port
+        ~repl-output-path))))
 
 (defn- repl-launch
   "Run a REPL and launch a custom command to connect to it."
   [project {:keys [crossover-path builds repl-listen-port repl-launch-commands]} args]
-  (when (< (count args) 1)
-    (throw (Exception. "Must supply a launch command identifier.")))
-  (let [launch-name (first args)
-        command-args (rest args)
-        command-base (repl-launch-commands launch-name)]
-    (when (nil? command-base)
-      (throw (Exception. (str "Unknown REPL launch command: " launch-name))))
-    (let [command (concat command-base command-args)]
-      (println "Running ClojureScript REPL and launching command:" command)
-      (run-local-project project crossover-path builds
-        '(require 'cljsbuild.repl.listen)
-        `(cljsbuild.repl.listen/run-repl-launch
-            ~repl-listen-port
-            ~repl-output-path
-            '~command)))))
+  (require-trampoline
+    (when (< (count args) 1)
+      (throw (Exception. "Must supply a launch command identifier.")))
+    (let [launch-name (first args)
+          command-args (rest args)
+          command-base (repl-launch-commands launch-name)]
+      (when (nil? command-base)
+        (throw (Exception. (str "Unknown REPL launch command: " launch-name))))
+      (let [command (concat command-base command-args)]
+        (println "Running ClojureScript REPL and launching command:" command)
+        (run-local-project project crossover-path builds
+          '(require 'cljsbuild.repl.listen)
+          `(cljsbuild.repl.listen/run-repl-launch
+              ~repl-listen-port
+              ~repl-output-path
+              '~command))))))
 
 (defn- repl-rhino
   "Run a Rhino-based REPL."
   [project {:keys [crossover-path builds]}]
-  (println "Running Rhino-based ClojureScript REPL.")
-  (run-local-project project crossover-path builds
-    '(require 'cljsbuild.repl.rhino)
-    `(cljsbuild.repl.rhino/run-repl-rhino)))
+  (require-trampoline
+    (println "Running Rhino-based ClojureScript REPL.")
+    (run-local-project project crossover-path builds
+      '(require 'cljsbuild.repl.rhino)
+      `(cljsbuild.repl.rhino/run-repl-rhino))))
 
 (defn cljsbuild
   "Run the cljsbuild plugin."
@@ -163,29 +174,40 @@
             (lhelp/subtask-help-for *ns* #'cljsbuild))
           exit-failure)))))
 
-; TODO: Check leiningen.core.eval/*prepping?*
+; Lein2 "preps" the project when eval-in-project is called.  This
+; causes it to be compiled, which normally would trigger the compile
+; hook below, which is bad because we can't compile unless we're in
+; the dummy subproject.  To solve this problem, we disable all of the
+; hooks if we notice that lein2 is currently prepping.
+(defmacro skip-if-prepping [task args & forms]
+  `(if (subproject/prepping?)
+    (apply ~task ~args)
+    (do ~@forms)))
+
 (defn- compile-hook [task & args]
-  (let [compile-result (apply task args)]
-    (if (not= compile-result exit-success)
-      compile-result
-      (run-compiler (first args) (config/extract-options (first args)) false))))
+  (skip-if-prepping task args
+    (let [compile-result (apply task args)]
+      (if (not= compile-result exit-success)
+        compile-result
+        (run-compiler (first args) (config/extract-options (first args)) false)))))
 
 (defn- test-hook [task & args]
-  (let [test-results [(apply task args)
-                      (run-tests (first args) (config/extract-options (first args)) [])]]
-    (if (every? #(= % exit-success) test-results)
-      exit-success
-      exit-failure)))
+  (skip-if-prepping task args
+    (let [test-results [(apply task args)
+                        (run-tests (first args) (config/extract-options (first args)) [])]]
+      (if (every? #(= % exit-success) test-results)
+        exit-success
+        exit-failure))))
 
 (defn- clean-hook [task & args]
-  (apply task args)
-  (clean (first args) (config/extract-options (first args))))
+  (skip-if-prepping task args
+    (apply task args)
+    (clean (first args) (config/extract-options (first args)))))
 
 (defn- jar-hook [task & [project out-file filespecs]]
-  (apply task [project out-file (concat filespecs (jar/get-filespecs project))]))
+  (skip-if-prepping task [project out-file filespecs]
+    (apply task [project out-file (concat filespecs (jar/get-filespecs project))])))
 
-; FIXME: These hooks do NOT work with lein2.  It looks like hooks have changed
-;        significantly.  Do more research on the subject.
 (hooke/add-hook #'lcompile/compile #'compile-hook)
 (hooke/add-hook #'ltest/test #'test-hook)
 (hooke/add-hook #'lclean/clean #'clean-hook)

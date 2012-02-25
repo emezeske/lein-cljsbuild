@@ -12,6 +12,11 @@ your project updated soon!
 
 ## The Easy Way
 
+Before doing anything else, `lein cljsbuild clean`.  This will remove old temporary files
+that may be renamed in the new version.  Most importantly, it will remove any crossover files
+that have been copied into place.  **This is very important.  If you are using crossovers,
+skipping this step will cause pain!**
+
 Once you've updated your project to use `[lein-cljsbuild "0.1.0"]`, run any subcommand,
 for instance, `lein cljsbuild once`.  The plugin will complain that your configuration
 is deprecated.  However, it should automatically convert your `:cljsbuild` entry to the new
