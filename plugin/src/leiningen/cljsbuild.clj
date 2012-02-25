@@ -13,6 +13,9 @@
     [leiningen.test :as ltest]
     [robert.hooke :as hooke]))
 
+; TODO: lein2: All temporary output files, etc, should go into (:target-path project),
+;       in which case they will automatically be removed upon "lein clean".
+
 (def repl-output-path ".lein-cljsbuild-repl")
 
 (def exit-success 0)
@@ -97,6 +100,8 @@
       compile-result
       (run-tests project options args))))
 
+; TODO: REPL tasks should warn if *trampoline* is not set.
+
 (defn- repl-listen
   "Run a REPL that will listen for incoming connections."
   [project {:keys [crossover-path builds repl-listen-port]}]
@@ -158,6 +163,7 @@
             (lhelp/subtask-help-for *ns* #'cljsbuild))
           exit-failure)))))
 
+; TODO: Check leiningen.core.eval/*prepping?*
 (defn- compile-hook [task & args]
   (let [compile-result (apply task args)]
     (if (not= compile-result exit-success)
