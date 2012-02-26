@@ -51,7 +51,7 @@
     backwards-compat-crossovers))
 
 (defn- warn-deprecated [options]
-  (letfn [(delim [] (println (apply str (take 80  (repeat "-")))))]
+  (letfn [(delim [] (println (apply str (take 80 (repeat "-")))))]
     (delim)
     (println
       (str
@@ -107,6 +107,11 @@
     (when (not= options compat)
       (warn-deprecated compat))
     (set-default-options compat)))
+
+(defn parse-shell-command [raw]
+  (let [[shell tail] (split-with (comp not keyword?) raw)
+        options (apply hash-map tail)]
+    (merge {:shell shell} options)))
 
 (defn extract-options
   "Given a project, returns a seq of cljsbuild option maps."

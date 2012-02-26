@@ -56,24 +56,19 @@ and returns a seq of the results. Launches all the threads at once."
       (.join pump-out)
       (.join pump-err))))
 
-(defn- process-parse-command [raw]
-  (let [[shell tail] (split-with (comp not keyword?) raw)
-        opts (apply hash-map tail)
-        maybe-file (fn [file fallback]
-                     (if file
-                       (do
-                         (fs/delete file)
-                         (io/writer file))
-                       fallback))]
-    {:shell shell
-     ; FIXME: These files get left open.  Not a huge deal, but...
-     :stdout (maybe-file (:stdout opts) *out*)
-     :stderr (maybe-file (:stderr opts) *err*)}))
+(defn- maybe-writer [file fallback]
+  (if file
+    (do
+      (fs/delete file)
+      (io/writer file))
+    fallback))
 
-(defn process-start [command]
-  (let [{:keys [shell stdout stderr]} (process-parse-command command)
+(defn process-start [{:keys [shell stdout stderr]}]
+  ; FIXME: These writers get left open.  Not a huge deal, but...
+  (let [stdout-writer (maybe-writer stdout *out*)
+        stderr-writer (maybe-writer stderr *err*)
         process (.exec (Runtime/getRuntime) (into-array shell))
-        pumper (future (process-pump process stdout stderr))]
+        pumper (future (process-pump process stdout-writer stderr-writer))]
     {:kill (fn []
              (.destroy process))
      :wait (fn []

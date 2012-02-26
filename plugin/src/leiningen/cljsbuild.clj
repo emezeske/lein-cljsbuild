@@ -61,13 +61,14 @@
   (let [selected-tests (if (empty? args)
                          (do
                            (println "Running all ClojureScript tests.")
-                           (vec (vals test-commands)))
+                           (vals test-commands))
                          (do
                            (println "Running ClojureScript test:" (first args))
-                           [(test-commands (first args))]))]
+                           [(test-commands (first args))]))
+        parsed-tests (map config/parse-shell-command selected-tests)]
   (run-local-project project crossover-path builds
     '(require 'cljsbuild.test)
-    `(cljsbuild.test/run-tests ~selected-tests))))
+    `(cljsbuild.test/run-tests '~parsed-tests))))
 
 (defmacro require-trampoline [& forms]
   `(if ltrampoline/*trampoline?*
@@ -108,8 +109,6 @@
       compile-result
       (run-tests project options args))))
 
-; TODO: REPL tasks should warn if *trampoline* is not set.
-
 (defn- repl-listen
   "Run a REPL that will listen for incoming connections."
   [project {:keys [crossover-path builds repl-listen-port]}]
@@ -132,8 +131,10 @@
           command-base (repl-launch-commands launch-name)]
       (when (nil? command-base)
         (throw (Exception. (str "Unknown REPL launch command: " launch-name))))
-      (let [command (concat command-base command-args)]
-        (println "Running ClojureScript REPL and launching command:" command)
+      (let [parsed (config/parse-shell-command command-base)
+            shell (concat (:shell parsed) command-args)
+            command (assoc parsed :shell shell)]
+        (println "Running ClojureScript REPL and launching command:" shell)
         (run-local-project project crossover-path builds
           '(require 'cljsbuild.repl.listen)
           `(cljsbuild.repl.listen/run-repl-launch
