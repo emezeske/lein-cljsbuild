@@ -41,11 +41,11 @@ See the `phantom/unit-test.js` file for details on how this works.
 
 ## Connecting Firefox to a REPL
 
-First, start the Ring server in the background:
+First, in one terminal, start the Ring server:
 
-    $ lein ring server-headless 3000 &
+    $ lein ring server-headless 3000
 
-Now, run `repl-launch` with the "firefox" identifier and the URL of the REPL demo page:
+Now, in a different terminal, run `repl-launch` with the "firefox" identifier and the URL of the REPL demo page:
 
     $ lein trampoline cljsbuild repl-launch firefox http://localhost:3000/repl-demo
 
@@ -68,11 +68,11 @@ need to have your app running in the background:
 via Javascript.  It provides a Javascript execution environment with access to all browser
 features (the DOM, etc), without opening a browser GUI.
 
-To try out a PhantomJS-based REPL, first start the Ring server in the background:
+To try out a PhantomJS-based REPL, first start the Ring server in one terminal:
 
-    $ lein ring server-headless 3000 &
+    $ lein ring server-headless 3000
 
-Now, run `repl-launch` with the "phantom" identifier and the URL of the REPL demo page:
+Now, in a different terminal, run `repl-launch` with the "phantom" identifier and the URL of the REPL demo page:
 
     $ lein trampoline cljsbuild repl-launch phantom http://localhost:3000/repl-demo
 
