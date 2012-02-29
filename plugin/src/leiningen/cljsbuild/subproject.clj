@@ -2,7 +2,7 @@
   "Utilities for running cljsbuild in a subproject")
 
 (def cljsbuild-dependencies
-  '[[cljsbuild "0.1.1"]])
+  '[[cljsbuild "0.1.2"]])
 
 (defn- merge-dependencies [project-dependencies]
   (let [dependency-map #(into {} (map (juxt first rest) %))
