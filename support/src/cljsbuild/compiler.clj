@@ -8,6 +8,12 @@
 
 (def lock (Object.))
 
+(defn- print-safe
+  [& args]
+  (locking lock
+    (apply print args)
+    (flush)))
+
 (defn- println-safe
   [& args]
   (locking lock
@@ -19,7 +25,16 @@
     (with-precision 2
       (str (/ (double elapsed-us) 1000000000) " seconds"))))
 
-(defn- compile-cljs [cljs-path compiler-options]
+(defn- notify-cljs [notify-command msg]
+  (try
+    (cond
+      (= :bell notify-command) (print-safe \u0007)
+      (string? notify-command) (let [cmd (format notify-command msg)]
+                                 (.exec (Runtime/getRuntime) cmd)))
+    (catch Throwable e)) 
+  (println-safe msg))
+
+(defn- compile-cljs [cljs-path compiler-options notify-command]
   (let [output-file (:output-to compiler-options)
         output-file-dir (fs/parent output-file)]
     (println-safe (str "Compiling " output-file " from " cljs-path "..."))
@@ -34,12 +49,12 @@
     (let [started-at (. System (nanoTime))]
       (try
         (build cljs-path compiler-options)
-        (println-safe (str output-file " compiled in " (elapsed started-at) "."))
+        (notify-cljs notify-command (str output-file " compiled in " (elapsed started-at) "."))
         (catch Throwable e
-          (println-safe " Failed!")
+          (notify-cljs notify-command " Failed!")
           (pst+ e))))))
 
-(defn run-compiler [cljs-path crossover-path compiler-options watch?]
+(defn run-compiler [cljs-path crossover-path compiler-options notify-command watch?]
   (loop [last-dependency-mtimes {}]
     (let [output-file (:output-to compiler-options)
           output-mtime (if (fs/exists? output-file) (fs/mod-time output-file) 0)
@@ -50,7 +65,7 @@
         (and
           (not= last-dependency-mtimes dependency-mtimes)
           (some #(< output-mtime %) dependency-mtimes))
-        (compile-cljs cljs-path compiler-options))
+        (compile-cljs cljs-path compiler-options notify-command))
       (when watch?
         (Thread/sleep 100)
         (recur dependency-mtimes)))))
