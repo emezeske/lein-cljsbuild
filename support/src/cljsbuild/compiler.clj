@@ -29,8 +29,8 @@
   (try
     (cond
       (= :bell notify-command) (print-safe \u0007)
-      (string? notify-command) (let [cmd (format notify-command msg)]
-                                 (.exec (Runtime/getRuntime) cmd)))
+      (string? notify-command) (.exec (Runtime/getRuntime)
+                                 (format notify-command msg)))
     (catch Throwable e)) 
   (println-safe msg))
 
