@@ -21,6 +21,7 @@
 (def default-build-options
   {:source-path "src-cljs"
    :jar false
+   :notify-command nil
    :compiler default-compiler-options})
 
 (defn- backwards-compat-builds [options]

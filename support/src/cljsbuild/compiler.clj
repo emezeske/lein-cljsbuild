@@ -25,13 +25,14 @@
     (with-precision 2
       (str (/ (double elapsed-us) 1000000000) " seconds"))))
 
-(defn- notify-cljs [notify-command msg]
+(defn- notify-cljs [cmd msg]
   (try
-    (cond
-      (= :bell notify-command) (print-safe \u0007)
-      (string? notify-command) (.exec (Runtime/getRuntime)
-                                 (format notify-command msg)))
-    (catch Throwable e)) 
+    (if (:bell cmd)
+      (print-safe \u0007)) 
+    (if (first (:shell cmd)) 
+      (util/sh (assoc cmd :shell (map #(if (= % "%") msg %) (:shell cmd))))) 
+    (catch Throwable e
+      (pst+ e))) 
   (println-safe msg))
 
 (defn- compile-cljs [cljs-path compiler-options notify-command]

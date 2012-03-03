@@ -75,3 +75,8 @@ and returns a seq of the results. Launches all the threads at once."
              (.waitFor process)
              (deref pumper)
              (.exitValue process))}))
+
+(defn sh [command]
+  (let [process (process-start command)]
+    ((:wait process))))
+
