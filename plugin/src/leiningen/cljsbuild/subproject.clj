@@ -58,4 +58,6 @@
    (require 'leiningen.core.eval)
    (deref (resolve 'leiningen.core.eval/*prepping?*))
    (catch java.io.FileNotFoundException _
+     false)
+   (catch NullPointerException _
      false)))
