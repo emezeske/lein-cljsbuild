@@ -28,11 +28,11 @@
 (defn- notify-cljs [cmd msg]
   (try
     (if (:bell cmd)
-      (print-safe \u0007)) 
-    (if (first (:shell cmd)) 
-      (util/sh (assoc cmd :shell (map #(if (= % "%") msg %) (:shell cmd))))) 
+      (print-safe \u0007))
+    (if (first (:shell cmd))
+      (util/sh (assoc cmd :shell (map #(if (= % "%") msg %) (:shell cmd)))))
     (catch Throwable e
-      (pst+ e))) 
+      (pst+ e)))
   (println-safe msg))
 
 (defn- compile-cljs [cljs-path compiler-options notify-command]
@@ -59,7 +59,7 @@
   (loop [last-dependency-mtimes {}]
     (let [output-file (:output-to compiler-options)
           output-mtime (if (fs/exists? output-file) (fs/mod-time output-file) 0)
-          find-cljs #(util/find-files % #{"cljs"}) 
+          find-cljs #(util/find-files % #{"cljs"})
           dependency-files (mapcat find-cljs [cljs-path crossover-path])
           dependency-mtimes (map fs/mod-time dependency-files)]
       (when

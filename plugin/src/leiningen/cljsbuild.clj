@@ -53,7 +53,7 @@
                 (:source-path opts#)
                 ~crossover-path
                 (:compiler opts#)
-                (:notify-command opts#) 
+                (:notify-command opts#)
                 ~watch?))
             '~parsed-builds))))))
 
