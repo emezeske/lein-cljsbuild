@@ -36,24 +36,26 @@
   ; the files it contains won't be classloadable, for some reason.
   (when (not-empty crossovers)
     (fs/mkdirs crossover-path))
-  (run-local-project project crossover-path builds
-    '(require 'cljsbuild.compiler 'cljsbuild.crossover 'cljsbuild.util)
-    `(do
-      (letfn [(copy-crossovers# []
-                (cljsbuild.crossover/copy-crossovers
-                  ~crossover-path
-                  '~crossovers))]
-        (copy-crossovers#)
-        (when ~watch?
-          (cljsbuild.util/once-every 1000 "copying crossovers" copy-crossovers#))
-        (cljsbuild.util/in-threads
-          (fn [opts#]
-            (cljsbuild.compiler/run-compiler
-              (:source-path opts#)
-              ~crossover-path
-              (:compiler opts#)
-              ~watch?))
-          '~builds)))))
+  (let [parsed-builds (map #(update-in % [:notify-command] config/parse-shell-command) builds)]
+    (run-local-project project crossover-path parsed-builds
+      '(require 'cljsbuild.compiler 'cljsbuild.crossover 'cljsbuild.util)
+      `(do
+        (letfn [(copy-crossovers# []
+                  (cljsbuild.crossover/copy-crossovers
+                    ~crossover-path
+                    '~crossovers))]
+          (copy-crossovers#)
+          (when ~watch?
+            (cljsbuild.util/once-every 1000 "copying crossovers" copy-crossovers#))
+          (cljsbuild.util/in-threads
+            (fn [opts#]
+              (cljsbuild.compiler/run-compiler
+                (:source-path opts#)
+                ~crossover-path
+                (:compiler opts#)
+                (:notify-command opts#) 
+                ~watch?))
+            '~parsed-builds))))))
 
 (defn- run-tests [project {:keys [test-commands crossover-path builds]} args]
   (when (> (count args) 1)
