@@ -56,6 +56,8 @@
 (defn prepping? []
  (try
    (require 'leiningen.core.eval)
-   (deref (resolve 'leiningen.core.eval/*prepping?*))
+   (if-let [prepping-var (resolve 'leiningen.core.eval/*prepping?*)]
+     (deref prepping-var)
+     false)
    (catch java.io.FileNotFoundException _
      false)))
