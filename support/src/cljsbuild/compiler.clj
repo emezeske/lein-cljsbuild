@@ -8,32 +8,29 @@
 
 (def lock (Object.))
 
-(defn- print-safe
-  [& args]
+(defn- apply-safe [f & args]
   (locking lock
-    (apply print args)
+    (apply f args)
     (flush)))
 
-(defn- println-safe
-  [& args]
-  (locking lock
-    (apply println args)
-    (flush)))
+(defn- println-safe [& args]
+  (apply-safe println args))
 
 (defn- elapsed [started-at]
   (let [elapsed-us (- (. System (nanoTime)) started-at)]
     (with-precision 2
       (str (/ (double elapsed-us) 1000000000) " seconds"))))
 
-(defn- notify-cljs [cmd msg]
-  (try
-    (if (:bell cmd)
-      (print-safe \u0007))
-    (if (first (:shell cmd))
-      (util/sh (assoc cmd :shell (map #(if (= % "%") msg %) (:shell cmd)))))
-    (catch Throwable e
-      (pst+ e)))
-  (println-safe msg))
+(defn- notify-cljs [command message]
+  (when (:bell command)
+    (apply-safe print \u0007))
+  (when (seq (:shell command))
+    (try
+      (util/sh (assoc command :shell (map #(if (= % "%") message %) (:shell command))))
+      (catch Throwable e
+        (println-safe "Error running :notify-command:")
+        (pst+ e))))
+  (println-safe message))
 
 (defn- compile-cljs [cljs-path compiler-options notify-command]
   (let [output-file (:output-to compiler-options)

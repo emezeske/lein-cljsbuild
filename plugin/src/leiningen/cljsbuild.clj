@@ -30,13 +30,17 @@
     requires)
   exit-success)
 
+(defn- parse-notify-command [build]
+  (assoc build :parsed-notify-command
+    (config/parse-shell-command (:notify-command build)))) 
+
 (defn- run-compiler [project {:keys [crossover-path crossovers builds]} watch?]
   (println "Compiling ClojureScript.")
   ; If crossover-path does not exist before eval-in-project is called,
   ; the files it contains won't be classloadable, for some reason.
   (when (not-empty crossovers)
     (fs/mkdirs crossover-path))
-  (let [parsed-builds (map #(update-in % [:notify-command] config/parse-shell-command) builds)]
+  (let [parsed-builds (map parse-notify-command builds)]
     (run-local-project project crossover-path parsed-builds
       '(require 'cljsbuild.compiler 'cljsbuild.crossover 'cljsbuild.util)
       `(do
@@ -53,7 +57,7 @@
                 (:source-path opts#)
                 ~crossover-path
                 (:compiler opts#)
-                (:notify-command opts#)
+                (:parsed-notify-command opts#)
                 ~watch?))
             '~parsed-builds))))))
 

@@ -79,4 +79,3 @@ and returns a seq of the results. Launches all the threads at once."
 (defn sh [command]
   (let [process (process-start command)]
     ((:wait process))))
-
