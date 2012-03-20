@@ -3,7 +3,7 @@ if (phantom.args.length != 1) {
     phantom.exit(1);
 }
 
-var page = new WebPage();
+var page = require('webpage').create();
 var url = phantom.args[0];
 
 page.onConsoleMessage = function (message) {

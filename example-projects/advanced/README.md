@@ -20,6 +20,18 @@ Set up and start the server like this:
 
 Now, point your web browser at `http://localhost:3000`, and see the web app in action!
 
+## PhantomJS
+
+[PhantomJS] (http://www.phantomjs.org) is a headless Webkit browser, which can be automated
+via Javascript.  It provides a Javascript execution environment with access to all browser
+features (the DOM, etc), without opening a browser GUI.
+
+The tests and the "phantom-*" REPLs require PhantomJS 1.3 or newer to be installed.
+The process for accomplishing This is OS dependent.  See [PhantomJS] (http://www.phantomjs.org)
+for information on installing it on your OS.
+
+If you do not plan to run the tests and only want to use the rhino or firefox REPLs, you can skip this step.
+
 ## Running the Tests
 
 To run the unit tests:
@@ -36,8 +48,8 @@ be compiled, so they have their own entry in the `:builds` configuration.  Note 
 all of the `:source-path` entries from the `:builds` are added to the classpath, so
 the tests can `:require` ClojureScript namespaces from, e.g., the `src-cljs` directory.
 
-The example configuration uses [PhantomJS] (http://www.phantomjs.org) to run the tests.
-See the `phantom/unit-test.js` file for details on how this works.
+See the `phantom/unit-test.js` file for more details on how PhantomJS is configured to
+make this work.
 
 ## Connecting Firefox to a REPL
 
@@ -63,10 +75,6 @@ need to have your app running in the background:
     $ lein trampoline cljsbuild repl-launch firefox-naked
 
 ## Connecting PhantomJS to a REPL
-
-[PhantomJS] (http://www.phantomjs.org) is a headless Webkit browser, which can be automated
-via Javascript.  It provides a Javascript execution environment with access to all browser
-features (the DOM, etc), without opening a browser GUI.
 
 To try out a PhantomJS-based REPL, first start the Ring server in one terminal:
 
