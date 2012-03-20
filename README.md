@@ -198,3 +198,4 @@ See the file COPYING.
 * Phil Hagelberg (phil@hagelb.org)
 * Daniel E. Renfer (duck@kronkltd.net)
 * Daniel Harper (http://djhworld.github.com)
+* Philip Kamenarsky (http://github.com/pkamenarsky)
