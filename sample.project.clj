@@ -58,13 +58,18 @@
     ; The :builds option should be set to a sequence of maps.  Each
     ; map will be treated as a separate, independent, ClojureScript
     ; compiler configuration.
-    :builds [{
+    :builds [
       ; The path under which lein-cljsbuild will look for ClojureScript
       ; files to compile.  Defaults to "src-cljs".
       :source-path "src-cljs"
       ; If hooks are enabled, this flag determines whether files from this
       ; :source-path are added to the JAR file created by "lein jar".
       :jar true
+      ; If a notify-command is specified, it will be called when compilation succeeds
+      ; or fails, with a textual description of what happened appended to the command.
+      ; If ":beep true" is included, a system beep will be emitted as well.
+      ; Defaults to nil (disabled).
+      :notify-command ["growlnotify" "-m" :beep true]
       ; The :compiler options are passed directly to the ClojureScript compiler.
       :compiler {
         ; The path to the JavaScript file that will be output.
@@ -95,4 +100,4 @@
         ; Adds dependencies on foreign libraries.
         ; Defaults to the empty vector [].
         :foreign-libs [[{:file "http://example.com/remote.js"
-                         :provides  ["my.example"]}]]}}]})
+                         :provides  ["my.example"]}]]}]})
