@@ -44,7 +44,7 @@ lein trampoline cljsbuild repl-listen"]
       "And then browse to this page manually."]
       [:hr]
       [:h2 {:id "fun"} "Try some fun REPL commands!"]
-      [:pre "> (js/alert \"Hello!\)"
+      [:pre "> (js/alert \"Hello!\")
 > (load-namespace 'goog.date.Date)
 > (js/alert (goog.date.Date.))
 > (console.log (reduce + [1 2 3 4 5]))
