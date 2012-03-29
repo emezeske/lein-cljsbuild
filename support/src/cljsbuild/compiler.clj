@@ -4,6 +4,7 @@
     [cljs.closure :only [build]])
   (:require
     [cljsbuild.util :as util]
+    [cljs.compiler :as compiler]
     [fs.core :as fs]))
 
 (def lock (Object.))
@@ -46,7 +47,8 @@
       (fs/mkdirs output-file-dir))
     (let [started-at (. System (nanoTime))]
       (try
-        (build cljs-path compiler-options)
+        (binding [compiler/*cljs-warn-on-undeclared* true]
+          (build cljs-path compiler-options))
         (notify-cljs notify-command (str output-file " compiled in " (elapsed started-at) "."))
         (catch Throwable e
           (notify-cljs notify-command " Failed!")
