@@ -54,28 +54,28 @@
                "resources/private/html/unit-test.html"]}
     :crossovers [example.crossover]
     :crossover-jar true
-    :builds [
+    :builds {
       ; This build has the lowest level of optimizations, so it is
       ; useful when debugging the app.
-      {:id "dev"
-       :source-path "src-cljs"
+      :dev
+      {:source-path "src-cljs"
        :jar true
        :compiler {:output-to "resources/public/js/main-debug.js"
                   :optimizations :whitespace
                   :pretty-print true}}
       ; This build has the highest level of optimizations, so it is
       ; efficient when running the app in production.
-      {:id "prod"
-       :source-path "src-cljs"
+      :prod
+      {:source-path "src-cljs"
        :compiler {:output-to "resources/public/js/main.js"
                   :optimizations :advanced
                   :pretty-print false}}
       ; This build is for the ClojureScript unit tests that will
       ; be run via PhantomJS.  See the phantom/unit-test.js file
       ; for details on how it's run.
-      {:id "test"
-       :source-path "test-cljs"
+      :test
+      {:source-path "test-cljs"
        :compiler {:output-to "resources/private/js/unit-test.js"
                   :optimizations :whitespace
-                  :pretty-print true}}]}
+                  :pretty-print true}}}}
   :ring {:handler example.routes/app})
