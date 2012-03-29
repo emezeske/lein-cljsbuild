@@ -58,6 +58,7 @@
                 ~crossover-path
                 (:compiler opts#)
                 (:parsed-notify-command opts#)
+                (:warn-on-undeclared opts#)
                 ~watch?))
             '~parsed-builds))))))
 
