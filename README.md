@@ -160,6 +160,24 @@ This is extremely convenient for doing library development in ClojureScript.
 This allows cljsbuild to compile in all four optimization levels at once, for
 easier testing, or to compile a test suite alongside the library code.
 
+You can optionally assign an id to a build configuration and then
+build only that one:
+
+```clj
+(defproject lein-cljsbuild-example "1.2.3"
+  :plugins [[lein-cljsbuild "0.1.3"]]
+  :cljsbuild {
+    :builds [
+      {:id "main"
+       :source-path "src-cljs-main"
+       :compiler {:output-to "main.js"}}
+      {:id "other"
+       :source-path "src-cljs-other"
+       :compiler {:output-to "other.js"}}}])
+```
+
+    $ lein cljsbuild auto main
+
 See the
 [example-projects/advanced] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.3/example-projects/advanced)
 directory for a working example of a project that uses this feature.
