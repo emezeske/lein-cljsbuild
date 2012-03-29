@@ -34,13 +34,19 @@
   (assoc build :parsed-notify-command
     (config/parse-shell-command (:notify-command build)))) 
 
-(defn- run-compiler [project {:keys [crossover-path crossovers builds]} watch?]
+(defn- run-compiler [project {:keys [crossover-path crossovers builds]} build-ids watch?]
+  (doseq [build-id build-ids]
+    (if (empty? (filter #(= (:id %) build-id) builds))
+      (throw (Exception. (str "Unknown build identifier: " build-id)))))
   (println "Compiling ClojureScript.")
   ; If crossover-path does not exist before eval-in-project is called,
   ; the files it contains won't be classloadable, for some reason.
   (when (not-empty crossovers)
     (fs/mkdirs crossover-path))
-  (let [parsed-builds (map parse-notify-command builds)]
+  (let [filtered-builds (if (empty? build-ids)
+                          builds
+                          (filter #(some #{(:id %)} build-ids) builds))
+        parsed-builds (map parse-notify-command filtered-builds)]
     (run-local-project project crossover-path parsed-builds
       '(require 'cljsbuild.compiler 'cljsbuild.crossover 'cljsbuild.util)
       `(do
@@ -85,13 +91,13 @@
 
 (defn- once
   "Compile the ClojureScript project once."
-  [project options]
-  (run-compiler project options false))
+  [project options build-ids]
+  (run-compiler project options build-ids false))
 
 (defn- auto
   "Automatically recompile when files are modified."
-  [project options]
-  (run-compiler project options true))
+  [project options build-ids]
+  (run-compiler project options build-ids true))
 
 (defn- clean
   "Remove automatically generated files."
@@ -168,8 +174,8 @@
   ([project subtask & args]
     (let [options (config/extract-options project)]
       (case subtask
-        "once" (once project options)
-        "auto" (auto project options)
+        "once" (once project options args)
+        "auto" (auto project options args)
         "clean" (clean project options)
         "test" (test project options args)
         "repl-listen" (repl-listen project options)
