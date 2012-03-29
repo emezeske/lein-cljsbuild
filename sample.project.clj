@@ -70,6 +70,9 @@
       ; If ":beep true" is included, a system beep will be emitted as well.
       ; Defaults to nil (disabled).
       :notify-command ["growlnotify" "-m" :beep true]
+      ; This flag will turn on compiler warnings for references to
+      ; undeclared vars. Defaults to true.
+      :warn-on-undeclared true
       ; The :compiler options are passed directly to the ClojureScript compiler.
       :compiler {
         ; The path to the JavaScript file that will be output.

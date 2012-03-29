@@ -22,6 +22,7 @@
   {:source-path "src-cljs"
    :jar false
    :notify-command nil
+   :warn-on-undeclared true
    :compiler default-compiler-options})
 
 (defn- backwards-compat-builds [options]

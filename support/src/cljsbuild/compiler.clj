@@ -4,6 +4,7 @@
     [cljs.closure :only [build]])
   (:require
     [cljsbuild.util :as util]
+    [cljs.compiler :as compiler]
     [fs.core :as fs]))
 
 (def lock (Object.))
@@ -32,7 +33,8 @@
         (pst+ e))))
   (println-safe message))
 
-(defn- compile-cljs [cljs-path compiler-options notify-command]
+(defn- compile-cljs [cljs-path compiler-options notify-command
+                     warn-on-undeclared]
   (let [output-file (:output-to compiler-options)
         output-file-dir (fs/parent output-file)]
     (println-safe (str "Compiling " output-file " from " cljs-path "..."))
@@ -46,13 +48,15 @@
       (fs/mkdirs output-file-dir))
     (let [started-at (. System (nanoTime))]
       (try
-        (build cljs-path compiler-options)
+        (binding [compiler/*cljs-warn-on-undeclared* warn-on-undeclared]
+          (build cljs-path compiler-options))
         (notify-cljs notify-command (str output-file " compiled in " (elapsed started-at) "."))
         (catch Throwable e
           (notify-cljs notify-command " Failed!")
           (pst+ e))))))
 
-(defn run-compiler [cljs-path crossover-path compiler-options notify-command watch?]
+(defn run-compiler [cljs-path crossover-path compiler-options notify-command
+                    warn-on-undeclared watch?]
   (loop [last-dependency-mtimes {}]
     (let [output-file (:output-to compiler-options)
           output-mtime (if (fs/exists? output-file) (fs/mod-time output-file) 0)
@@ -63,7 +67,8 @@
         (and
           (not= last-dependency-mtimes dependency-mtimes)
           (some #(< output-mtime %) dependency-mtimes))
-        (compile-cljs cljs-path compiler-options notify-command))
+        (compile-cljs cljs-path compiler-options notify-command
+                      warn-on-undeclared))
       (when watch?
         (Thread/sleep 100)
         (recur dependency-mtimes)))))
