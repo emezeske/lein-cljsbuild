@@ -9,7 +9,7 @@
   {:repl-launch-commands {}
    :repl-listen-port 9000
    :test-commands {}
-   :crossover-path "crossover-cljs"
+   :crossover-path ".crossover-cljs"
    :crossover-jar false
    :crossovers []})
 
