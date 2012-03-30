@@ -160,6 +160,43 @@ This is extremely convenient for doing library development in ClojureScript.
 This allows cljsbuild to compile in all four optimization levels at once, for
 easier testing, or to compile a test suite alongside the library code.
 
+You can optionally assign an ID to a build configuration and build
+only that one:
+
+```clj
+(defproject lein-cljsbuild-example "1.2.3"
+  :plugins [[lein-cljsbuild "0.1.3"]]
+  :cljsbuild {
+    :builds [
+      {:source-path "src-cljs-main"
+       :compiler {:output-to "main.js"}}
+      {:id "other"
+       :source-path "src-cljs-other"
+       :compiler {:output-to "other.js"}}}])
+```
+
+    $ lein cljsbuild auto other
+
+If you want IDs for all of your build configurations, you can specify
+them as a map instead of a vector:
+
+```clj
+(defproject lein-cljsbuild-example "1.2.3"
+  :plugins [[lein-cljsbuild "0.1.3"]]
+  :cljsbuild {
+    :builds {
+      :main
+      {:source-path "src-cljs-main"
+       :compiler {:output-to "main.js"}}
+      :other
+      {:source-path "src-cljs-other"
+       :compiler {:output-to "other.js"}}}})
+```
+
+You can also build multiple configurations at once:
+
+    $ lein cljsbuild auto main other
+
 See the
 [example-projects/advanced] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.3/example-projects/advanced)
 directory for a working example of a project that uses this feature.

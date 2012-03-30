@@ -25,6 +25,13 @@
    :warn-on-undeclared true
    :compiler default-compiler-options})
 
+(defn convert-builds-map [options]
+  (update-in options [:builds]
+             #(if (map? %)
+                (for [[id build] %]
+                  (assoc build :id (name id)))
+                %)))
+
 (defn- backwards-compat-builds [options]
   (cond
     (and (map? options) (some #{:compiler :source-path} (keys options)))
@@ -105,7 +112,8 @@
 (defn- normalize-options
   "Sets default options and accounts for backwards compatibility."
   [options]
-  (let [compat (backwards-compat options)]
+  (let [options (convert-builds-map options)
+        compat (backwards-compat options)]
     (when (not= options compat)
       (warn-deprecated compat))
     (set-default-options compat)))
