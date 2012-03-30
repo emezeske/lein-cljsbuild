@@ -237,4 +237,4 @@ See the file COPYING.
 * Daniel Harper (http://djhworld.github.com)
 * Philip Kamenarsky (http://github.com/pkamenarsky)
 * Felix H. Dahlke (fhd@ubercode.de)
-* jenanwise (http://github.com/jenanwise)
+* Jenan Wise (http://github.com/jenanwise)
