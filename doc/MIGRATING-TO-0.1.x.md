@@ -1,9 +1,9 @@
 # Migrating from 0.0.x to 0.1.x
 
-The `0.1.3` release of lein-cljsbuild adds several new features that necessitate
+The `0.1.x` release of lein-cljsbuild adds several new features that necessitate
 some changes to the format of the `:cljsbuild` configuration entry.
 
-With that said, `0.1.3` **is** backwards-compatible with your existing configuration.
+With that said, `0.1.x` **is** backwards-compatible with your existing configuration.
 However, it will be complaining loudly about how it's deprecated.  This document
 explains how to fix that.
 
@@ -17,7 +17,7 @@ that may be renamed in the new version.  Most importantly, it will remove any cr
 that have been copied into place.  **This is very important.  If you are using crossovers,
 skipping this step will cause pain!**
 
-Once you've updated your project to use `[lein-cljsbuild "0.1.3"]`, run any subcommand,
+Once you've updated your project to use `[lein-cljsbuild "0.1.x"]`, run any subcommand,
 for instance, `lein cljsbuild once`.  The plugin will complain that your configuration
 is deprecated.  However, it should automatically convert your `:cljsbuild` entry to the new
 format, and print it out.
