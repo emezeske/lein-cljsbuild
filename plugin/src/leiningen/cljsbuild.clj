@@ -117,7 +117,8 @@
 (defn- test
   "Run ClojureScript tests."
   [project options args]
-  (let [compile-result (run-compiler project options false)]
+  (let [build-ids nil
+        compile-result (run-compiler project options build-ids false)]
     (if (not= compile-result exit-success)
       compile-result
       (run-tests project options args))))
@@ -200,10 +201,12 @@
 
 (defn- compile-hook [task & args]
   (skip-if-prepping task args
-    (let [compile-result (apply task args)]
+    (let [compile-result (apply task args)
+          build-ids nil]
       (if (not= compile-result exit-success)
         compile-result
-        (run-compiler (first args) (config/extract-options (first args)) false)))))
+        (run-compiler (first args) (config/extract-options (first args))
+                      build-ids false)))))
 
 (defn- test-hook [task & args]
   (skip-if-prepping task args
