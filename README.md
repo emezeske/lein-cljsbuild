@@ -11,6 +11,9 @@ Beyond basic compiler support, lein-cljsbuild can optionally help with a few oth
 * [Launching ClojureScript tests] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.6/doc/TESTING.md)
 * [Sharing code between Clojure and ClojureScript] (https://github.com/emezeske/lein-cljsbuild/blob/0.1.6/doc/CROSSOVERS.md)
 
+The latest version of lein-cljsbuild is `0.1.6`.
+[See the release notes here.](https://github.com/emezeske/lein-cljsbuild/blob/0.1.6/doc/RELEASE-NOTES.md)
+
 ## Requirements
 
 The lein-cljsbuild plugin works with
