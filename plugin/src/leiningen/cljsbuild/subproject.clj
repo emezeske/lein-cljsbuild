@@ -26,12 +26,15 @@
                              [crossover-path])}))
 
 (defn make-subproject-lein2 [project crossover-path builds]
-  (merge (make-subproject project crossover-path builds)
-    {:source-paths (concat
-                     (:source-paths project)
-                     (map :source-path builds)
-                     [crossover-path])
-     :resources-path (:resources-path project)}))
+  (with-meta
+    (merge (make-subproject project crossover-path builds)
+      {:source-paths (concat
+                       (:source-paths project)
+                       (map :source-path builds)
+                       [crossover-path])
+       :resources-path (:resources-path project)
+       :eval-in (:eval-in project)})
+    (meta project)))
 
 (defn eval-in-project
   "Support eval-in-project in both Leiningen 1.x and 2.x."
