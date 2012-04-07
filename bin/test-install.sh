@@ -24,5 +24,6 @@ for d in $projects; do
 		extra_command=', cljsbuild test'
 	fi
 	lein deps, cljsbuild clean, cljsbuild once$extra_command
+	#lein2 cljsbuild clean, cljsbuild once$extra_command
 	popd
 done
