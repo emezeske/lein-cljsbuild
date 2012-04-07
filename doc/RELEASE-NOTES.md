@@ -1,6 +1,6 @@
 # Release Notes for lein-cljsbuild
 
-## 0.1.6
+## 0.1.7
 
 1. Changed to use upstream ClojureScript version 0.0-1011.  This should fix REPL issues.
 
