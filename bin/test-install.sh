@@ -8,11 +8,10 @@ set -e
 
 projects="$@"
 [ -z "$projects" ] && projects='simple advanced'
-project_root=$(dirname $(realpath $0))
+project_root=$(dirname $(realpath $0))/..
 pushd $project_root
 
-rm -rf ~/.m2/repository/lein-cljsbuild
-rm -rf ~/.m2/repository/cljsbuild/
+rm -rf ~/.m2/repository/lein-cljsbuild ~/.m2/repository/cljsbuild/
 for d in support plugin; do
 	pushd $d
 	lein install
