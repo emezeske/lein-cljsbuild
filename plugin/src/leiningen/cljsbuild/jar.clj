@@ -13,10 +13,14 @@
       (.read fis ba)
       ba)))
 
-(defn- relative-path
+(defn relative-path
   "Given two normalized path strings, returns a path string of the second relative to the first."
   [parent child]
-  (s/replace (s/replace child parent "") #"^[\\/]" ""))
+  (let [relative (s/replace child parent "")]
+    (when (= child relative)
+      (throw (Exception.
+               (str child " is not a child of " parent))))
+    (s/replace relative #"^[\\/]" "")))
 
 ;; The reason we return a :bytes filespec is that it's the only way of
 ;; specifying a file's destination path inside the jar and is contents
