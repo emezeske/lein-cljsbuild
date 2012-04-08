@@ -45,18 +45,22 @@
     (is (apply = (map dependency-map [(concat lein-dependencies cljsbuild-dependencies)
                                       (:dependencies subproject)])))))
 
+(def lein2-metadata {:test-metadata "testing 1 2 3"})
 (def lein2-eval-in :trampoline)
 (def lein2-resources-path "resources")
 (def lein2-project
-  {:dependencies lein-dependencies
-   :dev-dependencies lein-dev-dependencies
-   :source-paths (concat [lein-source-path] lein-extra-classpath-dirs)
-   :repositories lein-repositories
-   :eval-in lein2-eval-in 
-   :resources-path lein2-resources-path})
+  (with-meta
+    {:dependencies lein-dependencies
+     :dev-dependencies lein-dev-dependencies
+     :source-paths (concat [lein-source-path] lein-extra-classpath-dirs)
+     :repositories lein-repositories
+     :eval-in lein2-eval-in 
+     :resources-path lein2-resources-path}
+    lein2-metadata))
 
 (deftest test-make-subproject-lein2
   (let [subproject (make-subproject-lein2 lein2-project lein-crossover lein-builds)]
+    (is (= lein2-metadata (meta subproject)))
     (doseq [dir (concat lein-extra-classpath-dirs [lein-source-path lein-build-path lein-crossover])]
       (is (some #{dir} (:source-paths subproject))))
     (is (:local-repo-classpath subproject))
