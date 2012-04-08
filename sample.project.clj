@@ -50,8 +50,8 @@
     ; doc/CROSSOVERS.md for more details. Defaults to the empty vector [].
     :crossovers [example.crossover]
     ; The directory into which the :crossovers namespaces should be copied.
-    ; Defaults to "crossover-cljs".
-    :crossover-path "crossover-cljs"
+    ; Defaults to ".crossover-cljs".
+    :crossover-path ".crossover-cljs"
     ; If hooks are enabled, this flag determines whether files from :crossover-path
     ; are added to the JAR file created by "lein jar".
     :crossover-jar true
