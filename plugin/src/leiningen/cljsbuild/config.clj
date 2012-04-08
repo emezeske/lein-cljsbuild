@@ -54,7 +54,7 @@
       (assoc no-crossovers
         :crossovers all-crossovers))))
 
-(defn- backwards-compat [options]
+(defn backwards-compat [options]
   (-> options
     backwards-compat-builds
     backwards-compat-crossovers))
@@ -99,11 +99,12 @@
              build
              (assoc-in build output-dir-key
                (str compiler-output-dir-base counter))))]
-    (if (apply distinct? (map #(get-in % output-dir-key) builds))
+    (if (or (empty? builds)
+            (apply distinct? (map #(get-in % output-dir-key) builds)))
       (assoc options :builds builds)
       (throw (Exception. (str "All " output-dir-key " options must be distinct."))))))
 
-(defn- set-default-options [options]
+(defn set-default-options [options]
   (set-default-output-dirs
     (deep-merge default-global-options
       (assoc options :builds
