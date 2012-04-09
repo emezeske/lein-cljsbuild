@@ -4,4 +4,4 @@
 
 (defn make-example-text []
   (macros/reverse-eval
-    ("code" "shared " "from the " "Hello " str))) 
+    ("code" "shared " "from the " "Hello " str)))

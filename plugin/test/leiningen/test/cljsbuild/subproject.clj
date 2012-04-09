@@ -1,22 +1,28 @@
 (ns leiningen.test.cljsbuild.subproject
   (:use
     leiningen.cljsbuild.subproject
-    clojure.test))
+    midje.sweet))
 
-(deftest test-check-clojure-version
-  (are [x] (= nil x)
-       (check-clojure-version {'org.clojure/clojure ["1.3.0"]})
-       (check-clojure-version {'org.clojure/clojure ["1.4.0"]}))
-  (are [x] (thrown? Exception x)
-       (check-clojure-version {'org.clojure/clojure ["1.2.0"]})
-       (check-clojure-version {})))
+(fact
+  (check-clojure-version {'org.clojure/clojure ["1.3.0"]}) => nil
+  (check-clojure-version {'org.clojure/clojure ["1.4.0"]}) => nil
+  (check-clojure-version {'org.clojure/clojure ["1.2.0"]}) => (throws Exception)
+  (check-clojure-version {}) => (throws Exception))
 
-(deftest test-merge-dependencies
-  (are [x] (apply =
-                  (map dependency-map [(concat x cljsbuild-dependencies)
-                                       (merge-dependencies x)]))
-    [['org.clojure/clojure "1.3.0"] ['a "1"] ['b "2"]]
-    [['org.clojure/clojure "1.3.0"] ['cljsbuild "9.9.9"]]))
+(defn- merge-dependencies-map [dependencies]
+  (-> dependencies
+    merge-dependencies
+    dependency-map))
+
+(defn- expected-dependencies-map [dependencies]
+  (-> dependencies
+    (concat cljsbuild-dependencies)
+    dependency-map))
+
+(fact
+  (for [dependencies [[['org.clojure/clojure "1.3.0"] ['a "1"] ['b "2"]]
+                      [['org.clojure/clojure "1.3.0"] ['cljsbuild "9.9.9"]]]]
+    (merge-dependencies-map dependencies) => (expected-dependencies-map dependencies)))
 
 (def lein-crossover ".crossovers")
 (def lein-build-path "src-cljs-a")
@@ -34,16 +40,15 @@
    :extra-classpath-dirs lein-extra-classpath-dirs
    :repositories lein-repositories})
 
-(deftest test-make-subproject-lein1
+(fact
   (let [subproject (make-subproject-lein1 lein1-project lein-crossover lein-builds)]
     (doseq [dir (concat lein-extra-classpath-dirs [lein-build-path lein-crossover])]
-      (is (some #{dir} (:extra-classpath-dirs subproject))))
-    (is (= lein-source-path (:source-path subproject)))
-    (is (:local-repo-classpath subproject))
-    (is (= lein-dev-dependencies (:dev-dependencies subproject)))
-    (is (= lein-repositories (:repositories subproject)))
-    (is (apply = (map dependency-map [(concat lein-dependencies cljsbuild-dependencies)
-                                      (:dependencies subproject)])))))
+      (:extra-classpath-dirs subproject) => (contains dir))
+    (:source-path subproject) => lein-source-path
+    (:local-repo-classpath subproject) => truthy
+    (:dev-dependencies subproject) => lein-dev-dependencies
+    (:repositories subproject) => lein-repositories
+    (dependency-map (:dependencies subproject)) => (expected-dependencies-map lein-dependencies)))
 
 (def lein2-metadata {:test-metadata "testing 1 2 3"})
 (def lein2-eval-in :trampoline)
@@ -54,19 +59,18 @@
      :dev-dependencies lein-dev-dependencies
      :source-paths (concat [lein-source-path] lein-extra-classpath-dirs)
      :repositories lein-repositories
-     :eval-in lein2-eval-in 
+     :eval-in lein2-eval-in
      :resources-path lein2-resources-path}
     lein2-metadata))
 
-(deftest test-make-subproject-lein2
+(fact
   (let [subproject (make-subproject-lein2 lein2-project lein-crossover lein-builds)]
-    (is (= lein2-metadata (meta subproject)))
+    (meta subproject) => lein2-metadata
     (doseq [dir (concat lein-extra-classpath-dirs [lein-source-path lein-build-path lein-crossover])]
-      (is (some #{dir} (:source-paths subproject))))
-    (is (:local-repo-classpath subproject))
-    (is (= lein-dev-dependencies (:dev-dependencies subproject)))
-    (is (= lein-repositories (:repositories subproject)))
-    (is (= lein2-eval-in (:eval-in subproject)))
-    (is (= lein2-resources-path (:resources-path subproject)))
-    (is (apply = (map dependency-map [(concat lein-dependencies cljsbuild-dependencies)
-                                      (:dependencies subproject)])))))
+      (:source-paths subproject) => (contains dir))
+    (:local-repo-classpath subproject)
+    (:dev-dependencies subproject) => lein-dev-dependencies
+    (:repositories subproject) => lein-repositories
+    (:eval-in subproject) => lein2-eval-in
+    (:resources-path subproject) => lein2-resources-path
+    (dependency-map (:dependencies subproject)) => (expected-dependencies-map lein-dependencies)))

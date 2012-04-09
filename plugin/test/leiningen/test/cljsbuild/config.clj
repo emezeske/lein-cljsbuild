@@ -1,9 +1,9 @@
 (ns leiningen.test.cljsbuild.config
   (:use
     leiningen.cljsbuild.config
-    clojure.test))
+    midje.sweet))
 
-(deftest test-backwards-compatibility
+(fact
   (let [config-0-0-x-early {:source-path "a"
                             :compiler {:output-to "hello.js"}}
         config-0-0-x-late [{:source-path "a"
@@ -11,56 +11,74 @@
         config-backwards {:builds
                            [{:source-path "a"
                              :compiler {:output-to "hello.js"}}]}]
-    (is (= config-backwards (backwards-compat config-0-0-x-early))) 
-    (is (= config-backwards (backwards-compat config-0-0-x-late)))))
+    (backwards-compat config-0-0-x-early) => config-backwards
+    (backwards-compat config-0-0-x-late) => config-backwards))
 
-(deftest test-ids
+(fact
   (let [config-vec {:builds [{:id "a"} {:id "b"}]}
         config-map {:builds {:a {} :b {}}}]
-    (is (= config-vec (convert-builds-map config-vec)))
-    (is (= config-vec (convert-builds-map config-map)))))
+    (convert-builds-map config-vec) => config-vec
+    (convert-builds-map config-map) => config-vec))
 
-(deftest test-shell-command
-  (is (= {:shell []}
-         (parse-shell-command [])))
-  (is (= {:shell ["a"]}
-         (parse-shell-command ["a"])))
-  (is (= {:shell ["a" "b" "c"] :x 1 :y 2}
-         (parse-shell-command ["a" "b" "c" :x 1 :y 2]))))
+(fact
+  (parse-shell-command []) => {:shell []}
+  (parse-shell-command ["a"]) => {:shell ["a"]}
+  (parse-shell-command ["a" "b" "c" :x 1 :y 2]) => {:shell ["a" "b" "c"] :x 1 :y 2})
 
-(deftest test-default-options
-  (let [config-in {:repl-launch-commands {:a ["a"]}
-                   :repl-listen-port 10000
-                   :test-commands {:b ["b"]}
-                   :crossover-path "c"
-                   :crossover-jar true
-                   :crossovers ["d" "e"]
-                   :builds
-                     '({:source-path "f"
-                        :jar true
-                        :notify-command ["g"]
-                        :warn-on-undeclared false
-                        :compiler
-                          {:output-to "h"
-                           :output-dir "i"
-                           :optimizations :advanced
-                           :pretty-print false}})}]
-    ; Ensure that none of our custom settings are overwritten by defaults.
-    (is (= config-in (set-default-options config-in)))
-    ; Ensure that if any custom setting is missing, a default is provided.
-    (doseq [option (keys config-in)]
-      (is (contains? (set-default-options (dissoc config-in option)) option)))
-    (let [build (first (:builds config-in))]
-      (doseq [build-option (keys build)]
-        (let [defaulted (set-default-options
-                          (assoc config-in :builds 
-                            (list (dissoc build build-option))))]
-        (is (contains? (first (:builds defaulted)) build-option))))
-      (let [compiler (:compiler build)]
-        (doseq [compiler-option (keys compiler)]
-          (let [defaulted (set-default-options
-                            (assoc config-in :builds
-                              (list
-                                (assoc build :compiler
-                                  (dissoc compiler :compiler-option)))))]
-          (is (contains? (:compiler (first (:builds defaulted))) compiler-option))))))))
+(def config-in
+ {:repl-launch-commands {:a ["a"]}
+  :repl-listen-port 10000
+  :test-commands {:b ["b"]}
+  :crossover-path "c"
+  :crossover-jar true
+  :crossovers ["d" "e"]
+  :builds
+    '({:source-path "f"
+       :jar true
+       :notify-command ["g"]
+       :warn-on-undeclared false
+       :compiler
+         {:output-to "h"
+          :output-dir "i"
+          :optimizations :advanced
+          :pretty-print false}})})
+
+(fact "custom settings are not overwritten by defaults"
+  (set-default-options config-in) => config-in)
+
+(fact "missing settings have defaults provided"
+  (doseq [option (keys config-in)]
+    (set-default-options (dissoc config-in option)) => (contains {option anything})))
+
+(defn- get-build [config]
+  (first (:builds config)))
+
+(defn- default-build-option [config build option]
+  (set-default-options
+    (assoc config :builds
+      (list (dissoc build option)))))
+
+(fact "missing build settings have defaults provided"
+  (let [build (get-build config-in)]
+    (doseq [build-option (keys build)]
+      (let [defaulted (default-build-option config-in build build-option)]
+        (get-build defaulted) => (contains {build-option anything})))))
+
+(defn- get-compiler [config]
+  (:compiler (get-build config)))
+
+(defn- default-compiler-option [config compiler option]
+  (set-default-options
+    (assoc config :builds
+      (list
+        (assoc compiler :compiler
+          (dissoc compiler option))))))
+
+(fact "missing compiler settings have defaults provided"
+  (let [compiler (:compiler (get-build config-in))]
+    (doseq [compiler-option (keys compiler)]
+      (let [defaulted (default-compiler-option config-in compiler compiler-option)]
+        (get-compiler defaulted) => (contains {compiler-option anything})))))
+
+(fact
+  (extract-options {:cljsbuild config-in}) => config-in)

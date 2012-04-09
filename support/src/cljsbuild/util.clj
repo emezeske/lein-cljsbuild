@@ -30,14 +30,19 @@ and returns a seq of the results. Launches all the threads at once."
   [f s]
   (doall (map deref (doall (map #(future (f %)) s)))))
 
-(defn once-every [ms desc f]
-  (future
-    (while true
-      (Thread/sleep ms)
+(defn sleep [ms]
+  (Thread/sleep ms))
+
+(defn once-every
+  ([ms desc f keep-going]
+    (while (keep-going)
       (try
         (f)
         (catch Exception e
-          (println (str "Error " desc ": " e)))))))
+          (println (str "Error " desc ": " e))))
+      (sleep ms)))
+  ([ms desc f]
+    (once-every ms desc f (fn [] true))))
 
 (defn- pump-file [reader out]
   (let [buffer (make-array Character/TYPE 1000)]
@@ -56,7 +61,7 @@ and returns a seq of the results. Launches all the threads at once."
       (.join pump-out)
       (.join pump-err))))
 
-(defn- maybe-writer [file fallback]
+(defn maybe-writer [file fallback]
   (if file
     (do
       (fs/delete file)

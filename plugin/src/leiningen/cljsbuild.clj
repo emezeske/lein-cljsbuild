@@ -56,7 +56,8 @@
                     '~crossovers))]
           (copy-crossovers#)
           (when ~watch?
-            (cljsbuild.util/once-every 1000 "copying crossovers" copy-crossovers#))
+            (future
+              (cljsbuild.util/once-every 1000 "copying crossovers" copy-crossovers#)))
           (cljsbuild.util/in-threads
             (fn [opts#]
               (cljsbuild.compiler/run-compiler

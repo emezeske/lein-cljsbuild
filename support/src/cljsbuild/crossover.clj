@@ -95,7 +95,7 @@
         (let [temp-file (str to-file ".tmp")]
           ; Write a temp file and atomically rename to the real file
           ; to prevent the compiler from reading a half-written file
-          (spit temp-file (filtered-crossover-file from-resource)) 
+          (spit temp-file (filtered-crossover-file from-resource))
           (fs/rename temp-file to-file)
           ; Mark the file as read-only, to hopefully warn the user not to modify it.
           (fs/chmod "-w" to-file))))))

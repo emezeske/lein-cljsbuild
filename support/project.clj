@@ -8,4 +8,8 @@
                  [org.clojure/clojurescript "0.0-1011"
                    :exclusions [org.apache.ant/ant]]
                  [fs "1.1.2"]
-                 [clj-stacktrace "0.2.4"]])
+                 [clj-stacktrace "0.2.4"]]
+  :dev-dependencies [[midje "1.3.1"]
+                     ; NOTE: lein-midje requires different versions to be
+                     ; installed for lein1 vs lein2 compatibility :(.
+                     [lein-midje "1.0.9"]])
