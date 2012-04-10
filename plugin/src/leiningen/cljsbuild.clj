@@ -32,7 +32,7 @@
 
 (defn- parse-notify-command [build]
   (assoc build :parsed-notify-command
-    (config/parse-shell-command (:notify-command build)))) 
+    (config/parse-shell-command (:notify-command build))))
 
 (defn- run-compiler [project {:keys [crossover-path crossovers builds]} build-ids watch?]
   (doseq [build-id build-ids]

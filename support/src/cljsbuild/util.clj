@@ -14,8 +14,8 @@
     (filter #(types (ext %)) files)))
 
 (defn find-dir-files [root files types]
-  (for [files (filter-by-ext files types)]
-    (join-paths root files)))
+  (for [file (filter-by-ext files types)]
+    (join-paths root file)))
 
 (defn find-files [dir types]
   (let [iter (fs/iterate-dir dir)]

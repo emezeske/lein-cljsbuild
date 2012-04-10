@@ -26,6 +26,8 @@
      ["a/b" "" ["m.z" "n.z" "o.b"]]]
     :times 1))
 
+; FIXME: There appears to be a race condition in this test (or perhaps the
+;        code under test).  The test fails periodically!
 (unfinished call-in-threads)
 
 (fact
