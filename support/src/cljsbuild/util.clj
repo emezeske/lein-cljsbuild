@@ -44,6 +44,10 @@ and returns a seq of the results. Launches all the threads at once."
   ([ms desc f]
     (once-every ms desc f (fn [] true))))
 
+(defn once-every-bg [& args]
+  (future
+    (apply once-every args)))
+
 (defn- pump-file [reader out]
   (let [buffer (make-array Character/TYPE 1000)]
     (loop [len (.read reader buffer)]

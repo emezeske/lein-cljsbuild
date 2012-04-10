@@ -124,6 +124,10 @@
         options (apply hash-map tail)]
     (merge {:shell shell} options)))
 
+(defn parse-notify-command [build]
+  (assoc build :parsed-notify-command
+    (parse-shell-command (:notify-command build))))
+
 (defn extract-options
   "Given a project, returns a seq of cljsbuild option maps."
   [project]

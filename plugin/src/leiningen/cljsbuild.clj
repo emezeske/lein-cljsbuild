@@ -30,10 +30,6 @@
     requires)
   exit-success)
 
-(defn- parse-notify-command [build]
-  (assoc build :parsed-notify-command
-    (config/parse-shell-command (:notify-command build))))
-
 (defn- run-compiler [project {:keys [crossover-path crossovers builds]} build-ids watch?]
   (doseq [build-id build-ids]
     (if (empty? (filter #(= (:id %) build-id) builds))
@@ -46,7 +42,7 @@
   (let [filtered-builds (if (empty? build-ids)
                           builds
                           (filter #(some #{(:id %)} build-ids) builds))
-        parsed-builds (map parse-notify-command filtered-builds)]
+        parsed-builds (map config/parse-notify-command filtered-builds)]
     (run-local-project project crossover-path parsed-builds
       '(require 'cljsbuild.compiler 'cljsbuild.crossover 'cljsbuild.util)
       `(do
@@ -56,8 +52,7 @@
                     '~crossovers))]
           (copy-crossovers#)
           (when ~watch?
-            (future
-              (cljsbuild.util/once-every 1000 "copying crossovers" copy-crossovers#)))
+            (cljsbuild.util/once-every-bg 1000 "copying crossovers" copy-crossovers#))
           (cljsbuild.util/in-threads
             (fn [opts#]
               (cljsbuild.compiler/run-compiler

@@ -26,22 +26,22 @@
   (parse-shell-command ["a" "b" "c" :x 1 :y 2]) => {:shell ["a" "b" "c"] :x 1 :y 2})
 
 (def config-in
- {:repl-launch-commands {:a ["a"]}
-  :repl-listen-port 10000
-  :test-commands {:b ["b"]}
-  :crossover-path "c"
-  :crossover-jar true
-  :crossovers ["d" "e"]
-  :builds
-    '({:source-path "f"
-       :jar true
-       :notify-command ["g"]
-       :warn-on-undeclared false
-       :compiler
-         {:output-to "h"
-          :output-dir "i"
-          :optimizations :advanced
-          :pretty-print false}})})
+  {:repl-launch-commands {:a ["a"]}
+   :repl-listen-port 10000
+   :test-commands {:b ["b"]}
+   :crossover-path "c"
+   :crossover-jar true
+   :crossovers ["d" "e"]
+   :builds
+     '({:source-path "f"
+        :jar true
+        :notify-command ["g"]
+        :warn-on-undeclared false
+        :compiler
+          {:output-to "h"
+           :output-dir "i"
+           :optimizations :advanced
+           :pretty-print false}})})
 
 (fact "custom settings are not overwritten by defaults"
   (set-default-options config-in) => config-in)
