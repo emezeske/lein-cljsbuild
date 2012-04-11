@@ -195,7 +195,7 @@
     (apply ~task ~args)
     (do ~@forms)))
 
-(defn- compile-hook [task & args]
+(defn compile-hook [task & args]
   (skip-if-prepping task args
     (let [compile-result (apply task args)
           build-ids nil]
@@ -204,7 +204,7 @@
         (run-compiler (first args) (config/extract-options (first args))
                       build-ids false)))))
 
-(defn- test-hook [task & args]
+(defn test-hook [task & args]
   (skip-if-prepping task args
     (let [test-results [(apply task args)
                         (run-tests (first args) (config/extract-options (first args)) [])]]
@@ -212,12 +212,12 @@
         exit-success
         exit-failure))))
 
-(defn- clean-hook [task & args]
+(defn clean-hook [task & args]
   (skip-if-prepping task args
     (apply task args)
     (clean (first args) (config/extract-options (first args)))))
 
-(defn- jar-hook [task & [project out-file filespecs]]
+(defn jar-hook [task & [project out-file filespecs]]
   (skip-if-prepping task [project out-file filespecs]
     (apply task [project out-file (concat filespecs (jar/get-filespecs project))])))
 
