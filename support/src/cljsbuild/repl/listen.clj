@@ -9,22 +9,26 @@
   (let [env (browser/repl-env :port (Integer. port) :working-dir output-dir)]
     (repl/repl env)))
 
-(defn process-start-delayed [command]
-  (try
-    ; TODO: Poll the REPL to see if it's ready before starting
-    ;       the process, instead of sleeping.
-    (Thread/sleep 5000)
-    (util/process-start command)
-    (catch Exception e
-      (println "Error in background process: " e)
-      (throw e))))
+(defn delayed-process-start [command]
+  (future
+    (try
+      ; TODO: Poll the REPL to see if it's ready before starting
+      ;       the process, instead of sleeping.
+      (util/sleep 5000)
+      (util/process-start command)
+      (catch Exception e
+        (println "Error in background process: " e)
+        (throw e)))))
+
+(defn delayed-process-wait [process]
+  (let [p @process]
+    ((:kill p))
+    ((:wait p))))
 
 (defn run-repl-launch [port output-dir command]
   (println "Background command output will be shown after the REPL is exited via :cljs/quit .")
-  (let [process-delayed (future (process-start-delayed command))]
+  (let [process (delayed-process-start command)]
     (try
       (run-repl-listen port output-dir)
       (finally
-        (let [process @process-delayed]
-          ((:kill process))
-          ((:wait process)))))))
+        (delayed-process-wait process)))))
