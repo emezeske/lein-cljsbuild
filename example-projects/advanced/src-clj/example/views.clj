@@ -34,9 +34,10 @@
     [:body
       [:h1 "REPL Demo"]
       [:hr]
-      "This page is meant to be accessed by running:"
-      [:pre "lein ring server-headless 3000 &
-lein trampoline cljsbuild repl-launch firefox http://localhost:3000/repl-demo"]
+      "This page is meant to be accessed by running this in one terminal:"
+      [:pre "lein ring server-headless 3000"]
+      "And then this in a different terminal:"
+      [:pre "lein trampoline cljsbuild repl-launch firefox http://localhost:3000/repl-demo"]
       [:hr]
       "Alternately, you can run:"
       [:pre "lein ring server-headless 3000 &
