@@ -26,7 +26,6 @@
     ((:wait p))))
 
 (defn run-repl-launch [port output-dir command]
-  (println "Background command output will be shown after the REPL is exited via :cljs/quit .")
   (let [process (delayed-process-start command)]
     (try
       (run-repl-listen port output-dir)
