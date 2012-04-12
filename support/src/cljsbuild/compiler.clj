@@ -7,9 +7,9 @@
     [cljs.compiler :as compiler]
     [fs.core :as fs]))
 
-(def lock (Object.))
+(defonce lock (Object.))
 
-(defn- apply-safe [f & args]
+(defn- apply-safe [f args]
   (locking lock
     (apply f args)
     (flush)))
@@ -17,27 +17,38 @@
 (defn- println-safe [& args]
   (apply-safe println args))
 
+(def reset-color "\u001b[0m")
+(def foreground-red "\u001b[31m")
+(def foreground-green "\u001b[32m")
+
+(defn- colorizer [c]
+  (fn [& args]
+    (str c (apply str args) reset-color)))
+
+(def red (colorizer foreground-red))
+(def green (colorizer foreground-green))
+
 (defn- elapsed [started-at]
   (let [elapsed-us (- (. System (nanoTime)) started-at)]
     (with-precision 2
       (str (/ (double elapsed-us) 1000000000) " seconds"))))
 
-(defn- notify-cljs [command message]
+(defn- notify-cljs [command message colorizer]
   (when (:bell command)
     (apply-safe print \u0007))
   (when (seq (:shell command))
     (try
       (util/sh (assoc command :shell (map #(if (= % "%") message %) (:shell command))))
       (catch Throwable e
-        (println-safe "Error running :notify-command:")
+        (println-safe (red "Error running :notify-command:"))
         (pst+ e))))
-  (println-safe message))
+  (println-safe (colorizer message)))
 
 (defn- compile-cljs [cljs-path compiler-options notify-command
-                     warn-on-undeclared]
+                     warn-on-undeclared?]
   (let [output-file (:output-to compiler-options)
         output-file-dir (fs/parent output-file)]
-    (println-safe (str "Compiling " output-file " from " cljs-path "..."))
+    (println-safe (str "Compiling \"" output-file "\" from \"" cljs-path "\"..."))
     (flush)
     ; FIXME: I do not trust the ClojureScript compiler's cljs/js caching in the
     ;        output-dir.  It seems to forget to rebuild things sometimes, and
@@ -46,17 +57,21 @@
     (fs/delete-dir (:output-dir compiler-options))
     (when output-file-dir
       (fs/mkdirs output-file-dir))
-    (let [started-at (. System (nanoTime))]
+    (let [started-at (System/nanoTime)]
       (try
-        (binding [compiler/*cljs-warn-on-undeclared* warn-on-undeclared]
+        (binding [compiler/*cljs-warn-on-undeclared* warn-on-undeclared?]
           (build cljs-path compiler-options))
-        (notify-cljs notify-command (str output-file " compiled in " (elapsed started-at) "."))
+        (notify-cljs
+          notify-command
+          (str "Successfully compiled \"" output-file "\" in " (elapsed started-at) ".") green)
         (catch Throwable e
-          (notify-cljs notify-command " Failed!")
+          (notify-cljs
+            notify-command
+            (str "Compiling \"" output-file "\" failed:") red)
           (pst+ e))))))
 
 (defn run-compiler [cljs-path crossover-path compiler-options notify-command
-                    warn-on-undeclared watch?]
+                    warn-on-undeclared? watch?]
   (loop [last-dependency-mtimes {}]
     (let [output-file (:output-to compiler-options)
           output-mtime (if (fs/exists? output-file) (fs/mod-time output-file) 0)
@@ -68,7 +83,7 @@
           (not= last-dependency-mtimes dependency-mtimes)
           (some #(< output-mtime %) dependency-mtimes))
         (compile-cljs cljs-path compiler-options notify-command
-                      warn-on-undeclared))
+                      warn-on-undeclared?))
       (when watch?
         (Thread/sleep 100)
         (recur dependency-mtimes)))))

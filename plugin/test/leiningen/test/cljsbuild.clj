@@ -86,14 +86,6 @@
     :crossovers crossovers
     :builds builds}})
 
-(defmacro quietly [& forms]
-  `(binding [*out* (new java.io.StringWriter)]
-    ~@forms))
-
-(defn run-cljsbuild [& args]
-  (quietly
-    (apply cljsbuild args)))
-
 (defn hook-success [& args]
   0)
 
@@ -110,11 +102,11 @@
      ~@forms))
 
 (fact "fail when no arguments present"
-  (run-cljsbuild project) => 1)
+  (cljsbuild project) => 1)
 
 (fact "once/auto call eval-in-project with the right args"
   (doseq [command ["once" "auto"]]
-    (run-cljsbuild project command) => 0
+    (cljsbuild project command) => 0
     (provided
       (subproject/eval-in-project
         project
@@ -127,7 +119,7 @@
   (doseq [[command watch?] {"once" false "auto" true}
           extra-args [[] [build-id]]]
     (with-compiler-bindings
-      (apply run-cljsbuild project command extra-args)) => 0
+      (apply cljsbuild project command extra-args)) => 0
     (provided
       (cljsbuild.crossover/copy-crossovers
         crossover-path
@@ -142,24 +134,21 @@
 
 (fact "bad build IDs are detected"
   (with-compiler-bindings
-    (run-cljsbuild project "once" "wrong-build-id")) => (throws Exception))
+    (cljsbuild project "once" "wrong-build-id")) => (throws Exception))
 
 (fact "clean calls cleanup-files"
   (with-compiler-bindings
-    (run-cljsbuild project "clean")) => 0
+    (cljsbuild project "clean")) => 0
   (with-compiler-bindings
-    (quietly
-      (clean-hook hook-success project))) => 0
+    (clean-hook hook-success project)) => 0
   (with-compiler-bindings
-    (quietly
-      (clean-hook hook-failure project))) => 0
+    (clean-hook hook-failure project)) => 0
   (against-background
     (cljsbuild.clean/cleanup-files compiler) => nil :times 1))
 
 (fact "compile-hook calls through to the compiler when task succeeds"
   (with-compiler-bindings
-    (quietly
-      (compile-hook hook-success project))) => 0
+    (compile-hook hook-success project)) => 0
   (provided
     (cljsbuild.crossover/copy-crossovers
       crossover-path
@@ -174,8 +163,7 @@
 
 (fact "compile-hook does not call through to the compiler when task fails"
   (with-compiler-bindings
-    (quietly
-      (compile-hook hook-failure project))) => 1
+    (compile-hook hook-failure project)) => 1
   (provided
     (cljsbuild.crossover/copy-crossovers
       anything
@@ -193,15 +181,13 @@
 (let [parsed-commands [(config/parse-shell-command test-command)]]
   (fact "tests work correctly"
       (with-compiler-bindings
-        (run-cljsbuild project "test")) => 0
+        (cljsbuild project "test")) => 0
       (with-compiler-bindings
-        (run-cljsbuild project "test" test-command-id)) => 0
+        (cljsbuild project "test" test-command-id)) => 0
       (with-compiler-bindings
-        (quietly
-          (test-hook hook-success project))) => 0
+        (test-hook hook-success project)) => 0
       (with-compiler-bindings
-        (quietly
-          (test-hook hook-failure project))) => 1
+        (test-hook hook-failure project)) => 1
       (against-background
         (cljsbuild.crossover/copy-crossovers
           crossover-path
@@ -222,22 +208,22 @@
 
 (fact "repl-listen calls run-repl-listen"
   (with-repl-bindings
-    (run-cljsbuild project "repl-listen")) => 0
+    (cljsbuild project "repl-listen")) => 0
   (provided
     (cljsbuild.repl.listen/run-repl-listen repl-listen-port anything) => nil :times 1))
 
 (fact "repl-launch with no ID fails"
   (with-repl-bindings
-    (run-cljsbuild project "repl-launch")) => (throws Exception))
+    (cljsbuild project "repl-launch")) => (throws Exception))
 
 (fact "repl-launch with bad ID fails"
   (with-repl-bindings
-    (run-cljsbuild project "repl-launch" "wrong-repl-launch-id")) => (throws Exception))
+    (cljsbuild project "repl-launch" "wrong-repl-launch-id")) => (throws Exception))
 
 (fact "repl-launch calls run-repl-launch"
   (let [parsed-command (config/parse-shell-command repl-launch-command)]
     (with-repl-bindings
-      (run-cljsbuild project "repl-launch" repl-launch-command-id)) => 0
+      (cljsbuild project "repl-launch" repl-launch-command-id)) => 0
     (provided
       (cljsbuild.repl.listen/run-repl-launch
         repl-listen-port
@@ -246,7 +232,7 @@
 
 (fact "repl-rhino calls run-repl-rhino"
   (with-repl-bindings
-    (run-cljsbuild project "repl-rhino")) => 0
+    (cljsbuild project "repl-rhino")) => 0
   (provided
     (cljsbuild.repl.rhino/run-repl-rhino) => nil :times 1))
 
@@ -257,8 +243,7 @@
         input-filespecs [{:type :bytes :path "/i/j" :bytes "fake-1"}]
         project-filespecs [{:type :bytes :path "/a/b" :bytes "fake-2"}]
         all-filespecs (concat input-filespecs project-filespecs)]
-    (quietly
-      (jar-hook jar-task project out-file input-filespecs)) => 0
+    (jar-hook jar-task project out-file input-filespecs) => 0
     (provided
       (jar-task project out-file all-filespecs) => 0
       (jar/get-filespecs project) => project-filespecs)))

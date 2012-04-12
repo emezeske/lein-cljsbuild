@@ -44,7 +44,7 @@
 (defn- truncate-uri-path [uri n]
   (if uri
     (let [uri-path (.getPath uri)]
-      (subs uri-path 0 (- (.length uri-path) n)))
+      (subs uri-path 0 (- (count uri-path) n)))
     nil))
 
 (defn- ns-to-path [ns]
@@ -55,11 +55,11 @@
 (defn- find-crossover [crossover]
   (let [ns-path (ns-to-path crossover)
         as-dir (resource ns-path)
-        dir-parent (truncate-uri-path as-dir (.length ns-path))
+        dir-parent (truncate-uri-path as-dir (count ns-path))
         recurse-dirs (recurse-resource-dir as-dir)
         ns-file-path (str ns-path ".clj")
         as-file (resource ns-file-path)
-        file-parent (truncate-uri-path as-file (.length ns-file-path))
+        file-parent (truncate-uri-path as-file (count ns-file-path))
         all-resources (conj
                         (map vector (repeat dir-parent) recurse-dirs)
                         [file-parent as-file])
@@ -71,19 +71,28 @@
       (fail "Unable to find crossover: " crossover))
     resources))
 
-(defn- find-crossovers [crossovers]
+(defn find-crossovers [crossovers]
   (distinct
     (mapcat find-crossover crossovers)))
 
-(defn- crossover-needs-update? [from-resource to-file]
-  (let [exists (fs/exists? to-file)]
-    (or
-      (not exists)
-      (and
-        ; We can't determine the mtime for jar resources; they'll just
-        ; be copied once and that's it.
-        (= "file" (.getProtocol from-resource))
-        (> (fs/mod-time (.getPath from-resource)) (fs/mod-time to-file))))))
+(defn crossover-needs-update? [from-resource to-file]
+  (or
+    (not (fs/exists? to-file))
+    (and
+      ; We can't determine the mtime for jar resources; they'll just
+      ; be copied once and that's it.
+      (= "file" (.getProtocol from-resource))
+      (> (fs/mod-time (.getPath from-resource)) (fs/mod-time to-file)))))
+
+(defn write-crossover
+  "Write a temp file and atomically rename to the real file
+to prevent the compiler from reading a half-written file."
+  [from-resource to-file]
+  (let [temp-file (str to-file ".tmp")]
+    (spit temp-file (filtered-crossover-file from-resource)) 
+    (fs/rename temp-file to-file) 
+    ; Mark the file as read-only, to hopefully warn the user not to modify it.
+    (fs/chmod "-w" to-file)))
 
 (defn copy-crossovers [crossover-path crossovers]
   (let [from-resources (find-crossovers crossovers)
@@ -92,10 +101,4 @@
       (fs/mkdirs dir))
     (doseq [[[_ from-resource] to-file] (zipmap from-resources to-files)]
       (when (crossover-needs-update? from-resource to-file)
-        (let [temp-file (str to-file ".tmp")]
-          ; Write a temp file and atomically rename to the real file
-          ; to prevent the compiler from reading a half-written file
-          (spit temp-file (filtered-crossover-file from-resource))
-          (fs/rename temp-file to-file)
-          ; Mark the file as read-only, to hopefully warn the user not to modify it.
-          (fs/chmod "-w" to-file))))))
+        (write-crossover from-resource to-file)))))

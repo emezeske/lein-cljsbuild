@@ -14,8 +14,7 @@
 (fact
   (run-repl-listen port output-dir) => nil
 
-  (binding [*out* (new java.io.StringWriter)]
-    (run-repl-launch port output-dir command)) => nil
+  (run-repl-launch port output-dir command) => nil
   (provided
     (delayed-process-start command) => (future {:kill (fn [] nil) :wait (fn [] nil)}))
 

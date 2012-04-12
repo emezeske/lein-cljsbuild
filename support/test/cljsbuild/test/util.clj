@@ -26,29 +26,27 @@
      ["a/b" "" ["m.z" "n.z" "o.b"]]]
     :times 1))
 
-; FIXME: There appears to be a race condition in this test (or perhaps the
-;        code under test).  The test fails periodically!
-(unfinished call-in-threads)
+(defn- call-in-threads [x]
+  (inc x))
 
 (fact
-  (in-threads call-in-threads [1 2 3]) => [nil nil nil]
-  (provided (call-in-threads 1) => nil :times 1)
-  (provided (call-in-threads 2) => nil :times 1)
-  (provided (call-in-threads 3) => nil :times 1))
+  (in-threads call-in-threads [1 2 3]) => [2 3 4])
 
 (unfinished call-once-every)
 (unfinished keep-going)
 
 (fact
   (once-every 1000 "description" call-once-every keep-going) => nil
-  (provided (keep-going) =streams=> [true true true false] :times 4)
-  (provided (call-once-every) => nil :times 3)
-  (provided (sleep 1000) => nil :times 3))
+  (provided
+    (keep-going) =streams=> [true true true false] :times 4
+    (call-once-every) => nil :times 3
+    (sleep 1000) => nil :times 3))
 
 (fact
   (maybe-writer "filename" *out*) => :success
-  (provided (fs/delete "filename") => nil :times 1)
-  (provided (io/writer "filename") => :success :times 1))
+  (provided
+    (fs/delete "filename") => nil :times 1
+    (io/writer "filename") => :success :times 1))
 
 (fact
   (maybe-writer nil *out*) => *out*)
@@ -61,4 +59,5 @@
 (fact
   (let [command {:shell ["command" "arg1" "arg2"]}]
     (sh command) => 0
-    (provided (process-start command) => {:wait (fn [] 0)} :times 1)))
+    (provided
+      (process-start command) => {:wait (fn [] 0)} :times 1)))
