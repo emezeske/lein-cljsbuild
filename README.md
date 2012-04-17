@@ -18,12 +18,12 @@ The latest version of lein-cljsbuild is `0.1.8`.
 
 The lein-cljsbuild plugin works with
 [Leiningen] (https://github.com/technomancy/leiningen/blob/master/README.md)
-version `1.6.2` or higher, although `1.7.0` or higher is recommended.
+version `1.7.0` or higher.
 
 ## Installation
 
-If you're using Leiningen `1.7.0` or newer, you can install the plugin by
-adding lein-cljsbuild to your `project.clj` file in the `:plugins` section:
+You can install the plugin by adding lein-cljsbuild to your `project.clj`
+file in the `:plugins` section:
 
 ```clj
 ; Using Leiningen 1.7.0 or newer:
@@ -31,16 +31,7 @@ adding lein-cljsbuild to your `project.clj` file in the `:plugins` section:
   :plugins [[lein-cljsbuild "0.1.8"]])
 ```
 
-For versions of Leiningen older than `1.7.0` (not recommended), add
-lein-cljsbuild to the `:dev-dependencies` section instead:
-
-```clj
-; Using Leiningen 1.6.x or older:
-(defproject lein-cljsbuild-example "1.2.3"
-  :dev-dependencies [[lein-cljsbuild "0.1.8"]])
-```
-
-Make sure you pull down the jar file:
+And then running the following command to download it:
 
     $ lein deps
 
