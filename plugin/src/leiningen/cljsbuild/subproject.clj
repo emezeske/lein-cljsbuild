@@ -1,20 +1,31 @@
 (ns leiningen.cljsbuild.subproject
   "Utilities for running cljsbuild in a subproject"
-  (:import
-    org.apache.maven.artifact.versioning.DefaultArtifactVersion))
+  (:require
+    [clojure.string :as string]))
 
 (def cljsbuild-dependencies '[[cljsbuild "0.1.7"]])
 (def required-clojure-version "1.3.0")
+
+(defn- numeric-version [v]
+  (map #(Integer. %) (re-seq #"\d+" (first (string/split v #"-" 2)))))
+
+(defn- version-satisfies? [v1 v2]
+  (let [v1 (numeric-version v1)
+        v2 (numeric-version v2)]
+    (loop [versions (map vector v1 v2)
+           [seg1 seg2] (first versions)]
+      (cond (empty? versions) true
+            (= seg1 seg2) (recur (rest versions) (first (rest versions)))
+            (> seg1 seg2) true
+            (< seg1 seg2) false))))
 
 (defn check-clojure-version [project-dependencies]
   (let [clojure-dependency ('org.clojure/clojure project-dependencies)]
     (when (nil? clojure-dependency)
       (throw
         (Exception. "lein-cljsbuild requires your project to specify which Clojure version it uses ")))
-    (let [version-str (first clojure-dependency)
-          version (DefaultArtifactVersion. version-str)
-          required (DefaultArtifactVersion. required-clojure-version)]
-      (when (< (.compareTo version required) 0)
+    (let [version (first clojure-dependency)]
+      (when (not (version-satisfies? version required-clojure-version))
         (throw
           (Exception.
             (str "lein-cljsbuild requires your project to use Clojure version >= " required-clojure-version)))))))
