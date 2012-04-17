@@ -1,5 +1,11 @@
 # Release Notes for lein-cljsbuild
 
+## 0.1.8
+
+1. Minor fix for compatibility with the latest Leiningen 2 preview.
+
+[Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?sort=created&direction=desc&state=closed&page=1&milestone=11)
+
 ## 0.1.7
 
 1. The various REPL commands now work when used via Leiningen 2.  This should mean that lein-cljsbuild is fully Leiningen-2-compatible.
