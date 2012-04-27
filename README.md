@@ -232,3 +232,4 @@ See the file COPYING.
 * Philip Kamenarsky (http://github.com/pkamenarsky)
 * Felix H. Dahlke (fhd@ubercode.de)
 * Jenan Wise (http://github.com/jenanwise)
+* Kris Jenkins (http://github.com/krisajenkins)
