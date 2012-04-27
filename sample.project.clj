@@ -67,10 +67,11 @@
         ; :source-path are added to the JAR file created by "lein jar".
         :jar true
         ; If a notify-command is specified, it will be called when compilation succeeds
-        ; or fails, with a textual description of what happened appended to the command.
+        ; or fails, with a textual description of what happened will be inserted where the
+        ; "%" is located in the command.
         ; If ":beep true" is included, a system beep will be emitted as well.
         ; Defaults to nil (disabled).
-        :notify-command ["growlnotify" "-m" :beep true]
+        :notify-command ["growlnotify" "-m" "%" :beep true]
         ; This flag will turn on compiler warnings for references to
         ; undeclared vars. Defaults to true.
         :warn-on-undeclared true
