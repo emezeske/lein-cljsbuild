@@ -104,5 +104,5 @@
           :libs ["closure/library/third_party/closure"]
           ; Adds dependencies on foreign libraries.
           ; Defaults to the empty vector [].
-          :foreign-libs [[{:file "http://example.com/remote.js"
-                           :provides  ["my.example"]}]]}}}})
+          :foreign-libs [{:file "http://example.com/remote.js"
+                           :provides  ["my.example"]}]}}}})
