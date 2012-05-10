@@ -1,8 +1,10 @@
 (ns example.views
   (:require
-    [example.crossover.shared :as shared])
-  (:use
-    [hiccup core page-helpers]))
+    [example.crossover.shared :as shared]
+    [hiccup
+      [page :refer [html5]]
+      [element :refer [javascript-tag]]
+      [page :refer [include-js]]]))
 
 ; When using {:optimizations :whitespace}, the Google Closure compiler combines
 ; its JavaScript inputs into a single file, which obviates the need for a "deps.js"
@@ -48,7 +50,7 @@ lein trampoline cljsbuild repl-listen"]
       [:pre "> (js/alert \"Hello!\")
 > (load-namespace 'goog.date.Date)
 > (js/alert (goog.date.Date.))
-> (console.log (reduce + [1 2 3 4 5]))
+> (.log js/console (reduce + [1 2 3 4 5]))
 > (load-namespace 'goog.dom)
 > (goog.dom.setTextContent (goog.dom.getElement \"fun\") \"I changed something....\") "]
       (run-clojurescript
