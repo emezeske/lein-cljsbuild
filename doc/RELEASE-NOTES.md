@@ -1,5 +1,12 @@
 # Release Notes for lein-cljsbuild
 
+## 0.1.9
+
+1. Changed to use upstream ClojureScript version 0.0-1211.
+2. Updated example projects to use the latest Clojure, Ring, Compojure, and Hiccup versions.
+
+[Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=12&state=closed)
+
 ## 0.1.8
 
 1. Minor fix for compatibility with the latest Leiningen 2 preview.

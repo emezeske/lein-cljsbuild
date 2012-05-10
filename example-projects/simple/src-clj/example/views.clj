@@ -1,5 +1,9 @@
 (ns example.views
-  (:use [hiccup core page-helpers]))
+  (:require
+    [hiccup
+      [page :refer [html5]]
+      [element :refer [javascript-tag]]
+      [page :refer [include-js]]]))
 
 ; When using {:optimizations :whitespace}, the Google Closure compiler combines
 ; its JavaScript inputs into a single file, which obviates the need for a "deps.js"
