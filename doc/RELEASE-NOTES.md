@@ -2,7 +2,9 @@
 
 ## 0.1.11
 
-TODO
+1. The compiler is now run under Clojure 1.4.0.
+
+[Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=14&state=closed)
 
 ## 0.1.10
 
