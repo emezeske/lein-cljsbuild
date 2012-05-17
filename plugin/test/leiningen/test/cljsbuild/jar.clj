@@ -68,7 +68,7 @@
       (path-filespecs root-b) => [(get-in entries [:b :filespec])] :times 1
       (path-filespecs root-c) => [(get-in entries [:c :filespec])] :times 1)
     (let [entries (dissoc entries :a)
-          project (assoc project :crossover-jar false)]
+          project (assoc-in project [:cljsbuild :crossover-jar] false)]
       (get-filespecs project) => (just (set (map :filespec (vals entries))))
       (provided
         (path-filespecs root-b) => [(get-in entries [:b :filespec])] :times 1
