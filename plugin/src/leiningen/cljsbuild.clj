@@ -43,6 +43,8 @@
                           builds
                           (filter #(some #{(:id %)} build-ids) builds))
         parsed-builds (map config/parse-notify-command filtered-builds)]
+    (doseq [build parsed-builds]
+      (config/warn-unsupported-notify-command build))
     (run-local-project project crossover-path parsed-builds
       '(require 'cljsbuild.compiler 'cljsbuild.crossover 'cljsbuild.util)
       `(do
