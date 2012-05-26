@@ -61,6 +61,7 @@
                 (:compiler opts#)
                 (:parsed-notify-command opts#)
                 (:warn-on-undeclared opts#)
+                (:incremental opts#)
                 ~watch?))
             '~parsed-builds))))))
 

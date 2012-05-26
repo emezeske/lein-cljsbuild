@@ -75,6 +75,11 @@
         ; This flag will turn on compiler warnings for references to
         ; undeclared vars. Defaults to true.
         :warn-on-undeclared true
+        ; Determines whether the temporary JavaScript files will be left in place between
+        ; automatic builds.  Leaving them in place speeds up compilation because things can
+        ; be built incrementally.  This probably shouldn't be disabled except for troubleshooting.
+        ; Defaults to true.
+        :incremental true
         ; The :compiler options are passed directly to the ClojureScript compiler.
         :compiler {
           ; The path to the JavaScript file that will be output.

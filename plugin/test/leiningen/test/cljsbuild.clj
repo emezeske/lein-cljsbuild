@@ -56,6 +56,7 @@
 (def build-id "build-id")
 (def source-path "source-path")
 (def warn-on-undeclared false)
+(def incremental false)
 
 (def compiler
   {:output-to "output-to"
@@ -70,6 +71,7 @@
      :jar true
      :notify-command ["notify"]
      :warn-on-undeclared warn-on-undeclared
+     :incremental incremental
      :compiler compiler}))
 
 (def parsed-builds
@@ -130,6 +132,7 @@
         compiler
         anything
         warn-on-undeclared
+        incremental
         watch?) => nil :times 1)))
 
 (fact "bad build IDs are detected"
@@ -159,6 +162,7 @@
       compiler
       anything
       warn-on-undeclared
+      incremental
       false) => nil :times 1))
 
 (fact "compile-hook does not call through to the compiler when task fails"
@@ -169,6 +173,7 @@
       anything
       anything) => nil :times 0
     (cljsbuild.compiler/run-compiler
+      anything
       anything
       anything
       anything
@@ -198,6 +203,7 @@
           compiler
           anything
           warn-on-undeclared
+          incremental
           false) => nil :times 1
         (cljsbuild.test/run-tests parsed-commands) => 0 :times 1)))
 

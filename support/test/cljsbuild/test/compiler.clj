@@ -18,6 +18,7 @@
    :pretty-print false})
 (def notify-command nil)
 (def warn-on-undeclared? true)
+(def incremental? true)
 (def watch? false)
 
 (fact "run-compiler calls cljs/build correctly"
@@ -27,6 +28,7 @@
     compiler-options
     notify-command
     warn-on-undeclared?
+    incremental?
     watch?) => nil
   (provided
     (fs/exists? output-to) => false :times 1

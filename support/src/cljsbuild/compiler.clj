@@ -45,16 +45,13 @@
   (println-safe (colorizer message)))
 
 (defn- compile-cljs [cljs-path compiler-options notify-command
-                     warn-on-undeclared?]
+                     warn-on-undeclared? incremental?]
   (let [output-file (:output-to compiler-options)
         output-file-dir (fs/parent output-file)]
     (println-safe (str "Compiling \"" output-file "\" from \"" cljs-path "\"..."))
     (flush)
-    ; FIXME: I do not trust the ClojureScript compiler's cljs/js caching in the
-    ;        output-dir.  It seems to forget to rebuild things sometimes, and
-    ;        it's a PITA to debug.  This probably slows down compilation, but
-    ;        for the moment it is better than the alternative.
-    (fs/delete-dir (:output-dir compiler-options))
+    (when (not incremental?)
+      (fs/delete-dir (:output-dir compiler-options)))
     (when output-file-dir
       (fs/mkdirs output-file-dir))
     (let [started-at (System/nanoTime)]
@@ -71,7 +68,7 @@
           (pst+ e))))))
 
 (defn run-compiler [cljs-path crossover-path compiler-options notify-command
-                    warn-on-undeclared? watch?]
+                    warn-on-undeclared? incremental? watch?]
   (loop [last-dependency-mtimes {}]
     (let [output-file (:output-to compiler-options)
           output-mtime (if (fs/exists? output-file) (fs/mod-time output-file) 0)
@@ -83,7 +80,7 @@
           (not= last-dependency-mtimes dependency-mtimes)
           (some #(< output-mtime %) dependency-mtimes))
         (compile-cljs cljs-path compiler-options notify-command
-                      warn-on-undeclared?))
+                      warn-on-undeclared? incremental?))
       (when watch?
         (Thread/sleep 100)
         (recur dependency-mtimes)))))
