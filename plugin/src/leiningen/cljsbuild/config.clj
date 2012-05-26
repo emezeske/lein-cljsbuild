@@ -126,8 +126,12 @@
     (merge {:shell shell} options)))
 
 (defn parse-notify-command [build]
-  (assoc build :parsed-notify-command
-    (parse-shell-command (:notify-command build))))
+  (let [parsed (parse-shell-command (:notify-command build))]
+    (when (or (first (filter #(= "%" %) (:shell parsed)))
+              (:beep parsed))
+      (println "WARNING: the :notify-command no longer accepts the \"%\" or :beep options.")
+      (println "See https://github.com/emezeske/lein-cljsbuild/blob/master/doc/RELEASE-NOTES.md for details."))
+    (assoc build :parsed-notify-command parsed)))
 
 (defn extract-options
   "Given a project, returns a seq of cljsbuild option maps."

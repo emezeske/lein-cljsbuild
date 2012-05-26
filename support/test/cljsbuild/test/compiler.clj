@@ -16,7 +16,7 @@
    :output-dir "output-dir"
    :optimizations :advanced
    :pretty-print false})
-(def notify-command nil)
+(def notify-command {:shell ["a" "b"] :test "c"})
 (def warn-on-undeclared? true)
 (def incremental? true)
 (def watch? false)
@@ -34,6 +34,7 @@
     (fs/exists? output-to) => false :times 1
     (util/find-files cljs-path #{"cljs"}) => ["src-cljs/a.cljs"] :times 1
     (util/find-files crossover-path #{"cljs"}) => ["crossovers/b.cljs"] :times 1
+    (util/sh anything) => nil :times 1
     (fs/mod-time "src-cljs/a.cljs") => 1000 :times 1
     (fs/mkdirs anything) => nil
     (cljs/build cljs-path compiler-options) => nil :times 1))

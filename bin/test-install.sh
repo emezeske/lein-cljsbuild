@@ -20,9 +20,9 @@ done
 for d in $projects; do
 	pushd example-projects/$d
 	rm -rf .lein-*
-	if [ $d = advanced ]; then
-		extra_command=', cljsbuild test'
-	fi
+	#if [ $d = advanced ]; then
+	#	extra_command=', cljsbuild test'
+	#fi
 	lein deps, cljsbuild clean, cljsbuild once$extra_command
 	#lein2 cljsbuild clean, cljsbuild once$extra_command
 	popd

@@ -34,11 +34,9 @@
       (str (/ (double elapsed-us) 1000000000) " seconds"))))
 
 (defn- notify-cljs [command message colorizer]
-  (when (:bell command)
-    (apply-safe print \u0007))
   (when (seq (:shell command))
     (try
-      (util/sh (assoc command :shell (map #(if (= % "%") message %) (:shell command))))
+      (util/sh (update-in command [:shell] (fn [old] (concat old [message]))))
       (catch Throwable e
         (println-safe (red "Error running :notify-command:"))
         (pst+ e))))

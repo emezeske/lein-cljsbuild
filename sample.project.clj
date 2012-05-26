@@ -10,7 +10,7 @@
   :dependencies [[org.clojure/clojure "1.3.0"]]
   ; Your project should plugin-depend on lein-cljsbuild, to ensure that
   ; the right version of the plugin is installed.
-  :plugins [[lein-cljsbuild "0.1.11"]]
+  :plugins [[lein-cljsbuild "0.2.0"]]
   ; The standard Leiningen :source-path option is used by lein-cljsbuild
   ; to determine the source directory from which crossover files will
   ; be copied.  Leiningen defaults to "src".
@@ -67,11 +67,11 @@
         ; :source-path are added to the JAR file created by "lein jar".
         :jar true
         ; If a notify-command is specified, it will be called when compilation succeeds
-        ; or fails, with a textual description of what happened will be inserted where the
-        ; "%" is located in the command.
-        ; If ":beep true" is included, a system beep will be emitted as well.
+        ; or fails, and a textual description of what happened will be appended as the
+        ; last argument to the command.  If a more complex command needs to be constructed,
+        ; the recommendation is to write a small shell script wrapper.
         ; Defaults to nil (disabled).
-        :notify-command ["growlnotify" "-m" "%" :beep true]
+        :notify-command ["growlnotify" "-m"]
         ; This flag will turn on compiler warnings for references to
         ; undeclared vars. Defaults to true.
         :warn-on-undeclared true
