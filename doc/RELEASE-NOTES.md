@@ -1,5 +1,11 @@
 # Release Notes for lein-cljsbuild
 
+## 0.2.2
+
+**TODO**
+
+[Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=16&state=closed)
+
 ## 0.2.1
 
 1. Automatically add `closure-js/libs` to `:libs` and `closure-js/externs` to `:externs`.  This means that libraries can put their libs and externs in `resources/closure-js/libs/<library-name>` and `resources/closure-js/externs/<library-name>`, respectively, and lein-cljsbuild will automatically pick them up.
