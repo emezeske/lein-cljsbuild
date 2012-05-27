@@ -121,7 +121,7 @@
           (when (seq macro-modified)
             (reload-clojure (map macro-classpath-files macro-modified) compiler-options))
           (when (seq clj-modified)
-            (reload-clojure (map relativize cljs-path clj-files) compiler-options))
+            (reload-clojure (map (partial relativize cljs-path) clj-files) compiler-options))
           (when (or (seq macro-modified) (seq clj-modified) (seq cljs-modified))
             (compile-cljs cljs-path compiler-options notify-command
                           warn-on-undeclared? incremental?))))
