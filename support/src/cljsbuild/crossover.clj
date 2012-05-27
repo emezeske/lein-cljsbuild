@@ -52,7 +52,7 @@
     (apply util/join-paths
       (string/split underscored #"\."))))
 
-(defn- find-crossover [crossover]
+(defn- find-crossover [crossover macros?]
   (let [ns-path (ns-to-path crossover)
         as-dir (resource ns-path)
         dir-parent (truncate-uri-path as-dir (count ns-path))
@@ -63,17 +63,30 @@
         all-resources (conj
                         (map vector (repeat dir-parent) recurse-dirs)
                         [file-parent as-file])
-        resources (remove
-                    (fn [[_ file]]
-                      (or (nil? file) (is-macro-file? file)))
+        all-resources (remove
+                        (comp nil? second)
+                        all-resources)
+        keep-wanted (if macros? filter remove)
+        resources (keep-wanted
+                    (comp is-macro-file? second)
                     all-resources)]
-    (when (empty? resources)
-      (fail "Unable to find crossover: " crossover))
+    (when (empty? all-resources)
+      (println "WARNING: Unable to find crossover: " crossover))
     resources))
 
-(defn find-crossovers [crossovers]
+(defn find-crossovers [crossovers macros?]
   (distinct
-    (mapcat find-crossover crossovers)))
+    (mapcat #(find-crossover % macros?) crossovers)))
+
+(defn crossover-macro-paths [crossovers]
+  (let [macro-paths (find-crossovers crossovers true)
+        macro-files (remove #(not= (.getProtocol (second %)) "file") macro-paths)]
+    (map (fn [[parent file]]
+           (let [file-path (.getPath file)
+                 classpath-path (string/replace-first file-path parent "")]
+             {:absolute (fs/absolute-path file-path)
+              :classpath classpath-path}))
+         macro-files)))
 
 (defn crossover-needs-update? [from-resource to-file]
   (or
@@ -89,13 +102,13 @@
 to prevent the compiler from reading a half-written file."
   [from-resource to-file]
   (let [temp-file (str to-file ".tmp")]
-    (spit temp-file (filtered-crossover-file from-resource)) 
-    (fs/rename temp-file to-file) 
+    (spit temp-file (filtered-crossover-file from-resource))
+    (fs/rename temp-file to-file)
     ; Mark the file as read-only, to hopefully warn the user not to modify it.
     (fs/chmod "-w" to-file)))
 
 (defn copy-crossovers [crossover-path crossovers]
-  (let [from-resources (find-crossovers crossovers)
+  (let [from-resources (find-crossovers crossovers false)
         to-files (map (partial crossover-to crossover-path) from-resources)]
     (doseq [dir (distinct (map fs/parent to-files))]
       (fs/mkdirs dir))

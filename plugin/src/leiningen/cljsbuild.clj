@@ -55,17 +55,19 @@
           (copy-crossovers#)
           (when ~watch?
             (cljsbuild.util/once-every-bg 1000 "copying crossovers" copy-crossovers#))
-          (cljsbuild.util/in-threads
-            (fn [opts#]
-              (cljsbuild.compiler/run-compiler
-                (:source-path opts#)
-                ~crossover-path
-                (:compiler opts#)
-                (:parsed-notify-command opts#)
-                (:warn-on-undeclared opts#)
-                (:incremental opts#)
-                ~watch?))
-            '~parsed-builds))))))
+          (let [crossover-macro-paths# (cljsbuild.crossover/crossover-macro-paths '~crossovers)]
+            (cljsbuild.util/in-threads
+              (fn [opts#]
+                (cljsbuild.compiler/run-compiler
+                  (:source-path opts#)
+                  ~crossover-path
+                  crossover-macro-paths#
+                  (:compiler opts#)
+                  (:parsed-notify-command opts#)
+                  (:warn-on-undeclared opts#)
+                  (:incremental opts#)
+                  ~watch?))
+              '~parsed-builds)))))))
 
 (defn- run-tests [project {:keys [test-commands crossover-path builds]} args]
   (when (> (count args) 1)

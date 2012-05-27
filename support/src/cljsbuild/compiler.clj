@@ -5,6 +5,7 @@
   (:require
     [cljsbuild.util :as util]
     [cljs.compiler :as compiler]
+    [clojure.string :as string]
     [fs.core :as fs]))
 
 (defonce lock (Object.))
@@ -65,20 +66,65 @@
             (str "Compiling \"" output-file "\" failed:") red)
           (pst+ e))))))
 
-(defn run-compiler [cljs-path crossover-path compiler-options notify-command
+(defn- get-mtimes [paths]
+  (into {}
+    (map (fn [path] [path (fs/mod-time path)]) paths)))
+
+(defn- list-modified [output-mtime dependency-mtimes]
+  (reduce (fn [modified [path mtime]]
+            (if (< output-mtime mtime)
+              (conj modified path)
+              modified))
+          []
+          dependency-mtimes))
+
+(defn- drop-extension [path]
+  (let [i (.lastIndexOf path ".")]
+    (if (pos? i)
+      (subs path 0 i)
+      path)))
+
+(defn- relativize [parent path]
+  (let [path (fs/absolute-path path)
+        parent (fs/absolute-path parent)]
+    (if (.startsWith path parent)
+      (subs path (count parent))
+      path)))
+
+(defn reload-clojure [paths compiler-options]
+  ; Incremental builds will use cached JS output unless one of the cljs input files
+  ; has been modified.  Since reloading a clj file *might* affect the build, but does
+  ; not affect any cljs file mtimes, we have to clear the cache here to force everything
+  ; to be rebuilt.
+  (fs/delete-dir (:output-dir compiler-options))
+  (doseq [path paths]
+    (load (drop-extension path))))
+
+(defn run-compiler [cljs-path crossover-path crossover-macro-paths
+                    compiler-options notify-command
                     warn-on-undeclared? incremental? watch?]
   (loop [last-dependency-mtimes {}]
     (let [output-file (:output-to compiler-options)
           output-mtime (if (fs/exists? output-file) (fs/mod-time output-file) 0)
-          find-cljs #(util/find-files % #{"cljs"})
-          dependency-files (mapcat find-cljs [cljs-path crossover-path])
-          dependency-mtimes (map fs/mod-time dependency-files)]
-      (when
-        (and
-          (not= last-dependency-mtimes dependency-mtimes)
-          (some #(< output-mtime %) dependency-mtimes))
-        (compile-cljs cljs-path compiler-options notify-command
-                      warn-on-undeclared? incremental?))
+          macro-files (map :absolute crossover-macro-paths)
+          macro-classpath-files (into {} (map vector macro-files (map :classpath crossover-macro-paths)))
+          clj-files (util/find-files cljs-path #{"clj"})
+          cljs-files (mapcat #(util/find-files % #{"cljs"}) [cljs-path crossover-path])
+          macro-mtimes (get-mtimes macro-files)
+          clj-mtimes (get-mtimes clj-files)
+          cljs-mtimes (get-mtimes cljs-files)
+          dependency-mtimes (merge macro-mtimes clj-mtimes cljs-mtimes)]
+      (when (not= last-dependency-mtimes dependency-mtimes)
+        (let [macro-modified (list-modified output-mtime macro-mtimes)
+              clj-modified (list-modified output-mtime clj-mtimes)
+              cljs-modified (list-modified output-mtime cljs-mtimes)]
+          (when (seq macro-modified)
+            (reload-clojure (map macro-classpath-files macro-modified) compiler-options))
+          (when (seq clj-modified)
+            (reload-clojure (map relativize cljs-path clj-files) compiler-options))
+          (when (or (seq macro-modified) (seq clj-modified) (seq cljs-modified))
+            (compile-cljs cljs-path compiler-options notify-command
+                          warn-on-undeclared? incremental?))))
       (when watch?
         (Thread/sleep 100)
         (recur dependency-mtimes)))))

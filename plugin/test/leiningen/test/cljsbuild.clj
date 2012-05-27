@@ -16,6 +16,7 @@
 (in-ns 'cljsbuild.crossover)
 (clojure.core/use 'midje.sweet)
 (unfinished copy-crossovers)
+(unfinished crossover-macro-paths)
 
 (in-ns 'cljsbuild.util)
 (clojure.core/use 'midje.sweet)
@@ -51,7 +52,9 @@
 (def test-command-id "test-id")
 (def test-command ["test-me"])
 (def crossover-path "crossover-path")
-(def crossovers [])
+(def crossovers ['test.crossover])
+(def crossover-macros [{:absolute "/root/stuff/test/crossover.clj"
+                        :classpath "test/crossover.clj"}])
 
 (def build-id "build-id")
 (def source-path "source-path")
@@ -123,12 +126,15 @@
     (with-compiler-bindings
       (apply cljsbuild project command extra-args)) => 0
     (provided
+      (cljsbuild.crossover/crossover-macro-paths
+        crossovers) => crossover-macros :times 1
       (cljsbuild.crossover/copy-crossovers
         crossover-path
         crossovers) => nil :times 1
       (cljsbuild.compiler/run-compiler
         source-path
         crossover-path
+        crossover-macros
         compiler
         anything
         warn-on-undeclared
@@ -153,12 +159,15 @@
   (with-compiler-bindings
     (compile-hook hook-success project)) => 0
   (provided
+    (cljsbuild.crossover/crossover-macro-paths
+      crossovers) => crossover-macros :times 1
     (cljsbuild.crossover/copy-crossovers
       crossover-path
       crossovers) => nil :times 1
     (cljsbuild.compiler/run-compiler
       source-path
       crossover-path
+      crossover-macros
       compiler
       anything
       warn-on-undeclared
@@ -169,10 +178,13 @@
   (with-compiler-bindings
     (compile-hook hook-failure project)) => 1
   (provided
+    (cljsbuild.crossover/crossover-macro-paths
+      anything) => nil :times 0
     (cljsbuild.crossover/copy-crossovers
       anything
       anything) => nil :times 0
     (cljsbuild.compiler/run-compiler
+      anything
       anything
       anything
       anything
@@ -194,12 +206,15 @@
       (with-compiler-bindings
         (test-hook hook-failure project)) => 1
       (against-background
+        (cljsbuild.crossover/crossover-macro-paths
+          crossovers) => crossover-macros :times 0
         (cljsbuild.crossover/copy-crossovers
           crossover-path
           crossovers) => nil :times 1
         (cljsbuild.compiler/run-compiler
           source-path
           crossover-path
+          crossover-macros
           compiler
           anything
           warn-on-undeclared

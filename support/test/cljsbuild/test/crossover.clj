@@ -12,7 +12,7 @@
 (fact
   (copy-crossovers crossover-path crossovers) => nil
   (provided
-    (find-crossovers crossovers)=>
+    (find-crossovers crossovers false) =>
       [["/project/src" (io/file "/project/src/a.clj")]
        ["/project/src" (io/file "/project/src/a/a.clj")]
        ["/project/src" (io/file "/project/src/a/b.clj")]] :times 1
@@ -35,7 +35,7 @@
   (spit from-resource clojurescript-source)
   (fact "crossover files are copied/edited correctly"
     (write-crossover from-resource to-file) => anything
-    (.indexOf (slurp to-file) cljsbuild-remove) => -1)) 
+    (.indexOf (slurp to-file) cljsbuild-remove) => -1))
 
 ; TODO: It would be nice to test more of the crossover features, but they
 ;       are pretty heavily dependent on interop and resources, which makes

@@ -7,6 +7,7 @@ Note that the minor version was incremented not due to any major features, but d
 1. The compiler is now run under Clojure 1.4.0.
 2. Added a new `:build` suboption `:incremental`, which determines whether intermediate JavaScript sources are left intact between automatic builds.  The old behavior was to delete intermediate files before each build.  This slowed things down, but worked around (unisolated) problems with incremental compilation.  Incremental builds are now the default, as they appear to work well, but this option allows the old behavior to be selected if necessary for troubleshooting.
 3. The :notify option has been changed such that its argument is consistent with other cljsbuild shell commands.  This means that the `%` argument is no longer respected, and the textual result will simply be appended as the last command line argument.  Also, `:beep true` no longer has any effect.  If either of these features is desired, the recommended solution is a small shell script wrapper.
+4. Clojure source files that reside in the ClojureScript :source-path (as well as crossover macro files) are now monitored for changes.  When modified, they will be reloaded, and a build will be triggered.  This is useful for ClojureScript projects that use macros.
 
 [Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=14&state=closed)
 
