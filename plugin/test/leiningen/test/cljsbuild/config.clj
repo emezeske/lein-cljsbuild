@@ -41,6 +41,8 @@
         :compiler
           {:output-to "h"
            :output-dir "i"
+           :libs ["j"]
+           :externs ["k"]
            :optimizations :advanced
            :pretty-print false}})})
 
@@ -81,5 +83,7 @@
       (let [defaulted (default-compiler-option config-in compiler compiler-option)]
         (get-compiler defaulted) => (contains {compiler-option anything})))))
 
+(def config-out (set-compiler-global-dirs config-in))
+
 (fact
-  (extract-options {:cljsbuild config-in}) => config-in)
+  (extract-options {:cljsbuild config-in}) => config-out)

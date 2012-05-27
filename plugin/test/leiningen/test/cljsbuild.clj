@@ -78,7 +78,11 @@
      :compiler compiler}))
 
 (def parsed-builds
-  (map config/parse-notify-command builds))
+  (map config/set-build-global-dirs
+    (map config/parse-notify-command builds)))
+
+(def parsed-compiler
+  (:compiler (first parsed-builds)))
 
 (def project
  {:dependencies [['org.clojure/clojure "1.3.0"]]
@@ -134,7 +138,7 @@
         source-path
         crossover-path
         crossover-macros
-        compiler
+        parsed-compiler
         anything
         warn-on-undeclared
         incremental
@@ -152,7 +156,7 @@
   (with-compiler-bindings
     (clean-hook hook-failure project)) => 0
   (against-background
-    (cljsbuild.clean/cleanup-files compiler) => nil :times 1))
+    (cljsbuild.clean/cleanup-files parsed-compiler) => nil :times 1))
 
 (fact "compile-hook calls through to the compiler when task succeeds"
   (with-compiler-bindings
@@ -167,7 +171,7 @@
       source-path
       crossover-path
       crossover-macros
-      compiler
+      parsed-compiler
       anything
       warn-on-undeclared
       incremental
@@ -214,7 +218,7 @@
           source-path
           crossover-path
           crossover-macros
-          compiler
+          parsed-compiler
           anything
           warn-on-undeclared
           incremental

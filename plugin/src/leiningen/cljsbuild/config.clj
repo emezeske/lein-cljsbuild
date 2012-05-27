@@ -4,6 +4,9 @@
     [clojure.pprint :as pprint]))
 
 (def compiler-output-dir-base ".lein-cljsbuild-compiler-")
+(def compiler-global-dirs
+  {:libs "closure-js/libs"
+   :externs "closure-js/externs"})
 
 (def default-global-options
   {:repl-launch-commands {}
@@ -16,6 +19,8 @@
 (def default-compiler-options
   {:output-to "main.js"
    :optimizations :whitespace
+   :externs []
+   :libs []
    :pretty-print true})
 
 (def default-build-options
@@ -111,6 +116,15 @@
       (assoc options :builds
         (map set-default-build-options (:builds options))))))
 
+(defn set-build-global-dirs [build]
+  (reduce (fn [build [k v]] (update-in build [:compiler k] conj v))
+          build
+          compiler-global-dirs))
+
+(defn set-compiler-global-dirs [options]
+  (assoc options :builds
+    (map set-build-global-dirs (:builds options))))
+
 (defn- normalize-options
   "Sets default options and accounts for backwards compatibility."
   [options]
@@ -118,7 +132,9 @@
         compat (backwards-compat options)]
     (when (not= options compat)
       (warn-deprecated compat))
-    (set-default-options compat)))
+    (-> compat
+      set-default-options
+      set-compiler-global-dirs)))
 
 (defn parse-shell-command [raw]
   (let [[shell tail] (split-with (comp not keyword?) raw)
