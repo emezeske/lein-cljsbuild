@@ -26,12 +26,6 @@
      ["a/b" "" ["m.z" "n.z" "o.b"]]]
     :times 1))
 
-(defn- call-in-threads [x]
-  (inc x))
-
-(fact
-  (in-threads call-in-threads [1 2 3]) => [2 3 4])
-
 (unfinished call-once-every)
 (unfinished keep-going)
 

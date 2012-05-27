@@ -120,11 +120,10 @@
         anything
         anything) => 0 :times 1)) )
 
-(fact "once/auto tasks call the compiler correctly"
-  (doseq [[command watch?] {"once" false "auto" true}
-          extra-args [[] [build-id]]]
+(fact "once task calls the compiler correctly"
+  (doseq [extra-args [[] [build-id]]]
     (with-compiler-bindings
-      (apply cljsbuild project command extra-args)) => 0
+      (apply cljsbuild project "once" extra-args)) => 0
     (provided
       (cljsbuild.crossover/crossover-macro-paths
         crossovers) => crossover-macros :times 1
@@ -139,7 +138,7 @@
         anything
         warn-on-undeclared
         incremental
-        watch?) => nil :times 1)))
+        {}) => nil :times 1)))
 
 (fact "bad build IDs are detected"
   (with-compiler-bindings
@@ -172,7 +171,7 @@
       anything
       warn-on-undeclared
       incremental
-      false) => nil :times 1))
+      {}) => nil :times 1))
 
 (fact "compile-hook does not call through to the compiler when task fails"
   (with-compiler-bindings
@@ -219,7 +218,7 @@
           anything
           warn-on-undeclared
           incremental
-          false) => nil :times 1
+          {}) => nil :times 1
         (cljsbuild.test/run-tests parsed-commands) => 0 :times 1)))
 
 (defmacro with-repl-bindings [& forms]

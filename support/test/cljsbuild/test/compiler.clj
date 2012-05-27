@@ -23,7 +23,7 @@
 (def notify-command {:shell ["a" "b"] :test "c"})
 (def warn-on-undeclared? true)
 (def incremental? true)
-(def watch? false)
+(def mtime 1234)
 
 (fact "run-compiler calls cljs/build correctly"
   (run-compiler
@@ -34,16 +34,18 @@
     notify-command
     warn-on-undeclared?
     incremental?
-    watch?) => nil
+    {}) => (just {"src-cljs/a.cljs" mtime,
+                  "crossovers/b.cljs" mtime,
+                  crossover-macro-absolute mtime})
   (provided
     (fs/exists? output-to) => false :times 1
     (util/find-files cljs-path #{"clj"}) => [] :times 1
     (util/find-files cljs-path #{"cljs"}) => ["src-cljs/a.cljs"] :times 1
     (util/find-files crossover-path #{"cljs"}) => ["crossovers/b.cljs"] :times 1
     (util/sh anything) => nil :times 1
-    (fs/mod-time "src-cljs/a.cljs") => 1000 :times 1
-    (fs/mod-time "crossovers/b.cljs") => 1000 :times 1
-    (fs/mod-time crossover-macro-absolute) => 1000 :times 1
+    (fs/mod-time "src-cljs/a.cljs") => mtime :times 1
+    (fs/mod-time "crossovers/b.cljs") => mtime :times 1
+    (fs/mod-time crossover-macro-absolute) => mtime :times 1
     (fs/mkdirs anything) => nil
     (reload-clojure [crossover-macro-classpath] compiler-options) => nil :times 1
     (cljs/build cljs-path compiler-options) => nil :times 1))

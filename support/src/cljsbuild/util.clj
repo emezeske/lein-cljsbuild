@@ -24,12 +24,6 @@
         (find-dir-files root files types))
       iter)))
 
-(defn in-threads
-  "Given a seq and a function, applies the function to each item in a different thread
-and returns a seq of the results. Launches all the threads at once."
-  [f s]
-  (doall (map deref (doall (map #(future (f %)) s)))))
-
 (defn sleep [ms]
   (Thread/sleep ms))
 

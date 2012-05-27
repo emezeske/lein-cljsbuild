@@ -55,19 +55,25 @@
           (copy-crossovers#)
           (when ~watch?
             (cljsbuild.util/once-every-bg 1000 "copying crossovers" copy-crossovers#))
-          (let [crossover-macro-paths# (cljsbuild.crossover/crossover-macro-paths '~crossovers)]
-            (cljsbuild.util/in-threads
-              (fn [opts#]
-                (cljsbuild.compiler/run-compiler
-                  (:source-path opts#)
-                  ~crossover-path
-                  crossover-macro-paths#
-                  (:compiler opts#)
-                  (:parsed-notify-command opts#)
-                  (:warn-on-undeclared opts#)
-                  (:incremental opts#)
-                  ~watch?))
-              '~parsed-builds)))))))
+          (let [crossover-macro-paths# (cljsbuild.crossover/crossover-macro-paths '~crossovers)
+                builds# '~parsed-builds]
+            (loop [dependency-mtimes# (repeat (count builds#) {})]
+              (let [builds-mtimes# (map vector builds# dependency-mtimes#)
+                    new-dependency-mtimes#
+                      (doall
+                        (for [[build# mtimes#] builds-mtimes#]
+                          (cljsbuild.compiler/run-compiler
+                            (:source-path build#)
+                            ~crossover-path
+                            crossover-macro-paths#
+                            (:compiler build#)
+                            (:parsed-notify-command build#)
+                            (:warn-on-undeclared build#)
+                            (:incremental build#)
+                            mtimes#)))]
+                 (when ~watch?
+                   (Thread/sleep 100)
+                   (recur new-dependency-mtimes#))))))))))
 
 (defn- run-tests [project {:keys [test-commands crossover-path builds]} args]
   (when (> (count args) 1)
@@ -118,11 +124,9 @@
         (fs/delete filename))))
   (run-local-project project crossover-path builds
     '(require 'cljsbuild.clean 'cljsbuild.util)
-    `(cljsbuild.util/in-threads
-      (fn [opts#]
-        (cljsbuild.clean/cleanup-files
-          (:compiler opts#)))
-      '~builds)))
+    `(doseq [opts# '~builds]
+      (cljsbuild.clean/cleanup-files
+        (:compiler opts#)))))
 
 (defn- test
   "Run ClojureScript tests."
