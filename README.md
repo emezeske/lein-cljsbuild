@@ -35,13 +35,6 @@ And then running the following command to download it:
 
     $ lein deps
 
-## Upgrading from 0.0.x
-
-The `:cljsbuild` configuration format has changed.  This version is backwards-compatible
-with `0.0.x`, but the next major version won't be.  See the
-[migration documentation] (https://github.com/emezeske/lein-cljsbuild/blob/0.2.1/doc/MIGRATING-TO-0.1.x.md)
-for details.
-
 ## Just Give Me a Damned Example Already!
 
 See the
