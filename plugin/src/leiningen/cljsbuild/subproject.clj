@@ -49,6 +49,7 @@
 (defn make-subproject-lein1 [project crossover-path builds]
   (merge (make-subproject project crossover-path builds)
     {:source-path (:source-path project)
+     :resources-path (:resources-path project)
      :extra-classpath-dirs (concat
                              (:extra-classpath-dirs project)
                              (map :source-path builds)
