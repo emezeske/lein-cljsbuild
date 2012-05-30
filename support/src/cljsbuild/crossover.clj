@@ -103,7 +103,11 @@ to prevent the compiler from reading a half-written file."
   [from-resource to-file]
   (let [temp-file (str to-file ".tmp")]
     (spit temp-file (filtered-crossover-file from-resource))
-    (fs/rename temp-file to-file)
+    (if-not (fs/rename temp-file to-file)
+	  ;We're on Windows, file can't be renamed atomically 
+	  ;and operation is blocked
+	  (do (fs/delete to-file)
+		  (fs/rename temp-file to-file)))
     ; Mark the file as read-only, to hopefully warn the user not to modify it.
     (fs/chmod "-w" to-file)))
 
