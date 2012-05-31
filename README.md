@@ -226,3 +226,4 @@ See the file COPYING.
 * Felix H. Dahlke (fhd@ubercode.de)
 * Jenan Wise (http://github.com/jenanwise)
 * Kris Jenkins (http://github.com/krisajenkins)
+* Daniel Turczański (http://jvmsoup.com/)
