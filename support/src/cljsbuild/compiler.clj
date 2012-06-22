@@ -4,7 +4,7 @@
     [cljs.closure :only [build]])
   (:require
     [cljsbuild.util :as util]
-    [cljs.compiler :as compiler]
+    [cljs.analyzer :as analyzer]
     [clojure.string :as string]
     [fs.core :as fs]))
 
@@ -45,7 +45,7 @@
       (fs/mkdirs output-file-dir))
     (let [started-at (System/nanoTime)]
       (try
-        (binding [compiler/*cljs-warn-on-undeclared* warn-on-undeclared?]
+        (binding [analyzer/*cljs-warn-on-undeclared* warn-on-undeclared?]
           (build cljs-path compiler-options))
         (notify-cljs
           notify-command
