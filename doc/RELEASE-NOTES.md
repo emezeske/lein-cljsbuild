@@ -2,7 +2,8 @@
 
 ## 0.2.2
 
-**TODO**
+1. Changed to use upstream ClojureScript version 0.0-1424.
+2. Fixed an issue with copying crossover files under Windows.
 
 [Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=16&state=closed)
 
