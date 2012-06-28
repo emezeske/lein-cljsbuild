@@ -227,3 +227,4 @@ See the file COPYING.
 * Jenan Wise (http://github.com/jenanwise)
 * Kris Jenkins (http://github.com/krisajenkins)
 * Daniel Turczański (http://jvmsoup.com/)
+* Brandon Henry (http://brandonhenry.net/)
