@@ -20,10 +20,14 @@
     (filter-by-ext files #{"a" "b" "c" "d" "e"}) => files))
 
 (fact
+  (let [files ["a.a" "b.a" "c.a" ".a.a"]]
+    (remove-hidden files) => ["a.a" "b.a" "c.a"]))
+
+(fact
   (find-files "a" #{"z"}) => ["a/j.z" "a/k.z" "a/l.z" "a/b/m.z" "a/b/n.z"]
   (provided (fs/iterate-dir "a") =>
-    [["a" "" ["i.a" "j.z" "k.z" "l.z"]]
-     ["a/b" "" ["m.z" "n.z" "o.b"]]]
+    [["a" "" ["i.a" "j.z" "k.z" "l.z" ".l.z"]]
+     ["a/b" "" ["m.z" "n.z" "o.b" ".p.b"]]]
     :times 1))
 
 (unfinished call-once-every)
