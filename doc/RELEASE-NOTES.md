@@ -4,6 +4,8 @@
 
 **TODO**
 
+1. Ignore hidden files in the source and crossover paths (this makes things work better with emacs or other editors that use dotfiles for state).
+
 [Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=17&state=closed)
 
 ## 0.2.2
