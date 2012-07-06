@@ -2,9 +2,8 @@
 
 ## 0.2.3
 
-**TODO**
-
-1. Ignore hidden files in the source and crossover paths (this makes things work better with emacs or other editors that use dotfiles for state).
+1. Changed to use upstream ClojureScript version 0.0-1443.
+2. Ignore hidden files in the source and crossover paths (this makes things work better with emacs or other editors that use dotfiles for state).
 
 [Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=17&state=closed)
 

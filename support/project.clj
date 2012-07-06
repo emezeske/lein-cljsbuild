@@ -5,7 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"
             :distribution :repo}
   :dependencies [[org.clojure/clojure "1.4.0"]
-                 [org.clojure/clojurescript "0.0-1424"
+                 [org.clojure/clojurescript "0.0-1443"
                    :exclusions [org.apache.ant/ant]]
                  [fs "1.1.2"]
                  [clj-stacktrace "0.2.4"]]
