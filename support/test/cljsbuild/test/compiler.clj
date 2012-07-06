@@ -21,7 +21,6 @@
    :optimizations :advanced
    :pretty-print false})
 (def notify-command {:shell ["a" "b"] :test "c"})
-(def warn-on-undeclared? true)
 (def incremental? true)
 (def mtime 1234)
 
@@ -32,7 +31,6 @@
     crossover-macro-paths
     compiler-options
     notify-command
-    warn-on-undeclared?
     incremental?
     {}) => (just {"src-cljs/a.cljs" mtime,
                   "crossovers/b.cljs" mtime,

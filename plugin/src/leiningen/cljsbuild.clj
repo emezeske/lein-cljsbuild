@@ -44,6 +44,7 @@
                           (filter #(some #{(:id %)} build-ids) builds))
         parsed-builds (map config/parse-notify-command filtered-builds)]
     (doseq [build parsed-builds]
+      (config/warn-unsupported-warn-on-undeclared build)
       (config/warn-unsupported-notify-command build))
     (run-local-project project crossover-path parsed-builds
       '(require 'cljsbuild.compiler 'cljsbuild.crossover 'cljsbuild.util)
@@ -68,7 +69,6 @@
                             crossover-macro-paths#
                             (:compiler build#)
                             (:parsed-notify-command build#)
-                            (:warn-on-undeclared build#)
                             (:incremental build#)
                             mtimes#)))]
                  (when ~watch?

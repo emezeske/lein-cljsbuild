@@ -2,7 +2,9 @@
 
 ## 0.2.4
 
-**TODO**
+1. Removed support for `:warn-on-undeclared`, because the compiler itself now supports a `:warnings` option.  Use that instead.
+
+[Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=18&state=closed)
 
 ## 0.2.3
 

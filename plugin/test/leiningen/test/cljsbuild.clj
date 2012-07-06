@@ -58,12 +58,12 @@
 
 (def build-id "build-id")
 (def source-path "source-path")
-(def warn-on-undeclared false)
 (def incremental false)
 
 (def compiler
   {:output-to "output-to"
    :output-dir "output-dir"
+   :warnings false
    :optimizations :advanced
    :pretty-print false})
 
@@ -73,7 +73,6 @@
      :source-path source-path
      :jar true
      :notify-command ["notify"]
-     :warn-on-undeclared warn-on-undeclared
      :incremental incremental
      :compiler compiler}))
 
@@ -140,7 +139,6 @@
         crossover-macros
         parsed-compiler
         anything
-        warn-on-undeclared
         incremental
         {}) => nil :times 1)))
 
@@ -173,7 +171,6 @@
       crossover-macros
       parsed-compiler
       anything
-      warn-on-undeclared
       incremental
       {}) => nil :times 1))
 
@@ -220,7 +217,6 @@
           crossover-macros
           parsed-compiler
           anything
-          warn-on-undeclared
           incremental
           {}) => nil :times 1
         (cljsbuild.test/run-tests parsed-commands) => 0 :times 1)))

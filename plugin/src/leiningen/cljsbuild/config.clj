@@ -19,6 +19,7 @@
 (def default-compiler-options
   {:output-to "main.js"
    :optimizations :whitespace
+   :warnings true
    :externs []
    :libs []
    :pretty-print true})
@@ -27,7 +28,6 @@
   {:source-path "src-cljs"
    :jar false
    :notify-command nil
-   :warn-on-undeclared true
    :incremental true
    :compiler default-compiler-options})
 
@@ -144,6 +144,11 @@
 (defn parse-notify-command [build]
   (assoc build :parsed-notify-command
     (parse-shell-command (:notify-command build))))
+
+(defn warn-unsupported-warn-on-undeclared [build]
+  (when (contains? build :warn-on-undeclared)
+    (println "WARNING: the :warn-on-undeclared option is no longer available.")
+    (println "Set \":warnings true\" in your :compiler options instead.")))
 
 (defn warn-unsupported-notify-command [build]
   (when (or (first (filter #(= "%" %) (:shell (:parsed-notify-command build))))

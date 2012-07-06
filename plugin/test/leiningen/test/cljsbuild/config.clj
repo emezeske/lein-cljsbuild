@@ -36,11 +36,11 @@
      '({:source-path "f"
         :jar true
         :notify-command ["g"]
-        :warn-on-undeclared false
         :incremental false
         :compiler
           {:output-to "h"
            :output-dir "i"
+           :warnings false
            :libs ["j"]
            :externs ["k"]
            :optimizations :advanced

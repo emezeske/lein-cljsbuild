@@ -33,8 +33,7 @@
         (pst+ e))))
   (println (colorizer message)))
 
-(defn- compile-cljs [cljs-path compiler-options notify-command
-                     warn-on-undeclared? incremental?]
+(defn- compile-cljs [cljs-path compiler-options notify-command incremental?]
   (let [output-file (:output-to compiler-options)
         output-file-dir (fs/parent output-file)]
     (println (str "Compiling \"" output-file "\" from \"" cljs-path "\"..."))
@@ -45,8 +44,7 @@
       (fs/mkdirs output-file-dir))
     (let [started-at (System/nanoTime)]
       (try
-        (binding [analyzer/*cljs-warn-on-undeclared* warn-on-undeclared?]
-          (build cljs-path compiler-options))
+        (build cljs-path compiler-options)
         (notify-cljs
           notify-command
           (str "Successfully compiled \"" output-file "\" in " (elapsed started-at) ".") green)
@@ -91,8 +89,7 @@
     (load (drop-extension path))))
 
 (defn run-compiler [cljs-path crossover-path crossover-macro-paths
-                    compiler-options notify-command
-                    warn-on-undeclared? incremental?
+                    compiler-options notify-command incremental?
                     last-dependency-mtimes]
   (let [output-file (:output-to compiler-options)
         output-mtime (if (fs/exists? output-file) (fs/mod-time output-file) 0)
@@ -113,6 +110,5 @@
         (when (seq clj-modified)
           (reload-clojure (map (partial relativize cljs-path) clj-files) compiler-options))
         (when (or (seq macro-modified) (seq clj-modified) (seq cljs-modified))
-          (compile-cljs cljs-path compiler-options notify-command
-                        warn-on-undeclared? incremental?))))
+          (compile-cljs cljs-path compiler-options notify-command incremental?))))
     dependency-mtimes))

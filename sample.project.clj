@@ -72,9 +72,6 @@
         ; the recommendation is to write a small shell script wrapper.
         ; Defaults to nil (disabled).
         :notify-command ["growlnotify" "-m"]
-        ; This flag will turn on compiler warnings for references to
-        ; undeclared vars. Defaults to true.
-        :warn-on-undeclared true
         ; Determines whether the temporary JavaScript files will be left in place between
         ; automatic builds.  Leaving them in place speeds up compilation because things can
         ; be built incrementally.  This probably shouldn't be disabled except for troubleshooting.
@@ -85,6 +82,9 @@
           ; The path to the JavaScript file that will be output.
           ; Defaults to "main.js".
           :output-to "resources/public/js/main.js"
+          ; This flag will turn on compiler warnings for references to
+          ; undeclared vars, wrong function call arities, etc. Defaults to true.
+          :warnings true
           ; The optimization level.  May be :whitespace, :simple, or :advanced.
           ; Defaults to :whitespace.
           :optimizations :whitespace
