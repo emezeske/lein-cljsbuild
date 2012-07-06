@@ -1,5 +1,9 @@
 # Release Notes for lein-cljsbuild
 
+## 0.2.4
+
+**TODO**
+
 ## 0.2.3
 
 1. Changed to use upstream ClojureScript version 0.0-1443.
