@@ -1,4 +1,4 @@
-(defproject cljsbuild "0.2.4"
+(defproject cljsbuild "0.2.5"
   :description "ClojureScript Autobuilder"
   :url "http://github.com/emezeske/lein-cljsbuild"
   :license {:name "Eclipse Public License - v 1.0"
@@ -8,7 +8,7 @@
                  [org.clojure/clojurescript "0.0-1443"
                    :exclusions [org.apache.ant/ant]]
                  [fs "1.1.2"]
-                 [clj-stacktrace "0.2.4"]]
+                 [clj-stacktrace "0.2.5"]]
   :dev-dependencies [[midje "1.4.0"]
                      ; NOTE: lein-midje requires different versions to be
                      ; installed for lein1 vs lein2 compatibility :(.

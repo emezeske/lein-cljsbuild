@@ -1,5 +1,7 @@
 # Release Notes for lein-cljsbuild
 
+## 0.2.5
+
 ## 0.2.4
 
 1. Removed support for `:warn-on-undeclared`, because the compiler itself now supports a `:warnings` option.  Use that instead.
