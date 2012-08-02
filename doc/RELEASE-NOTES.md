@@ -1,5 +1,11 @@
 # Release Notes for lein-cljsbuild
 
+## 0.2.6
+
+TODO
+
+[Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=20&state=closed)
+
 ## 0.2.5
 
 1. Changed to use upstream ClojureScript version 0.0-1450.
