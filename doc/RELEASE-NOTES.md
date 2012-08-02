@@ -2,6 +2,10 @@
 
 ## 0.2.5
 
+1. Changed to use upstream ClojureScript version 0.0-1450.
+
+[Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=19&state=closed)
+
 ## 0.2.4
 
 1. Removed support for `:warn-on-undeclared`, because the compiler itself now supports a `:warnings` option.  Use that instead.
