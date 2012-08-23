@@ -24,19 +24,26 @@
 
 ; TODO: lein1 does not have a leiningen.core.main ns.  This can go away once lein2
 ;       is released, if that ever happens.
-(try
-  (require 'leiningen.core.main)
-  (catch java.io.FileNotFoundException _))
+(def ^:private lein2?
+  (try
+    (require 'leiningen.core.main)
+    true
+    (catch java.io.FileNotFoundException _
+      false)))
 
-(defn- exit-success []
-  (if-let [lexit (resolve 'leiningen.core.main/exit)]
-    (lexit)
+(defn- exit-success
+  "Exit successfully in a way that satisifies lein1 and lein2."
+  []
+  (if lein2?
+    nil
     exit-code-success))
 
-(defn- exit-failure []
-  (if-let [labort (resolve 'leiningen.core.main/abort)]
-    (labort)
-    exit-code-failure) )
+(defn- exit-failure
+  "Fail in a way that satisifies lein1 and lein2."
+  []
+  (if lein2?
+    ((resolve 'leiningen.core.main/abort))
+    exit-code-failure))
 
 (defn- run-local-project [project crossover-path builds requires form]
   (subproject/eval-in-project project crossover-path builds
@@ -219,43 +226,69 @@
             (lhelp/subtask-help-for *ns* #'cljsbuild))
           (exit-failure))))))
 
-; Lein2 "preps" the project when eval-in-project is called.  This
-; causes it to be compiled, which normally would trigger the compile
-; hook below, which is bad because we can't compile unless we're in
-; the dummy subproject.  To solve this problem, we disable all of the
-; hooks if we notice that lein2 is currently prepping.
-(defmacro skip-if-prepping [task args & forms]
-  `(if (subproject/prepping?)
-    (apply ~task ~args)
-    (do ~@forms)))
+; Supporting both lein1 and lein2 is starting to become VERY PAINFUL.
+(if lein2?
+  (do
+    ; Lein2 "preps" the project when eval-in-project is called.  This
+    ; causes it to be compiled, which normally would trigger the compile
+    ; hook below, which is bad because we can't compile unless we're in
+    ; the dummy subproject.  To solve this problem, we disable all of the
+    ; hooks if we notice that lein2 is currently prepping.
+    (defmacro skip-if-prepping [task args & forms]
+      `(if (subproject/prepping?)
+        (apply ~task ~args)
+        (do ~@forms)))
 
-(defn compile-hook [task & args]
-  (skip-if-prepping task args
-    (let [compile-result (apply task args)
-          build-ids nil]
-      (if (not= compile-result exit-code-success)
-        compile-result
-        (run-compiler (first args) (config/extract-options (first args))
-                      build-ids false)))))
+    (defn compile-hook [task & args]
+      (skip-if-prepping task args
+        (apply task args)
+        (run-compiler (first args) (config/extract-options (first args)) nil false)))
 
-(defn test-hook [task & args]
-  (skip-if-prepping task args
-    (let [test-results [(apply task args)
-                        (run-tests (first args) (config/extract-options (first args)) [])]]
-      (if (every? #(= % exit-code-success) test-results)
-        (exit-success)
-        (exit-failure)))))
+    (defn test-hook [task & args]
+      (skip-if-prepping task args
+        (apply task args)
+        (let [test-results (run-tests (first args) (config/extract-options (first args)) [])]
+          (if (not= test-results exit-code-success)
+            (exit-failure)))))
 
-(defn clean-hook [task & args]
-  (skip-if-prepping task args
-    (apply task args)
-    (clean (first args) (config/extract-options (first args)))))
+    (defn clean-hook [task & args]
+      (skip-if-prepping task args
+        (apply task args)
+        (clean (first args) (config/extract-options (first args)))))
 
-(defn jar-hook [task & [project out-file filespecs]]
-  (skip-if-prepping task [project out-file filespecs]
-    (apply task [project out-file (concat filespecs (jar/get-filespecs project))])))
+    (defn jar-hook [task & [project out-file filespecs]]
+      (skip-if-prepping task [project out-file filespecs]
+        (apply task [project out-file (concat filespecs (jar/get-filespecs project))]))))
+  (do
+    (defn compile-hook [task & args]
+      (let [compile-result (apply task args)]
+        (if (not= compile-result exit-code-success)
+          compile-result
+          (run-compiler (first args) (config/extract-options (first args)) nil false))))
 
-(hooke/add-hook #'lcompile/compile #'compile-hook)
-(hooke/add-hook #'ltest/test #'test-hook)
-(hooke/add-hook #'lclean/clean #'clean-hook)
-(hooke/add-hook #'ljar/write-jar #'jar-hook)
+    (defn test-hook [task & args]
+      (let [test-results [(apply task args)
+                          (run-tests (first args) (config/extract-options (first args)) [])]]
+        (if (every? #(= % exit-code-success) test-results)
+          (exit-success)
+          (exit-failure))))
+
+    (defn clean-hook [task & args]
+      (apply task args)
+      (clean (first args) (config/extract-options (first args))))
+
+    (defn jar-hook [task & [project out-file filespecs]]
+      (apply task [project out-file (concat filespecs (jar/get-filespecs project))]))))
+
+(defn activate
+  "Set up hooks for the plugin.  Eventually, this can be changed to just hook,
+   and people won't have to specify :hooks in their project.clj files anymore."
+  []
+  (hooke/add-hook #'lcompile/compile #'compile-hook)
+  (hooke/add-hook #'ltest/test #'test-hook)
+  (hooke/add-hook #'lclean/clean #'clean-hook)
+  (hooke/add-hook #'ljar/write-jar #'jar-hook))
+
+; Lein1 hooks have to be called manually, in lein2 the activate function will
+; be automatically called.
+(when-not lein2? (activate))
