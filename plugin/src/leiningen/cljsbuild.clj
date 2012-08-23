@@ -25,7 +25,7 @@
 ; TODO: lein1 does not have a leiningen.core.main ns.  This can go away once lein2
 ;       is released, if that ever happens.
 (try
-  (require 'leiningen.core.eval)
+  (require 'leiningen.core.main)
   (catch java.io.FileNotFoundException _))
 
 (defn- exit-success []
