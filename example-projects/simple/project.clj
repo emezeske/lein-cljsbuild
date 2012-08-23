@@ -1,4 +1,4 @@
-(defproject cljsbuild-example-simple "0.2.6"
+(defproject cljsbuild-example-simple "0.2.7"
   :description "A simple example of how to use lein-cljsbuild"
   ; Source path for Leiningen 1.x:
   :source-path "src-clj"
@@ -8,7 +8,7 @@
                  [compojure "1.0.4"]
                  [hiccup "1.0.0"]]
   :dev-dependencies [[lein-ring "0.7.0"]]
-  :plugins [[lein-cljsbuild "0.2.6"]]
+  :plugins [[lein-cljsbuild "0.2.7"]]
   :cljsbuild {
     :builds [{:source-path "src-cljs"
               :compiler {:output-to "resources/public/js/main.js"

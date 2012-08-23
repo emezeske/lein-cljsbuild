@@ -1,5 +1,11 @@
 # Release Notes for lein-cljsbuild
 
+## 0.2.7
+
+TODO
+
+[Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=21&state=closed)
+
 ## 0.2.6
 
 1. Updated to support recent preview releases of Leiningen 2.

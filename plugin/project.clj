@@ -1,4 +1,4 @@
-(defproject lein-cljsbuild "0.2.6"
+(defproject lein-cljsbuild "0.2.7"
   :description "ClojureScript Autobuilder Plugin"
   :url "http://github.com/emezeske/lein-cljsbuild"
   :license {:name "Eclipse Public License - v 1.0"
