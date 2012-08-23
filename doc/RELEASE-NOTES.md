@@ -2,7 +2,7 @@
 
 ## 0.2.6
 
-TODO
+1. Updated to support recent preview releases of Leiningen 2.
 
 [Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=20&state=closed)
 
