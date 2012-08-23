@@ -228,3 +228,4 @@ See the file COPYING.
 * Kris Jenkins (http://github.com/krisajenkins)
 * Daniel Turczański (http://jvmsoup.com/)
 * Brandon Henry (http://brandonhenry.net/)
+* Daniel Gregoire (http://techylinguist.com)
