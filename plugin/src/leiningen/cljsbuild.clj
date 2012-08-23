@@ -8,7 +8,6 @@
     [leiningen.cljsbuild.jar :as jar]
     [leiningen.cljsbuild.subproject :as subproject]
     [leiningen.compile :as lcompile]
-    [leiningen.core.main :as lmain]
     [leiningen.help :as lhelp]
     [leiningen.jar :as ljar]
     [leiningen.test :as ltest]
@@ -20,7 +19,24 @@
 
 (def repl-output-path ".lein-cljsbuild-repl")
 
-(def exit-success 0)
+(def exit-code-success 0)
+(def exit-code-failure 1)
+
+; TODO: lein1 does not have a leiningen.core.main ns.  This can go away once lein2
+;       is released, if that ever happens.
+(try
+  (require 'leiningen.core.eval)
+  (catch java.io.FileNotFoundException _))
+
+(defn- exit-success []
+  (if-let [lexit (resolve 'leiningen.core.main/exit)]
+    (lexit)
+    exit-code-success))
+
+(defn- exit-failure []
+  (if-let [labort (resolve 'leiningen.core.main/abort)]
+    (labort)
+    exit-code-failure) )
 
 (defn- run-local-project [project crossover-path builds requires form]
   (subproject/eval-in-project project crossover-path builds
@@ -28,7 +44,7 @@
       ~form
       (shutdown-agents))
     requires)
-  (lmain/exit))
+  (exit-success))
 
 (defn- run-compiler [project {:keys [crossover-path crossovers builds]} build-ids watch?]
   (doseq [build-id build-ids]
@@ -95,7 +111,7 @@
     (do ~@forms)
     (do
       (println "REPL subcommands must be run via \"lein trampoline cljsbuild <command>\".")
-      (lmain/abort))))
+      (exit-failure))))
 
 (defn- once
   "Compile the ClojureScript project once."
@@ -133,7 +149,7 @@
   [project options args]
   (let [build-ids nil
         compile-result (run-compiler project options build-ids false)]
-    (if (not= compile-result exit-success)
+    (if (not= compile-result exit-code-success)
       compile-result
       (run-tests project options args))))
 
@@ -186,7 +202,7 @@
   ([project]
     (println
       (lhelp/help-for "cljsbuild"))
-    (lmain/abort))
+    (exit-failure))
   ([project subtask & args]
     (let [options (config/extract-options project)]
       (case subtask
@@ -201,7 +217,7 @@
           (println
             "Subtask" (str \" subtask \") "not found."
             (lhelp/subtask-help-for *ns* #'cljsbuild))
-          (lmain/abort))))))
+          (exit-failure))))))
 
 ; Lein2 "preps" the project when eval-in-project is called.  This
 ; causes it to be compiled, which normally would trigger the compile
@@ -217,7 +233,7 @@
   (skip-if-prepping task args
     (let [compile-result (apply task args)
           build-ids nil]
-      (if (not= compile-result exit-success)
+      (if (not= compile-result exit-code-success)
         compile-result
         (run-compiler (first args) (config/extract-options (first args))
                       build-ids false)))))
@@ -226,9 +242,9 @@
   (skip-if-prepping task args
     (let [test-results [(apply task args)
                         (run-tests (first args) (config/extract-options (first args)) [])]]
-      (if (every? #(= % exit-success) test-results)
-        (lmain/exit)
-        (lmain/abort)))))
+      (if (every? #(= % exit-code-success) test-results)
+        (exit-success)
+        (exit-failure)))))
 
 (defn clean-hook [task & args]
   (skip-if-prepping task args
