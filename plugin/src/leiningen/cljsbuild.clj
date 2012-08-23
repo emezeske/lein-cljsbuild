@@ -8,6 +8,7 @@
     [leiningen.cljsbuild.jar :as jar]
     [leiningen.cljsbuild.subproject :as subproject]
     [leiningen.compile :as lcompile]
+    [leiningen.core.main :as lmain]
     [leiningen.help :as lhelp]
     [leiningen.jar :as ljar]
     [leiningen.test :as ltest]
@@ -20,7 +21,6 @@
 (def repl-output-path ".lein-cljsbuild-repl")
 
 (def exit-success 0)
-(def exit-failure 1)
 
 (defn- run-local-project [project crossover-path builds requires form]
   (subproject/eval-in-project project crossover-path builds
@@ -28,7 +28,7 @@
       ~form
       (shutdown-agents))
     requires)
-  exit-success)
+  (lmain/exit))
 
 (defn- run-compiler [project {:keys [crossover-path crossovers builds]} build-ids watch?]
   (doseq [build-id build-ids]
@@ -95,7 +95,7 @@
     (do ~@forms)
     (do
       (println "REPL subcommands must be run via \"lein trampoline cljsbuild <command>\".")
-      exit-failure)))
+      (lmain/abort))))
 
 (defn- once
   "Compile the ClojureScript project once."
@@ -186,7 +186,7 @@
   ([project]
     (println
       (lhelp/help-for "cljsbuild"))
-    exit-failure)
+    (lmain/abort))
   ([project subtask & args]
     (let [options (config/extract-options project)]
       (case subtask
@@ -201,7 +201,7 @@
           (println
             "Subtask" (str \" subtask \") "not found."
             (lhelp/subtask-help-for *ns* #'cljsbuild))
-          exit-failure)))))
+          (lmain/abort))))))
 
 ; Lein2 "preps" the project when eval-in-project is called.  This
 ; causes it to be compiled, which normally would trigger the compile
@@ -227,8 +227,8 @@
     (let [test-results [(apply task args)
                         (run-tests (first args) (config/extract-options (first args)) [])]]
       (if (every? #(= % exit-success) test-results)
-        exit-success
-        exit-failure))))
+        (lmain/exit)
+        (lmain/abort)))))
 
 (defn clean-hook [task & args]
   (skip-if-prepping task args
