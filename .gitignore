@@ -12,3 +12,4 @@ example-projects/advanced/.crossover-cljs
 example-projects/advanced/.repl*
 example-projects/*/classes
 example-projects/*/lib
+example-projects/*/target
