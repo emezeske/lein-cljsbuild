@@ -154,9 +154,8 @@
 (defn- test
   "Run ClojureScript tests."
   [project options args]
-  (let [build-ids nil
-        compile-result (run-compiler project options build-ids false)]
-    (if (not= compile-result exit-code-success)
+  (let [compile-result (run-compiler project options nil false)]
+    (if (and (not lein2?) (not= compile-result exit-code-success))
       compile-result
       (run-tests project options args))))
 
@@ -247,9 +246,7 @@
     (defn test-hook [task & args]
       (skip-if-prepping task args
         (apply task args)
-        (let [test-results (run-tests (first args) (config/extract-options (first args)) [])]
-          (if (not= test-results exit-code-success)
-            (exit-failure)))))
+        (run-tests (first args) (config/extract-options (first args)) [])))
 
     (defn clean-hook [task & args]
       (skip-if-prepping task args
