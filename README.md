@@ -23,12 +23,13 @@ version `1.7.0` or higher.
 ## Installation
 
 You can install the plugin by adding lein-cljsbuild to your `project.clj`
-file in the `:plugins` section:
+file in the `:plugins` section. You also need to specify Clojure version in `:dependencies`:
 
 ```clj
 ; Using Leiningen 1.7.0 or newer:
 (defproject lein-cljsbuild-example "1.2.3"
-  :plugins [[lein-cljsbuild "0.2.6"]])
+  :plugins [[lein-cljsbuild "0.2.6"]]
+  :dependencies [[org.clojure/clojure "1.4.0"]])
 ```
 
 And then running the following command to download it:
@@ -57,6 +58,7 @@ of your `project.clj` file.  A simple project might look like this:
 ```clj
 (defproject lein-cljsbuild-example "1.2.3"
   :plugins [[lein-cljsbuild "0.2.6"]]
+  :dependencies [[org.clojure/clojure "1.4.0"]]
   :cljsbuild {
     :builds [{
         ; The path to the top-level ClojureScript source directory:
@@ -135,6 +137,7 @@ and will build all of them in parallel:
 ```clj
 (defproject lein-cljsbuild-example "1.2.3"
   :plugins [[lein-cljsbuild "0.2.6"]]
+  :dependencies [[org.clojure/clojure "1.4.0"]]
   :cljsbuild {
     :builds [
       {:source-path "src-cljs-main"
@@ -153,6 +156,7 @@ only that one:
 ```clj
 (defproject lein-cljsbuild-example "1.2.3"
   :plugins [[lein-cljsbuild "0.2.6"]]
+  :dependencies [[org.clojure/clojure "1.4.0"]]
   :cljsbuild {
     :builds [
       {:source-path "src-cljs-main"
@@ -170,6 +174,7 @@ them as a map instead of a vector:
 ```clj
 (defproject lein-cljsbuild-example "1.2.3"
   :plugins [[lein-cljsbuild "0.2.6"]]
+  :dependencies [[org.clojure/clojure "1.4.0"]]
   :cljsbuild {
     :builds {
       :main
