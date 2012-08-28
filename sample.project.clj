@@ -5,9 +5,9 @@
 ; the example-projects/ folder.
 
 (defproject org.example/sample "1.0.0-SNAPSHOT"
-  ; Your project must use Clojure 1.3 or above to support
+  ; Your project must use Clojure 1.4 or above to support
   ; ClojureScript compilation.
-  :dependencies [[org.clojure/clojure "1.3.0"]]
+  :dependencies [[org.clojure/clojure "1.4.0"]]
   ; Your project should plugin-depend on lein-cljsbuild, to ensure that
   ; the right version of the plugin is installed.
   :plugins [[lein-cljsbuild "0.2.7"]]
