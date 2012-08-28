@@ -14,7 +14,7 @@ pushd $project_root
 rm -rf ~/.m2/repository/lein-cljsbuild ~/.m2/repository/cljsbuild/
 for d in support plugin; do
 	pushd $d
-	lein install, midje
+	lein install #, midje
 	popd
 done
 for d in $projects; do
@@ -22,11 +22,11 @@ for d in $projects; do
 	if [ $d = advanced ]; then
 		extra_command=', cljsbuild test'
 	fi
-	lein clean
+	#lein clean
+	#rm -rf .lein-*
+	#lein cljsbuild clean, cljsbuild once$extra_command
+	lein2 clean
 	rm -rf .lein-*
-	lein cljsbuild clean, cljsbuild once$extra_command
-	lein clean
-	rm -rf .lein-*
-	lein2 do cljsbuild clean, cljsbuild once$extra_command
+	lein2 do cljsbuild clean, cljsbuild once #$extra_command
 	popd
 done

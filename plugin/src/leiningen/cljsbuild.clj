@@ -225,19 +225,19 @@
             (lhelp/subtask-help-for *ns* #'cljsbuild))
           (exit-failure))))))
 
+; Lein2 "preps" the project when eval-in-project is called.  This
+; causes it to be compiled, which normally would trigger the compile
+; hook below, which is bad because we can't compile unless we're in
+; the dummy subproject.  To solve this problem, we disable all of the
+; hooks if we notice that lein2 is currently prepping.
+(defmacro skip-if-prepping [task args & forms]
+  `(if (subproject/prepping?)
+    (apply ~task ~args)
+    (do ~@forms)))
+
 ; Supporting both lein1 and lein2 is starting to become VERY PAINFUL.
 (if lein2?
   (do
-    ; Lein2 "preps" the project when eval-in-project is called.  This
-    ; causes it to be compiled, which normally would trigger the compile
-    ; hook below, which is bad because we can't compile unless we're in
-    ; the dummy subproject.  To solve this problem, we disable all of the
-    ; hooks if we notice that lein2 is currently prepping.
-    (defmacro skip-if-prepping [task args & forms]
-      `(if (subproject/prepping?)
-        (apply ~task ~args)
-        (do ~@forms)))
-
     (defn compile-hook [task & args]
       (skip-if-prepping task args
         (apply task args)
