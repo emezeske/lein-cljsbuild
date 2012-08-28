@@ -4,31 +4,28 @@
     midje.sweet))
 
 (fact
-  (check-clojure-version {'org.clojure/clojure ["1.3.0"]}) => nil
-  (check-clojure-version {'org.clojure/clojure ["1.4.0"]}) => nil
-  (check-clojure-version {'org.clojure/clojure ["1.2.0"]}) => (throws Exception)
-  (check-clojure-version {}) => (throws Exception))
+  (check-clojure-version {}) => nil
+  (check-clojure-version {'org.clojure/clojure [required-clojure-version]}) => nil
+  (check-clojure-version {'org.clojure/clojure ["1.3.0"]}) => (throws Exception)
+  (check-clojure-version {'org.clojure/clojure ["1.2.0"]}) => (throws Exception))
 
-(defn- merge-dependencies-map [dependencies]
-  (-> dependencies
-    merge-dependencies
-    dependency-map))
-
-(defn- expected-dependencies-map [dependencies]
-  (-> dependencies
-    (concat cljsbuild-dependencies)
-    dependency-map))
+(def clojure-dependency ['org.clojure/clojure required-clojure-version])
 
 (fact
-  (for [dependencies [[['org.clojure/clojure "1.3.0"] ['a "1"] ['b "2"]]
-                      [['org.clojure/clojure "1.3.0"] ['cljsbuild "9.9.9"]]]]
-    (merge-dependencies-map dependencies) => (expected-dependencies-map dependencies)))
+  (let [original [clojure-dependency ['a "1"] ['b "2"]]
+        merged (conj original ['cljsbuild cljsbuild-version])]
+    (merge-dependencies original) => (in-any-order merged))
+
+  (let [original [['a "1"] ['b "2"]]
+        merged (concat original [clojure-dependency ['cljsbuild cljsbuild-version]])]
+    (merge-dependencies original) => (in-any-order merged)))
 
 (def lein-crossover ".crossovers")
 (def lein-build-path "src-cljs-a")
 (def lein-source-path "src-clj")
 (def lein-extra-classpath-dirs ["a" "b"])
-(def lein-dependencies [['org.clojure/clojure "1.3.0"] ['a "1"]])
+(def lein-dependencies [clojure-dependency ['a "1"]])
+(def expected-dependencies (conj lein-dependencies ['cljsbuild cljsbuild-version]))
 (def lein-dev-dependencies [['b "2"]])
 (def lein-repositories ["repository"])
 (def lein-builds [{:source-path lein-build-path}])
@@ -48,7 +45,7 @@
     (:local-repo-classpath subproject) => truthy
     (:dev-dependencies subproject) => lein-dev-dependencies
     (:repositories subproject) => lein-repositories
-    (dependency-map (:dependencies subproject)) => (expected-dependencies-map lein-dependencies)))
+    (:dependencies subproject) => (in-any-order expected-dependencies)))
 
 (def lein2-metadata {:test-metadata "testing 1 2 3"})
 (def lein2-eval-in :trampoline)
@@ -73,4 +70,4 @@
     (:repositories subproject) => lein-repositories
     (:eval-in subproject) => lein2-eval-in
     (:resources-path subproject) => lein2-resources-path
-    (dependency-map (:dependencies subproject)) => (expected-dependencies-map lein-dependencies)))
+    (:dependencies subproject) => (in-any-order expected-dependencies)))

@@ -3,11 +3,12 @@
   (:require
     [clojure.string :as string]))
 
+(def cljsbuild-version "0.2.7")
 (def required-clojure-version "1.4.0")
 
 (def cljsbuild-dependencies
-  '[[cljsbuild "0.2.7"]
-    [org.clojure/clojure required-clojure-version]])
+  [['cljsbuild cljsbuild-version]
+   ['org.clojure/clojure required-clojure-version]])
 
 (defn- numeric-version [v]
   (map #(Integer. %) (re-seq #"\d+" (first (string/split v #"-" 2)))))
