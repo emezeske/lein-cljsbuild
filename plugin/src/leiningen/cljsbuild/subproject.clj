@@ -63,6 +63,7 @@
                        (map :source-path builds)
                        [crossover-path])
        :resources-path (:resources-path project)
+       :checkout-deps-shares (:checkout-deps-shares project)
        :eval-in (:eval-in project)})
     (meta project)))
 
