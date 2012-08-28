@@ -1,5 +1,11 @@
 # Release Notes for lein-cljsbuild
 
+## 0.2.8
+
+TODO
+
+[Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=22&state=closed)
+
 ## 0.2.7
 
 1. Fix a bug introduced in 0.2.6 that broke the `cljsbuild jar` task for Leiningen 2.x.

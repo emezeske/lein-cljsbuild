@@ -3,7 +3,7 @@
   (:require
     [clojure.string :as string]))
 
-(def cljsbuild-version "0.2.7")
+(def cljsbuild-version "0.2.8")
 (def required-clojure-version "1.4.0")
 
 (def cljsbuild-dependencies
