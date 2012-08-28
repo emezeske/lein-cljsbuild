@@ -3,8 +3,11 @@
   (:require
     [clojure.string :as string]))
 
-(def cljsbuild-dependencies '[[cljsbuild "0.2.7"]])
-(def required-clojure-version "1.3.0")
+(def required-clojure-version "1.4.0")
+
+(def cljsbuild-dependencies
+  '[[cljsbuild "0.2.7"]
+    [org.clojure/clojure required-clojure-version]])
 
 (defn- numeric-version [v]
   (map #(Integer. %) (re-seq #"\d+" (first (string/split v #"-" 2)))))
@@ -20,15 +23,12 @@
             (< seg1 seg2) false))))
 
 (defn check-clojure-version [project-dependencies]
-  (let [clojure-dependency ('org.clojure/clojure project-dependencies)]
-    (when (nil? clojure-dependency)
-      (throw
-        (Exception. "lein-cljsbuild requires your project to specify which Clojure version it uses ")))
+  (if-let [clojure-dependency ('org.clojure/clojure project-dependencies)]
     (let [version (first clojure-dependency)]
       (when (not (version-satisfies? version required-clojure-version))
         (throw
           (Exception.
-            (str "lein-cljsbuild requires your project to use Clojure version >= " required-clojure-version)))))))
+            (str "The ClojureScript compiler requires Clojure version >= " required-clojure-version)))))))
 
 (defn dependency-map [dependency-vec]
   (into {} (map (juxt first rest) dependency-vec)))
@@ -38,7 +38,7 @@
         cljsbuild (dependency-map cljsbuild-dependencies)]
     (check-clojure-version project)
     (map (fn [[k v]] (vec (cons k v)))
-      (merge project cljsbuild))))
+      (merge cljsbuild project))))
 
 (defn make-subproject [project crossover-path builds]
   {:local-repo-classpath true
