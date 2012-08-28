@@ -2,7 +2,8 @@
 
 ## 0.2.7
 
-TODO
+1. Fix a bug introduced in 0.2.6 that broke the `cljsbuild jar` task for Leiningen 2.x.
+2. Alleviate the need for the parent project to specify a Clojure version.
 
 [Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=21&state=closed)
 
