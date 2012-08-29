@@ -26,7 +26,6 @@ You can install the plugin by adding lein-cljsbuild to your `project.clj`
 file in the `:plugins` section:
 
 ```clj
-; Using Leiningen 1.7.0 or newer:
 (defproject lein-cljsbuild-example "1.2.3"
   :plugins [[lein-cljsbuild "0.2.7"]])
 ```
