@@ -47,9 +47,7 @@
 
 (defn- run-local-project [project crossover-path builds requires form]
   (subproject/eval-in-project project crossover-path builds
-    `(do
-      ~form
-      (shutdown-agents))
+    form
     requires)
   (exit-success))
 
