@@ -51,7 +51,7 @@
         (catch Throwable e
           (notify-cljs
             notify-command
-            (str "Compiling \"" output-file "\" failed:") red)
+            (str "Compiling \"" output-file "\" failed.") red)
           (pst+ e))))))
 
 (defn- get-mtimes [paths]
@@ -79,14 +79,20 @@
       (subs path (count parent))
       path)))
 
-(defn reload-clojure [paths compiler-options]
+(defn reload-clojure [paths compiler-options notify-command]
   ; Incremental builds will use cached JS output unless one of the cljs input files
   ; has been modified.  Since reloading a clj file *might* affect the build, but does
   ; not affect any cljs file mtimes, we have to clear the cache here to force everything
   ; to be rebuilt.
   (fs/delete-dir (:output-dir compiler-options))
   (doseq [path paths]
-    (load (drop-extension path))))
+    (try
+      (load (drop-extension path))
+      (catch Throwable e
+        (notify-cljs
+          notify-command
+          (str "Reloading Clojure file \"" path "\" failed.") red)
+        (pst+ e)))))
 
 (defn run-compiler [cljs-path crossover-path crossover-macro-paths
                     compiler-options notify-command incremental?
@@ -106,9 +112,9 @@
             clj-modified (list-modified output-mtime clj-mtimes)
             cljs-modified (list-modified output-mtime cljs-mtimes)]
         (when (seq macro-modified)
-          (reload-clojure (map macro-classpath-files macro-modified) compiler-options))
+          (reload-clojure (map macro-classpath-files macro-modified) compiler-options notify-command))
         (when (seq clj-modified)
-          (reload-clojure (map (partial relativize cljs-path) clj-files) compiler-options))
+          (reload-clojure (map (partial relativize cljs-path) clj-files) compiler-options notify-command))
         (when (or (seq macro-modified) (seq clj-modified) (seq cljs-modified))
           (compile-cljs cljs-path compiler-options notify-command incremental?))))
     dependency-mtimes))

@@ -45,5 +45,5 @@
     (fs/mod-time "crossovers/b.cljs") => mtime :times 1
     (fs/mod-time crossover-macro-absolute) => mtime :times 1
     (fs/mkdirs anything) => nil
-    (reload-clojure [crossover-macro-classpath] compiler-options) => nil :times 1
+    (reload-clojure [crossover-macro-classpath] compiler-options notify-command) => nil :times 1
     (cljs/build cljs-path compiler-options) => nil :times 1))
