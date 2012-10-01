@@ -37,6 +37,7 @@
         :jar true
         :notify-command ["g"]
         :incremental false
+        :assert false
         :compiler
           {:output-to "h"
            :output-dir "i"

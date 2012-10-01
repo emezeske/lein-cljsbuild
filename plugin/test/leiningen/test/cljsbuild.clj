@@ -58,7 +58,8 @@
 
 (def build-id "build-id")
 (def source-path "source-path")
-(def incremental false)
+(def incremental? false)
+(def assert? false)
 
 (def compiler
   {:output-to "output-to"
@@ -73,7 +74,8 @@
      :source-path source-path
      :jar true
      :notify-command ["notify"]
-     :incremental incremental
+     :incremental incremental?
+     :assert assert?
      :compiler compiler}))
 
 (def parsed-builds
@@ -139,7 +141,8 @@
         crossover-macros
         parsed-compiler
         anything
-        incremental
+        incremental?
+        assert?
         {}) => nil :times 1)))
 
 (fact "bad build IDs are detected"
@@ -171,7 +174,8 @@
       crossover-macros
       parsed-compiler
       anything
-      incremental
+      incremental?
+      assert?
       {}) => nil :times 1))
 
 (fact "compile-hook does not call through to the compiler when task fails"
@@ -217,7 +221,8 @@
           crossover-macros
           parsed-compiler
           anything
-          incremental
+          incremental?
+          assert?
           {}) => nil :times 1
         (cljsbuild.test/run-tests parsed-commands) => 0 :times 1)))
 

@@ -91,6 +91,7 @@
                             (:compiler build#)
                             (:parsed-notify-command build#)
                             (:incremental build#)
+                            (:assert build#)
                             mtimes#)))]
                  (when ~watch?
                    (Thread/sleep 100)

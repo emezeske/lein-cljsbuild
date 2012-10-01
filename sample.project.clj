@@ -77,6 +77,10 @@
         ; be built incrementally.  This probably shouldn't be disabled except for troubleshooting.
         ; Defaults to true.
         :incremental true
+        ; Determines whether assertions are enabled for the ClojureScript code.  Technically, this
+        ; binds clojure.core/*assert*, which is respected by the ClojureScript compiler.
+        ; Defaults to true.
+        :assert true
         ; The :compiler options are passed directly to the ClojureScript compiler.
         :compiler {
           ; The path to the JavaScript file that will be output.

@@ -29,6 +29,7 @@
    :jar false
    :notify-command nil
    :incremental true
+   :assert true
    :compiler default-compiler-options})
 
 (defn convert-builds-map [options]

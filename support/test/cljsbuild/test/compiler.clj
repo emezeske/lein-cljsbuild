@@ -21,6 +21,7 @@
    :optimizations :advanced
    :pretty-print false})
 (def notify-command {:shell ["a" "b"] :test "c"})
+(def assert? false)
 (def incremental? true)
 (def mtime 1234)
 
@@ -32,6 +33,7 @@
     compiler-options
     notify-command
     incremental?
+    assert?
     {}) => (just {"src-cljs/a.cljs" mtime,
                   "crossovers/b.cljs" mtime,
                   crossover-macro-absolute mtime})
