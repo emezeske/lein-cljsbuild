@@ -228,3 +228,4 @@ See the file COPYING.
 * Daniel Turczański (http://jvmsoup.com/)
 * Brandon Henry (http://brandonhenry.net/)
 * Daniel Gregoire (http://techylinguist.com)
+* Chas Emerick (chas@cemerick.com)
