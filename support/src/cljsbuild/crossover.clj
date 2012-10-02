@@ -4,10 +4,10 @@
   (:require
     [cljsbuild.util :as util]
     [clojure.string :as string]
-    [fs.core :as fs]))
-
-(defn- fail [& args]
-  (throw (Exception. (apply str args))))
+    [fs.core :as fs])
+  (import
+    java.io.File
+    java.net.URLDecoder))
 
 (defn- is-macro-file? [file]
   (not (neg? (.indexOf (slurp file) ";*CLJSBUILD-MACRO-FILE*;"))))
@@ -23,9 +23,19 @@
     "; " file "\n\n"
     (string/replace (slurp file) ";*CLJSBUILD-REMOVE*;" "")))
 
+(defn get-path-safe
+  "Pull a local file path out of a resource URL.  Without this, it's possible to end up
+   with weird paths like /C:/x/y/z on Windows, which are troublesome to deal with."
+  [url]
+  (-> url
+    .getPath
+    (URLDecoder/decode "utf-8")
+    File.
+    .getPath))
+
 (defn- crossover-to [crossover-path [from-parent from-resource]]
   (let [subpath (string/replace-first
-                  (fs/absolute-path (.getPath from-resource))
+                  (fs/absolute-path (get-path-safe from-resource))
                   (fs/absolute-path from-parent) "")
         to-file (fs/normalized-path
                   (util/join-paths (fs/absolute-path crossover-path) subpath))]
@@ -37,13 +47,13 @@
     ; in jars cannot be specified recursively; they have to be named file
     ; by file.
     (if (= (.getProtocol dir) "file")
-      (let [files (util/find-files (.getPath dir) #{"clj"})]
+      (let [files (util/find-files (get-path-safe dir) #{"clj"})]
         (map #(as-url (str "file:" %)) files))
       [dir])))
 
-(defn- truncate-uri-path [uri n]
-  (if uri
-    (let [uri-path (.getPath uri)]
+(defn- truncate-url-path [url n]
+  (if url
+    (let [uri-path (get-path-safe url)]
       (subs uri-path 0 (- (count uri-path) n)))
     nil))
 
@@ -55,11 +65,11 @@
 (defn- find-crossover [crossover macros?]
   (let [ns-path (ns-to-path crossover)
         as-dir (resource ns-path)
-        dir-parent (truncate-uri-path as-dir (count ns-path))
+        dir-parent (truncate-url-path as-dir (count ns-path))
         recurse-dirs (recurse-resource-dir as-dir)
         ns-file-path (str ns-path ".clj")
         as-file (resource ns-file-path)
-        file-parent (truncate-uri-path as-file (count ns-file-path))
+        file-parent (truncate-url-path as-file (count ns-file-path))
         all-resources (conj
                         (map vector (repeat dir-parent) recurse-dirs)
                         [file-parent as-file])
@@ -82,7 +92,7 @@
   (let [macro-paths (find-crossovers crossovers true)
         macro-files (remove #(not= (.getProtocol (second %)) "file") macro-paths)]
     (map (fn [[parent file]]
-           (let [file-path (.getPath file)
+           (let [file-path (get-path-safe file)
                  classpath-path (string/replace-first file-path parent "")]
              {:absolute (fs/absolute-path file-path)
               :classpath classpath-path}))
@@ -95,7 +105,7 @@
       ; We can't determine the mtime for jar resources; they'll just
       ; be copied once and that's it.
       (= "file" (.getProtocol from-resource))
-      (> (fs/mod-time (.getPath from-resource)) (fs/mod-time to-file)))))
+      (> (fs/mod-time (get-path-safe from-resource)) (fs/mod-time to-file)))))
 
 (defn write-crossover
   "Write a temp file and atomically rename to the real file

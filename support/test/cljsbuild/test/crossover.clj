@@ -4,7 +4,8 @@
     midje.sweet)
   (:require
     [clojure.java.io :as io]
-    [fs.core :as fs]))
+    [fs.core :as fs])
+  (import java.net.URL))
 
 (def crossover-path "/project/crossovers")
 (def crossovers '[a a.a a.b])
@@ -36,6 +37,11 @@
   (fact "crossover files are copied/edited correctly"
     (write-crossover from-resource to-file) => anything
     (.indexOf (slurp to-file) cljsbuild-remove) => -1))
+
+(let [windows-index (-> "os.name" System/getProperty .toLowerCase (.indexOf "win"))
+      expected-path (if (not= windows-index -1) "C:/x/y/z" "/C:/x/y/z")]
+  (fact "Paths are pulled out of URLs correctly."
+    (get-path-safe (URL. "file:/C:/x/y/z")) => expected-path))
 
 ; TODO: It would be nice to test more of the crossover features, but they
 ;       are pretty heavily dependent on interop and resources, which makes
