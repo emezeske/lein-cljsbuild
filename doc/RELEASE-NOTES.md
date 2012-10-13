@@ -1,5 +1,11 @@
 # Release Notes for lein-cljsbuild
 
+## 0.2.9
+
+''TODO''
+
+[Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=23&state=closed)
+
 ## 0.2.8
 
 1. Fixed a bug where a `RejectedExecutionException` could be thrown if hooks were enabled and the project was run via `lein trampoline`.
