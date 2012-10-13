@@ -5,7 +5,7 @@
 1. Fixed a bug where a `RejectedExecutionException` could be thrown if hooks were enabled and the project was run via `lein trampoline`.
 2. Added the ability to set `clojure.core/*assert*` via the `:assert` option in each `:builds` map.
 3. Fixed a bug where if exceptions would not be caught if thrown while automatically reloading a Clojure file (e.g. containing macros).
-4. TODO
+4. Changed to use upstream ClojureScript version 0.0-1503.
 
 [Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=22&state=closed)
 
