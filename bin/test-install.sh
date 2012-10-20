@@ -19,9 +19,9 @@ for d in support plugin; do
 done
 for d in $projects; do
 	pushd example-projects/$d
-	if [ $d = advanced ]; then
-		extra_command=', cljsbuild test'
-	fi
+	#if [ $d = advanced ]; then
+	#	extra_command=', cljsbuild test'
+	#fi
 	lein clean
 	rm -rf .lein-*
 	lein cljsbuild clean, cljsbuild once$extra_command
