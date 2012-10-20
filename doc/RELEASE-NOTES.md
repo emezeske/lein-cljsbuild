@@ -2,7 +2,8 @@
 
 ## 0.2.9
 
-''TODO''
+1. Changed to use upstream ClojureScript version 0.0-1513.
+2. Changed to use clj-stacktrace version 0.2.5.
 
 [Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=23&state=closed)
 
