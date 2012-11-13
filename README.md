@@ -207,6 +207,12 @@ of "crossovers".  See the
 [crossovers documentation] (https://github.com/emezeske/lein-cljsbuild/blob/0.2.10/doc/CROSSOVERS.md)
 for more details.
 
+## ClojureScript Version
+
+After configuring lein-cljsbuild, `lein deps` will fetch a known-good version of the ClojureScript compiler.
+You can use a different version of the compiler via a local clone of the ClojureScript git repository.
+See [the wiki](https://github.com/emezeske/lein-cljsbuild/wiki/Using-a-Git-Checkout-of-the-ClojureScript-Compiler) for details.
+
 ##  License
 
 Source Copyright © Evan Mezeske, 2011-2012.
