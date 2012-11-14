@@ -139,7 +139,7 @@ and will build all of them in parallel:
       {:source-path "src-cljs-main"
        :compiler {:output-to "main.js"}}
       {:source-path "src-cljs-other"
-       :compiler {:output-to "other.js"}}}])
+       :compiler {:output-to "other.js"}}]})
 ```
 
 This is extremely convenient for doing library development in ClojureScript.
@@ -158,7 +158,7 @@ only that one:
        :compiler {:output-to "main.js"}}
       {:id "other"
        :source-path "src-cljs-other"
-       :compiler {:output-to "other.js"}}}])
+       :compiler {:output-to "other.js"}}]})
 ```
 
     $ lein cljsbuild auto other
