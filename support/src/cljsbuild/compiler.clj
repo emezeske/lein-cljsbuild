@@ -99,23 +99,27 @@
                     compiler-options notify-command incremental?
                     assert? last-dependency-mtimes]
   (let [output-file (:output-to compiler-options)
+        lib-paths (:libs compiler-options)
         output-mtime (if (fs/exists? output-file) (fs/mod-time output-file) 0)
         macro-files (map :absolute crossover-macro-paths)
         macro-classpath-files (into {} (map vector macro-files (map :classpath crossover-macro-paths)))
         clj-files (util/find-files cljs-path #{"clj"})
         cljs-files (mapcat #(util/find-files % #{"cljs"}) [cljs-path crossover-path])
+        js-files (mapcat #(util/find-files % #{"js"}) lib-paths)
         macro-mtimes (get-mtimes macro-files)
         clj-mtimes (get-mtimes clj-files)
         cljs-mtimes (get-mtimes cljs-files)
-        dependency-mtimes (merge macro-mtimes clj-mtimes cljs-mtimes)]
+        js-mtimes (get-mtimes js-files)
+        dependency-mtimes (merge macro-mtimes clj-mtimes cljs-mtimes js-mtimes)]
     (when (not= last-dependency-mtimes dependency-mtimes)
       (let [macro-modified (list-modified output-mtime macro-mtimes)
             clj-modified (list-modified output-mtime clj-mtimes)
-            cljs-modified (list-modified output-mtime cljs-mtimes)]
+            cljs-modified (list-modified output-mtime cljs-mtimes)
+            js-modified (list-modified output-mtime js-mtimes)]
         (when (seq macro-modified)
           (reload-clojure (map macro-classpath-files macro-modified) compiler-options notify-command))
         (when (seq clj-modified)
           (reload-clojure (map (partial relativize cljs-path) clj-files) compiler-options notify-command))
-        (when (or (seq macro-modified) (seq clj-modified) (seq cljs-modified))
+        (when (or (seq macro-modified) (seq clj-modified) (seq cljs-modified) (seq js-modified))
           (compile-cljs cljs-path compiler-options notify-command incremental? assert?))))
     dependency-mtimes))
