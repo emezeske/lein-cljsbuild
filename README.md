@@ -238,3 +238,4 @@ See the file COPYING.
 * Geoff Salmon (geoff.salmon@gmail.com)
 * Brandon Bloom (brandon@brandonbloom.name)
 * dspiteself (https://github.com/dspiteself)
+* Dirk Geurs (https://github.com/Dirklectisch)
