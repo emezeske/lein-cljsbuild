@@ -18,6 +18,7 @@
 
 (def default-compiler-options
   {:output-to "main.js"
+   :output-dir "tmp/cljsc-out"
    :optimizations :whitespace
    :warnings true
    :externs []
