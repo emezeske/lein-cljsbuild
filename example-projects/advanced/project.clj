@@ -1,4 +1,4 @@
-(defproject cljsbuild-example-advanced "0.2.10"
+(defproject cljsbuild-example-advanced "0.2.11"
   :description "An advanced example of how to use lein-cljsbuild"
   :source-paths ["src-clj"]
   :dependencies [[org.clojure/clojure "1.4.0"]
