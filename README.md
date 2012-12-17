@@ -237,3 +237,4 @@ See the file COPYING.
 * Chas Emerick (chas@cemerick.com)
 * Geoff Salmon (geoff.salmon@gmail.com)
 * Brandon Bloom (brandon@brandonbloom.name)
+* dspiteself (https://github.com/dspiteself)
