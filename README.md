@@ -235,3 +235,5 @@ See the file COPYING.
 * Brandon Henry (http://brandonhenry.net/)
 * Daniel Gregoire (http://techylinguist.com)
 * Chas Emerick (chas@cemerick.com)
+* Geoff Salmon (geoff.salmon@gmail.com)
+
