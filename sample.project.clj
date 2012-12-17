@@ -108,7 +108,8 @@
           ; For this entry, and those below, you can find a very good explanation at:
           ;     http://lukevanderhart.com/2011/09/30/using-javascript-and-clojurescript.html
           :externs ["jquery-externs.js"]
-          ; Adds dependencies on external libraries.
+          ; Adds dependencies on external libraries.  Note that files in these directories will be
+          ; watched and a rebuild will occur if they are modified.
           ; Defaults to the empty vector [].
           :libs ["closure/library/third_party/closure"]
           ; Adds dependencies on foreign libraries.
