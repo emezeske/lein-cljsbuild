@@ -236,4 +236,4 @@ See the file COPYING.
 * Daniel Gregoire (http://techylinguist.com)
 * Chas Emerick (chas@cemerick.com)
 * Geoff Salmon (geoff.salmon@gmail.com)
-
+* Brandon Bloom (brandon@brandonbloom.name)
