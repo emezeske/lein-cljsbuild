@@ -4,6 +4,7 @@
 
 1. Changed to use upstream ClojureScript version 0.0-1552.
 2. Balanced the parenthesis and square braces in the README correctly.
+3. Added a workaround for an unresolved upstream compiler issue: http://dev.clojure.org/jira/browse/CLJS-418.
 
 [Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=24&state=closed)
 
