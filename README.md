@@ -110,7 +110,8 @@ your project configuration:
 Note that by default the `lein jar` task does *not* package your ClojureScript
 code in the JAR file.  This feature needs to be explicitly enabled by adding
 the following entry to each of the `:builds` that you want included in the
-JAR file.
+JAR file. `lein uberjar` derives its behavior from `lein jar` and will include
+the ClojureScript as well if enabled.
 
 ```clj
 :jar true
