@@ -59,7 +59,7 @@
                       (doall
                         (for [[build# mtimes#] builds-mtimes#]
                           (cljsbuild.compiler/run-compiler
-                            (:source-path build#)
+                            (cljsbuild.compiler/get-source-paths build#)
                             ~crossover-path
                             crossover-macro-paths#
                             (:compiler build#)
