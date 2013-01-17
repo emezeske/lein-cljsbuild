@@ -1,10 +1,12 @@
 (ns cljsbuild.compiler
   (:use
+    [clojure.pprint]
     [clj-stacktrace.repl :only [pst+]]
     [cljs.closure :only [build]])
   (:require
     [cljsbuild.util :as util]
     [cljs.analyzer :as analyzer]
+    [cljs.closure :as closure]
     [clojure.string :as string]
     [fs.core :as fs]))
 
@@ -33,10 +35,17 @@
         (pst+ e))))
   (println (colorizer message)))
 
-(defn- compile-cljs [cljs-path compiler-options notify-command incremental? assert?]
+;; Cannnot call build with ["src/cljs" "src/cljs-more"] cause build thinks a vector
+;; denotes a cljs-form, so invent a new Compileable type cause thats what its expects
+(defrecord SourcePaths [paths]
+  cljs.closure/Compilable
+  (-compile [_ opts]
+    (mapcat #(closure/-compile % opts) paths)))
+
+(defn- compile-cljs [cljs-paths compiler-options notify-command incremental? assert?]
   (let [output-file (:output-to compiler-options)
         output-file-dir (fs/parent output-file)]
-    (println (str "Compiling \"" output-file "\" from \"" cljs-path "\"..."))
+    (println (str "Compiling \"" output-file "\" from " (pr-str cljs-paths) "..."))
     (flush)
     (when (not incremental?)
       (fs/delete-dir (:output-dir compiler-options)))
@@ -45,7 +54,7 @@
     (let [started-at (System/nanoTime)]
       (try
         (binding [*assert* assert?]
-          (build cljs-path compiler-options))
+          (build (SourcePaths. cljs-paths) compiler-options))
         (notify-cljs
           notify-command
           (str "Successfully compiled \"" output-file "\" in " (elapsed started-at) ".") green)
@@ -95,7 +104,12 @@
           (str "Reloading Clojure file \"" path "\" failed.") red)
         (pst+ e)))))
 
-(defn run-compiler [cljs-path crossover-path crossover-macro-paths
+(defn get-source-paths [build]
+  (if (contains? build :source-paths)
+    (:source-paths build)
+    [(:source-path build)]))
+
+(defn run-compiler [cljs-paths crossover-path crossover-macro-paths
                     compiler-options notify-command incremental?
                     assert? last-dependency-mtimes]
   (let [output-file (:output-to compiler-options)
@@ -103,8 +117,8 @@
         output-mtime (if (fs/exists? output-file) (fs/mod-time output-file) 0)
         macro-files (map :absolute crossover-macro-paths)
         macro-classpath-files (into {} (map vector macro-files (map :classpath crossover-macro-paths)))
-        clj-files (util/find-files cljs-path #{"clj"})
-        cljs-files (mapcat #(util/find-files % #{"cljs"}) [cljs-path crossover-path])
+        clj-files (mapcat #(util/find-files % #{"clj"}) cljs-paths)
+        cljs-files (mapcat #(util/find-files % #{"cljs"}) (conj cljs-paths crossover-path))
         js-files (mapcat #(util/find-files % #{"js"}) lib-paths)
         macro-mtimes (get-mtimes macro-files)
         clj-mtimes (get-mtimes clj-files)
@@ -119,7 +133,8 @@
         (when (seq macro-modified)
           (reload-clojure (map macro-classpath-files macro-modified) compiler-options notify-command))
         (when (seq clj-modified)
-          (reload-clojure (map (partial relativize cljs-path) clj-files) compiler-options notify-command))
+          ;; FIXME: figure out what this does, since it expects a single cljs-path and not a list of paths?
+          (reload-clojure (map (partial relativize (first cljs-paths)) clj-files) compiler-options notify-command))
         (when (or (seq macro-modified) (seq clj-modified) (seq cljs-modified) (seq js-modified))
-          (compile-cljs cljs-path compiler-options notify-command incremental? assert?))))
+          (compile-cljs cljs-paths compiler-options notify-command incremental? assert?))))
     dependency-mtimes))
