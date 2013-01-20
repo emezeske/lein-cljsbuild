@@ -20,7 +20,9 @@
 
 (defn- run-local-project [project crossover-path builds requires form]
   (leval/eval-in-project (subproject/make-subproject project crossover-path builds)
-    form
+    ; Without an explicit exit, the in-project subprocess seems to just hang for
+    ; around 30 seconds before exiting.  I don't fully understand why...
+    `(~form (System/exit 0))
     requires))
 
 (defn- run-compiler [project {:keys [crossover-path crossovers builds]} build-ids watch?]
