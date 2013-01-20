@@ -49,7 +49,7 @@
 
 (def lein2-metadata {:test-metadata "testing 1 2 3"})
 (def lein2-eval-in :trampoline)
-(def lein2-resources-path "resources")
+(def lein2-resource-paths "resources")
 (def lein2-project
   (with-meta
     {:dependencies lein-dependencies
@@ -57,7 +57,7 @@
      :source-paths (concat [lein-source-path] lein-extra-classpath-dirs)
      :repositories lein-repositories
      :eval-in lein2-eval-in
-     :resources-path lein2-resources-path}
+     :resource-paths lein2-resource-paths}
     lein2-metadata))
 
 (fact
@@ -69,5 +69,5 @@
     (:dev-dependencies subproject) => lein-dev-dependencies
     (:repositories subproject) => lein-repositories
     (:eval-in subproject) => lein2-eval-in
-    (:resources-path subproject) => lein2-resources-path
+    (:resource-paths subproject) => lein2-resource-paths
     (:dependencies subproject) => (in-any-order expected-dependencies)))
