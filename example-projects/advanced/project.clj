@@ -4,7 +4,7 @@
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [compojure "1.0.4"]
                  [hiccup "1.0.0"]]
-  :plugins [[lein-cljsbuild "0.2.9"]
+  :plugins [[lein-cljsbuild "0.3.0"]
             [lein-ring "0.7.0"]]
   ; Enable the lein hooks for: clean, compile, test, and jar.
   :hooks [leiningen.cljsbuild]
@@ -71,7 +71,4 @@
        :compiler {:output-to "resources/private/js/unit-test.js"
                   :optimizations :whitespace
                   :pretty-print true}}}}
-  :ring {:handler example.routes/app}
-  ; for Leiningen 1.x:
-  :source-path "src-clj"
-  :dev-dependencies [[lein-ring "0.7.0"]])
+  :ring {:handler example.routes/app})

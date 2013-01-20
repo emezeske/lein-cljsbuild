@@ -50,7 +50,7 @@
     ; doc/CROSSOVERS.md for more details. Defaults to the empty vector [].
     :crossovers [example.crossover]
     ; The directory into which the :crossovers namespaces should be copied.
-    ; Defaults to ".crossover-cljs".
+    ; Defaults to "/target/cljsbuild-crossover".
     :crossover-path ".crossover-cljs"
     ; If hooks are enabled, this flag determines whether files from :crossover-path
     ; are added to the JAR file created by "lein jar".
@@ -84,7 +84,7 @@
         ; The :compiler options are passed directly to the ClojureScript compiler.
         :compiler {
           ; The path to the JavaScript file that will be output.
-          ; Defaults to "main.js".
+          ; Defaults to "target/cljsbuild-main.js".
           :output-to "resources/public/js/main.js"
           ; This flag will turn on compiler warnings for references to
           ; undeclared vars, wrong function call arities, etc. Defaults to true.
@@ -101,7 +101,7 @@
           :print-input-delimiter false
           ; Sets the output directory for temporary files used during
           ; compilation.  Must be unique among all :builds. Defaults to
-          ; ".lein-cljsbuild-compiler-X" (where X is a unique integer).
+          ; "target/cljsbuild-compiler-X" (where X is a unique integer).
           :output-dir ".clojurescript-output"
           ; Configure externs files for external libraries.
           ; Defaults to the empty vector [].

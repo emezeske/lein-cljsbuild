@@ -25,6 +25,8 @@
   (parse-shell-command ["a"]) => {:shell ["a"]}
   (parse-shell-command ["a" "b" "c" :x 1 :y 2]) => {:shell ["a" "b" "c"] :x 1 :y 2})
 
+(def target-path "target")
+
 (def config-in
   {:repl-launch-commands {:a ["a"]}
    :repl-listen-port 10000
@@ -48,17 +50,17 @@
            :pretty-print false}})})
 
 (fact "custom settings are not overwritten by defaults"
-  (set-default-options config-in) => config-in)
+  (set-default-options target-path config-in) => config-in)
 
 (fact "missing settings have defaults provided"
   (doseq [option (keys config-in)]
-    (set-default-options (dissoc config-in option)) => (contains {option anything})))
+    (set-default-options target-path (dissoc config-in option)) => (contains {option anything})))
 
 (defn- get-build [config]
   (first (:builds config)))
 
 (defn- default-build-option [config build option]
-  (set-default-options
+  (set-default-options target-path
     (assoc config :builds
       (list (dissoc build option)))))
 
@@ -72,7 +74,7 @@
   (:compiler (get-build config)))
 
 (defn- default-compiler-option [config compiler option]
-  (set-default-options
+  (set-default-options target-path
     (assoc config :builds
       (list
         (assoc compiler :compiler

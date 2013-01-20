@@ -3,34 +3,39 @@
   (:require
     [clojure.pprint :as pprint]))
 
-(def compiler-output-dir-base ".lein-cljsbuild-compiler-")
+(defn in-target-path [target-path subpath]
+  (str target-path "/cljsbuild-" subpath))
+
+(defn- compiler-output-dir-base [target-path]
+  (in-target-path target-path "compiler-"))
+
 (def compiler-global-dirs
   {:libs "closure-js/libs"
    :externs "closure-js/externs"})
 
-(def default-global-options
+(defn- default-global-options [target-path]
   {:repl-launch-commands {}
    :repl-listen-port 9000
    :test-commands {}
-   :crossover-path ".crossover-cljs"
+   :crossover-path (in-target-path target-path "crossover")
    :crossover-jar false
    :crossovers []})
 
-(def default-compiler-options
-  {:output-to "main.js"
+(defn- default-compiler-options [target-path]
+  {:output-to (in-target-path target-path "main.js")
    :optimizations :whitespace
    :warnings true
    :externs []
    :libs []
    :pretty-print true})
 
-(def default-build-options
+(defn- default-build-options [target-path]
   {:source-path "src-cljs"
    :jar false
    :notify-command nil
    :incremental true
    :assert true
-   :compiler default-compiler-options})
+   :compiler (default-compiler-options target-path)})
 
 (defn convert-builds-map [options]
   (update-in options [:builds]
@@ -95,27 +100,27 @@
     (deep-merge a b)
     b))
 
-(defn- set-default-build-options [options]
-  (deep-merge default-build-options options))
+(defn- set-default-build-options [target-path options]
+  (deep-merge (default-build-options target-path) options))
 
-(defn- set-default-output-dirs [options]
+(defn- set-default-output-dirs [target-path options]
   (let [output-dir-key [:compiler :output-dir]
         builds
          (for [[build counter] (map vector (:builds options) (range))]
            (if (get-in build output-dir-key)
              build
              (assoc-in build output-dir-key
-               (str compiler-output-dir-base counter))))]
+               (str (compiler-output-dir-base target-path) counter))))]
     (if (or (empty? builds)
             (apply distinct? (map #(get-in % output-dir-key) builds)))
       (assoc options :builds builds)
       (throw (Exception. (str "All " output-dir-key " options must be distinct."))))))
 
-(defn set-default-options [options]
-  (set-default-output-dirs
-    (deep-merge default-global-options
+(defn set-default-options [target-path options]
+  (set-default-output-dirs target-path
+    (deep-merge (default-global-options target-path)
       (assoc options :builds
-        (map set-default-build-options (:builds options))))))
+        (map #(set-default-build-options target-path %) (:builds options))))))
 
 (defn set-build-global-dirs [build]
   (reduce (fn [build [k v]] (update-in build [:compiler k] conj v))
@@ -128,13 +133,13 @@
 
 (defn- normalize-options
   "Sets default options and accounts for backwards compatibility."
-  [options]
+  [target-path options]
   (let [options (convert-builds-map options)
         compat (backwards-compat options)]
     (when (not= options compat)
       (warn-deprecated compat))
-    (-> compat
-      set-default-options
+    (->> compat
+      (set-default-options target-path)
       set-compiler-global-dirs)))
 
 (defn parse-shell-command [raw]
@@ -163,4 +168,4 @@
   (when (nil? (:cljsbuild project))
     (println "WARNING: no :cljsbuild entry found in project definition."))
   (let [raw-options (:cljsbuild project)]
-    (normalize-options raw-options)))
+    (normalize-options (:target-path project) raw-options)))

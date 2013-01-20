@@ -4,6 +4,9 @@ lib
 classes/
 lein-cljsbuild-*.*.*
 cljsbuild-*.*.*
+target
+plugin/target
+support/target
 example-projects/*/*.jar
 example-projects/simple/resources
 example-projects/advanced/resources/public/js

@@ -6,45 +6,15 @@
     [leiningen.trampoline :as ltrampoline]
     [leiningen.cljsbuild.config :as config]
     [leiningen.cljsbuild.jar :as jar]
-    [leiningen.cljsbuild.subproject :as subproject]))
-
-; This crazy in-ns business is to mock out the namespaces that would normally
-; be required by eval-in-project.  It would be preferable to just :require them,
-; but they require Clojure 1.3 and we're running in Leningen 1 which uses 1.2.
-; TODO: Once Leiningen 2 is released, get rid of this.
-
-(in-ns 'cljsbuild.crossover)
-(clojure.core/use 'midje.sweet)
-(unfinished copy-crossovers)
-(unfinished crossover-macro-paths)
-
-(in-ns 'cljsbuild.util)
-(clojure.core/use 'midje.sweet)
-(unfinished once-every-bg)
-(unfinished in-threads)
-
-(in-ns 'cljsbuild.compiler)
-(clojure.core/use 'midje.sweet)
-(unfinished run-compiler)
-
-(in-ns 'cljsbuild.clean)
-(clojure.core/use 'midje.sweet)
-(unfinished cleanup-files)
-
-(in-ns 'cljsbuild.test)
-(clojure.core/use 'midje.sweet)
-(unfinished run-tests)
-
-(in-ns 'cljsbuild.repl.listen)
-(clojure.core/use 'midje.sweet)
-(unfinished run-repl-listen)
-(unfinished run-repl-launch)
-
-(in-ns 'cljsbuild.repl.rhino)
-(clojure.core/use 'midje.sweet)
-(unfinished run-repl-rhino)
-
-(in-ns 'leiningen.test.cljsbuild)
+    [leiningen.cljsbuild.subproject :as subproject]
+    [leiningen.core.eval :as leval]
+    cljsbuild.crossover
+    cljsbuild.util
+    cljsbuild.compiler
+    cljsbuild.clean
+    cljsbuild.test
+    cljsbuild.repl.listen
+    cljsbuild.repl.rhino))
 
 (def repl-listen-port 10000)
 (def repl-launch-command-id "launch-id")
@@ -86,7 +56,7 @@
   (:compiler (first parsed-builds)))
 
 (def project
- {:dependencies [['org.clojure/clojure "1.3.0"]]
+ {:dependencies [['org.clojure/clojure "1.4.0"]]
   :cljsbuild
    {:repl-listen-port repl-listen-port
     :repl-launch-commands {repl-launch-command-id repl-launch-command}
@@ -97,38 +67,35 @@
     :builds builds}})
 
 (defn hook-success [& args]
-  0)
+  nil)
 
 (defn hook-failure [& args]
-  1)
+  (throw (Exception. "Dummy hook failed.")))
 
-(defn eval-locally [_ _ _ body _]
+(defn eval-locally [_ body _]
   (eval body))
 
-(defmacro with-compiler-bindings [& forms]
-  `(binding [subproject/eval-in-project eval-locally
-             cljsbuild.util/in-threads (fn [f# s#] (doseq [i# s#] (f# i#)))
-             cljsbuild.util/once-every-bg (fn [_# _# _#] nil)]
+(defmacro with-mocks [& forms]
+  `(with-redefs [leval/eval-in-project eval-locally
+                 cljsbuild.util/once-every-bg (fn [_# _# _#] nil)]
      ~@forms))
 
 (fact "fail when no arguments present"
-  (cljsbuild project) => 1)
+  (cljsbuild project) => (throws Exception))
 
 (fact "once/auto call eval-in-project with the right args"
   (doseq [command ["once" "auto"]]
-    (cljsbuild project command) => 0
+    (cljsbuild project command) => nil
     (provided
-      (subproject/eval-in-project
-        project
-        crossover-path
-        parsed-builds
+      (leval/eval-in-project
+        (subproject/make-subproject project crossover-path parsed-builds)
         anything
-        anything) => 0 :times 1)) )
+        anything) => nil :times 1)) )
 
 (fact "once task calls the compiler correctly"
   (doseq [extra-args [[] [build-id]]]
-    (with-compiler-bindings
-      (apply cljsbuild project "once" extra-args)) => 0
+    (with-mocks
+      (apply cljsbuild project "once" extra-args)) => nil
     (provided
       (cljsbuild.crossover/crossover-macro-paths
         crossovers) => crossover-macros :times 1
@@ -146,22 +113,22 @@
         {}) => nil :times 1)))
 
 (fact "bad build IDs are detected"
-  (with-compiler-bindings
+  (with-mocks
     (cljsbuild project "once" "wrong-build-id")) => (throws Exception))
 
 (fact "clean calls cleanup-files"
-  (with-compiler-bindings
-    (cljsbuild project "clean")) => 0
-  (with-compiler-bindings
-    (clean-hook hook-success project)) => 0
-  (with-compiler-bindings
-    (clean-hook hook-failure project)) => 0
+  (with-mocks
+    (cljsbuild project "clean")) => nil
+  (with-mocks
+    (clean-hook hook-success project)) => nil
+  (with-mocks
+    (clean-hook hook-failure project)) => (throws Exception)
   (against-background
     (cljsbuild.clean/cleanup-files parsed-compiler) => nil :times 1))
 
 (fact "compile-hook calls through to the compiler when task succeeds"
-  (with-compiler-bindings
-    (compile-hook hook-success project)) => 0
+  (with-mocks
+    (compile-hook hook-success project)) => nil
   (provided
     (cljsbuild.crossover/crossover-macro-paths
       crossovers) => crossover-macros :times 1
@@ -179,8 +146,8 @@
       {}) => nil :times 1))
 
 (fact "compile-hook does not call through to the compiler when task fails"
-  (with-compiler-bindings
-    (compile-hook hook-failure project)) => 1
+  (with-mocks
+    (compile-hook hook-failure project)) => (throws Exception)
   (provided
     (cljsbuild.crossover/crossover-macro-paths
       anything) => nil :times 0
@@ -201,14 +168,14 @@
 ;       like being directly inside a let.
 (let [parsed-commands [(config/parse-shell-command test-command)]]
   (fact "tests work correctly"
-      (with-compiler-bindings
-        (cljsbuild project "test")) => 0
-      (with-compiler-bindings
-        (cljsbuild project "test" test-command-id)) => 0
-      (with-compiler-bindings
-        (test-hook hook-success project)) => 0
-      (with-compiler-bindings
-        (test-hook hook-failure project)) => 1
+      (with-mocks
+        (cljsbuild project "test")) => nil
+      (with-mocks
+        (cljsbuild project "test" test-command-id)) => nil
+      (with-mocks
+        (test-hook hook-success project)) => nil
+      (with-mocks
+        (test-hook hook-failure project)) => (throws Exception)
       (against-background
         (cljsbuild.crossover/crossover-macro-paths
           crossovers) => crossover-macros :times 0
@@ -224,31 +191,31 @@
           incremental?
           assert?
           {}) => nil :times 1
-        (cljsbuild.test/run-tests parsed-commands) => 0 :times 1)))
+        (cljsbuild.test/run-tests parsed-commands) => nil :times 1)))
 
-(defmacro with-repl-bindings [& forms]
-  `(binding [subproject/eval-in-project eval-locally
-             ltrampoline/*trampoline?* true]
-     ~@forms))
+(defmacro with-repl-env [& forms]
+  `(with-mocks
+    (binding [ltrampoline/*trampoline?* true]
+      ~@forms)))
 
 (fact "repl-listen calls run-repl-listen"
-  (with-repl-bindings
-    (cljsbuild project "repl-listen")) => 0
+  (with-repl-env
+    (cljsbuild project "repl-listen")) => nil
   (provided
     (cljsbuild.repl.listen/run-repl-listen repl-listen-port anything) => nil :times 1))
 
 (fact "repl-launch with no ID fails"
-  (with-repl-bindings
+  (with-repl-env
     (cljsbuild project "repl-launch")) => (throws Exception))
 
 (fact "repl-launch with bad ID fails"
-  (with-repl-bindings
+  (with-repl-env
     (cljsbuild project "repl-launch" "wrong-repl-launch-id")) => (throws Exception))
 
 (fact "repl-launch calls run-repl-launch"
   (let [parsed-command (config/parse-shell-command repl-launch-command)]
-    (with-repl-bindings
-      (cljsbuild project "repl-launch" repl-launch-command-id)) => 0
+    (with-repl-env
+      (cljsbuild project "repl-launch" repl-launch-command-id)) => nil
     (provided
       (cljsbuild.repl.listen/run-repl-launch
         repl-listen-port
@@ -256,8 +223,8 @@
         parsed-command) => nil :times 1)))
 
 (fact "repl-rhino calls run-repl-rhino"
-  (with-repl-bindings
-    (cljsbuild project "repl-rhino")) => 0
+  (with-repl-env
+    (cljsbuild project "repl-rhino")) => nil
   (provided
     (cljsbuild.repl.rhino/run-repl-rhino) => nil :times 1))
 
@@ -268,7 +235,7 @@
         input-filespecs [{:type :bytes :path "/i/j" :bytes "fake-1"}]
         project-filespecs [{:type :bytes :path "/a/b" :bytes "fake-2"}]
         all-filespecs (concat input-filespecs project-filespecs)]
-    (jar-hook jar-task project out-file input-filespecs) => 0
+    (jar-hook jar-task project out-file input-filespecs) => nil
     (provided
-      (jar-task project out-file all-filespecs) => 0
+      (jar-task project out-file all-filespecs) => nil
       (jar/get-filespecs project) => project-filespecs)))

@@ -42,57 +42,15 @@
       (merge cljsbuild project))))
 
 (defn make-subproject [project crossover-path builds]
-  {:local-repo-classpath true
-   :dependencies (merge-dependencies (:dependencies project))
-   :dev-dependencies (:dev-dependencies project)
-   :repositories (:repositories project)})
-
-(defn make-subproject-lein1 [project crossover-path builds]
-  (merge (make-subproject project crossover-path builds)
-    {:source-path (:source-path project)
-     :resources-path (:resources-path project)
-     :extra-classpath-dirs (concat
-                             (:extra-classpath-dirs project)
-                             (map :source-path builds)
-                             [crossover-path])}))
-
-(defn make-subproject-lein2 [project crossover-path builds]
   (with-meta
-    (merge (make-subproject project crossover-path builds)
-      {:source-paths (concat
-                       (:source-paths project)
-                       (map :source-path builds)
-                       [crossover-path])
-       :resource-paths (:resource-paths project)
-       :checkout-deps-shares (:checkout-deps-shares project)
-       :eval-in (:eval-in project)})
+    {:local-repo-classpath true
+     :dependencies (merge-dependencies (:dependencies project))
+     :repositories (:repositories project)
+     :source-paths (concat
+                     (:source-paths project)
+                     (map :source-path builds)
+                     [crossover-path])
+     :resource-paths (:resource-paths project)
+     :checkout-deps-shares (:checkout-deps-shares project)
+     :eval-in (:eval-in project)}
     (meta project)))
-
-(defn eval-in-project
-  "Support eval-in-project in both Leiningen 1.x and 2.x."
-  [project crossover-path builds form requires]
-  (let [[eip args]
-         (or (try (require 'leiningen.core.eval)
-                  [(resolve 'leiningen.core.eval/eval-in-project)
-                    [(make-subproject-lein2 project crossover-path builds)
-                     form
-                     requires]]
-                  (catch java.io.FileNotFoundException _))
-             (try (require 'leiningen.compile)
-                  [(resolve 'leiningen.compile/eval-in-project)
-                    [(make-subproject-lein1 project crossover-path builds)
-                     form
-                     nil
-                     nil
-                     requires]]
-                  (catch java.io.FileNotFoundException _)))]
-    (apply eip args)))
-
-(defn prepping? []
- (try
-   (require 'leiningen.core.eval)
-   (if-let [prepping-var (resolve 'leiningen.core.eval/*prepping?*)]
-     (deref prepping-var)
-     false)
-   (catch java.io.FileNotFoundException _
-     false)))
