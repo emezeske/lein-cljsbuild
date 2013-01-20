@@ -30,10 +30,10 @@ git push origin :refs/heads/$branch
 
 pushd support
 lein jar
-scp pom.xml cljsbuild-$branch.jar clojars@clojars.org:
+scp pom.xml target/cljsbuild-$branch.jar clojars@clojars.org:
 popd
 
 pushd plugin
 lein jar
-scp pom.xml lein-cljsbuild-$branch.jar clojars@clojars.org:
+scp pom.xml target/lein-cljsbuild-$branch.jar clojars@clojars.org:
 popd

@@ -21,7 +21,7 @@
 (def repl-launch-command ["launch-me"])
 (def test-command-id "test-id")
 (def test-command ["test-me"])
-(def crossover-path "crossover-path")
+(def crossover-path "target/crossover-path")
 (def crossovers ['test.crossover])
 (def crossover-macros [{:absolute "/root/stuff/test/crossover.clj"
                         :classpath "test/crossover.clj"}])
@@ -32,8 +32,8 @@
 (def assert? false)
 
 (def compiler
-  {:output-to "output-to"
-   :output-dir "output-dir"
+  {:output-to "target/output-to"
+   :output-dir "target/output-dir"
    :warnings false
    :optimizations :advanced
    :pretty-print false})
