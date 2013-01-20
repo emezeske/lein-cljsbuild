@@ -212,7 +212,7 @@ See [the wiki](https://github.com/emezeske/lein-cljsbuild/wiki/Using-a-Git-Check
 
 ##  License
 
-Source Copyright © Evan Mezeske, 2011-2012.
+Source Copyright © Evan Mezeske, 2011-2013.
 Released under the Eclipse Public License - v 1.0.
 See the file COPYING.
 
