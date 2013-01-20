@@ -1,6 +1,6 @@
 # Release Notes for lein-cljsbuild
 
-## 0.2.11
+## 0.3.0
 
 TODO
 
