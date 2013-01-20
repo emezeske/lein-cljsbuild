@@ -18,7 +18,7 @@ The latest version of lein-cljsbuild is `0.3.0`.
 
 The lein-cljsbuild plugin works with
 [Leiningen] (https://github.com/technomancy/leiningen/blob/master/README.md)
-version `1.7.0` or higher.
+version `2.0.0` or higher.
 
 ## Installation
 
@@ -29,10 +29,6 @@ file in the `:plugins` section:
 (defproject lein-cljsbuild-example "1.2.3"
   :plugins [[lein-cljsbuild "0.3.0"]])
 ```
-
-And then running the following command to download it:
-
-    $ lein deps
 
 ## Just Give Me a Damned Example Already!
 
@@ -63,7 +59,7 @@ of your `project.clj` file.  A simple project might look like this:
         ; The standard ClojureScript compiler options:
         ; (See the ClojureScript compiler documentation for details.)
         :compiler {
-          :output-to "war/javascripts/main.js"  ; default: main.js in current directory
+          :output-to "war/javascripts/main.js"  ; default: target/cljsbuild-main.js
           :optimizations :whitespace
           :pretty-print true}}]})
 ```
@@ -240,3 +236,5 @@ See the file COPYING.
 * Brandon Bloom (brandon@brandonbloom.name)
 * dspiteself (https://github.com/dspiteself)
 * Dirk Geurs (https://github.com/Dirklectisch)
+* Chris Allen (cma@bitemyapp.com)
+* Sean Grove (s@bushi.do)
