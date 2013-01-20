@@ -11,10 +11,10 @@
   ; Your project should plugin-depend on lein-cljsbuild, to ensure that
   ; the right version of the plugin is installed.
   :plugins [[lein-cljsbuild "0.3.0"]]
-  ; The standard Leiningen :source-path option is used by lein-cljsbuild
+  ; The standard Leiningen :source-paths option is used by lein-cljsbuild
   ; to determine the source directory from which crossover files will
-  ; be copied.  Leiningen defaults to "src".
-  :source-path "src-clj"
+  ; be copied.  Leiningen defaults to ["src"].
+  :source-paths ["src-clj"]
   ; This is required for lein-cljsbuild to hook into the default Leningen
   ; tasks, e.g. the "lein compile", "lein clean", and "lein jar" tasks.
   :hooks [leiningen.cljsbuild]
@@ -50,8 +50,8 @@
     ; doc/CROSSOVERS.md for more details. Defaults to the empty vector [].
     :crossovers [example.crossover]
     ; The directory into which the :crossovers namespaces should be copied.
-    ; Defaults to "/target/cljsbuild-crossover".
-    :crossover-path ".crossover-cljs"
+    ; Defaults to "target/cljsbuild-crossover".
+    :crossover-path "target/my-crossovers"
     ; If hooks are enabled, this flag determines whether files from :crossover-path
     ; are added to the JAR file created by "lein jar".
     :crossover-jar true
@@ -102,7 +102,7 @@
           ; Sets the output directory for temporary files used during
           ; compilation.  Must be unique among all :builds. Defaults to
           ; "target/cljsbuild-compiler-X" (where X is a unique integer).
-          :output-dir ".clojurescript-output"
+          :output-dir "target/my-compiler-output-"
           ; Configure externs files for external libraries.
           ; Defaults to the empty vector [].
           ; For this entry, and those below, you can find a very good explanation at:
