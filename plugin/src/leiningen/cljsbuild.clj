@@ -196,34 +196,20 @@
             (lhelp/subtask-help-for *ns* #'cljsbuild))
           (lmain/abort))))))
 
-; Lein "preps" the project when eval-in-project is called.  This
-; causes it to be compiled, which normally would trigger the compile
-; hook below, which is bad because we can't compile unless we're in
-; the dummy subproject.  To solve this problem, we disable all of the
-; hooks if we notice that lein is currently prepping.
-(defmacro skip-if-prepping [task args & forms]
-  `(if false ; FIXME FIXME leval/*prepping?*
-    (apply ~task ~args)
-    (do ~@forms)))
-
 (defn compile-hook [task & args]
-  (skip-if-prepping task args
-    (apply task args)
-    (run-compiler (first args) (config/extract-options (first args)) nil false)))
+  (apply task args)
+  (run-compiler (first args) (config/extract-options (first args)) nil false))
 
 (defn test-hook [task & args]
-  (skip-if-prepping task args
-    (apply task args)
-    (run-tests (first args) (config/extract-options (first args)) [])))
+  (apply task args)
+  (run-tests (first args) (config/extract-options (first args)) []))
 
 (defn clean-hook [task & args]
-  (skip-if-prepping task args
-    (apply task args)
-    (clean (first args) (config/extract-options (first args)))))
+  (apply task args)
+  (clean (first args) (config/extract-options (first args))))
 
 (defn jar-hook [task & [project out-file filespecs]]
-  (skip-if-prepping task [project out-file filespecs]
-    (apply task [project out-file (concat filespecs (jar/get-filespecs project))])))
+  (apply task [project out-file (concat filespecs (jar/get-filespecs project))]))
 
 (defn activate
   "Set up hooks for the plugin.  Eventually, this can be changed to just hook,
