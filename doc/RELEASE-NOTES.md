@@ -3,7 +3,7 @@
 ## 0.3.0
 
 1. Dropped support for Leiningen 1.x, now that Leiningen 2.0 is available.  **REPEAT: Leiningen 1.x is no longer supported.**
-2. Changed the `:source-path "path"` option to `:source-paths ["path" "path"]`.  The new option accepts a vector of paths rather than a single path.  **The old singular `:source-path` is not deprecated and will be removed soon.**
+2. Changed the `:source-path "path"` option to `:source-paths ["path" "path"]`.  The new option accepts a vector of paths rather than a single path.  **The old singular `:source-path` is now deprecated and will be removed soon.**
 3. Changed all default output paths (e.g. for temporary compiler files, crossover files, and REPL files) to be in the `:target-path` directory.  Explicitly configured paths can still be whatever you like.
 4. For compatibility with Leiningen 2.0, `:resource-paths` is now used instead of `:resources-path`.
 5. Fixed a long delay before exiting that could sometimes occur after one-shot tasks (like `cljsbuild once`).
