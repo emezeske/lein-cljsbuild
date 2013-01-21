@@ -238,3 +238,4 @@ See the file COPYING.
 * Dirk Geurs (https://github.com/Dirklectisch)
 * Chris Allen (cma@bitemyapp.com)
 * Sean Grove (s@bushi.do)
+* Thomas Heller (info@zilence.net)
