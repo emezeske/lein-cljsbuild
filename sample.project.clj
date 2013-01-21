@@ -61,10 +61,10 @@
     :builds {
       :main {
         ; The path under which lein-cljsbuild will look for ClojureScript
-        ; files to compile.  Defaults to "src-cljs".
-        :source-path "src-cljs"
-        ; If hooks are enabled, this flag determines whether files from this
-        ; :source-path are added to the JAR file created by "lein jar".
+        ; files to compile.  Defaults to ["src-cljs"].
+        :source-paths ["src-cljs"]
+        ; If hooks are enabled, this flag determines whether files from these
+        ; :source-paths are added to the JAR file created by "lein jar".
         :jar true
         ; If a notify-command is specified, it will be called when compilation succeeds
         ; or fails, and a textual description of what happened will be appended as the

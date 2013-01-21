@@ -9,7 +9,7 @@
         config-0-0-x-late [{:source-path "a"
                             :compiler {:output-to "hello.js"}}]
         config-backwards {:builds
-                           [{:source-path "a"
+                           [{:source-paths ["a"]
                              :compiler {:output-to "hello.js"}}]}]
     (backwards-compat config-0-0-x-early) => config-backwards
     (backwards-compat config-0-0-x-late) => config-backwards))
@@ -35,7 +35,7 @@
    :crossover-jar true
    :crossovers ["d" "e"]
    :builds
-     '({:source-path "f"
+     '({:source-paths ["f"]
         :jar true
         :notify-command ["g"]
         :incremental false

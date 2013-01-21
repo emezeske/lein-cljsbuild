@@ -51,7 +51,7 @@
   [project]
   (let [options (config/extract-options project)
         builds (:builds options)
-        build-paths (map :source-path (filter :jar builds))
+        build-paths (mapcat :source-paths (filter :jar builds))
         paths (if (:crossover-jar options)
                 (conj build-paths (:crossover-path options))
                 build-paths)]

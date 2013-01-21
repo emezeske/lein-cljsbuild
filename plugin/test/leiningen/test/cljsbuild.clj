@@ -27,7 +27,7 @@
                         :classpath "test/crossover.clj"}])
 
 (def build-id "build-id")
-(def source-path "source-path")
+(def source-paths ["source-path-a" "source-path-b"])
 (def incremental? false)
 (def assert? false)
 
@@ -41,7 +41,7 @@
 (def builds
   (list
     {:id build-id
-     :source-path source-path
+     :source-paths source-paths
      :jar true
      :notify-command ["notify"]
      :incremental incremental?
@@ -103,7 +103,7 @@
         crossover-path
         crossovers) => nil :times 1
       (cljsbuild.compiler/run-compiler
-        source-path
+        source-paths
         crossover-path
         crossover-macros
         parsed-compiler
@@ -136,7 +136,7 @@
       crossover-path
       crossovers) => nil :times 1
     (cljsbuild.compiler/run-compiler
-      source-path
+      source-paths
       crossover-path
       crossover-macros
       parsed-compiler
@@ -183,7 +183,7 @@
           crossover-path
           crossovers) => nil :times 1
         (cljsbuild.compiler/run-compiler
-          source-path
+          source-paths
           crossover-path
           crossover-macros
           parsed-compiler

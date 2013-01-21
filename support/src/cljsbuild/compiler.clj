@@ -36,7 +36,7 @@
   (println (colorizer message)))
 
 ;; Cannnot call build with ["src/cljs" "src/cljs-more"] cause build thinks a vector
-;; denotes a cljs-form, so invent a new Compileable type cause thats what its expects
+;; denotes a cljs-form, so invent a new Compilable type cause thats what its expects
 (defrecord SourcePaths [paths]
   cljs.closure/Compilable
   (-compile [_ opts]
@@ -104,11 +104,6 @@
           (str "Reloading Clojure file \"" path "\" failed.") red)
         (pst+ e)))))
 
-(defn get-source-paths [build]
-  (if (contains? build :source-paths)
-    (:source-paths build)
-    [(:source-path build)]))
-
 (defn run-compiler [cljs-paths crossover-path crossover-macro-paths
                     compiler-options notify-command incremental?
                     assert? last-dependency-mtimes]
@@ -117,11 +112,14 @@
         output-mtime (if (fs/exists? output-file) (fs/mod-time output-file) 0)
         macro-files (map :absolute crossover-macro-paths)
         macro-classpath-files (into {} (map vector macro-files (map :classpath crossover-macro-paths)))
-        clj-files (mapcat #(util/find-files % #{"clj"}) cljs-paths)
+        clj-files-in-cljs-paths
+          (into {}
+            (for [cljs-path cljs-paths]
+              [cljs-path (util/find-files cljs-path #{"clj"})]))
         cljs-files (mapcat #(util/find-files % #{"cljs"}) (conj cljs-paths crossover-path))
         js-files (mapcat #(util/find-files % #{"js"}) lib-paths)
         macro-mtimes (get-mtimes macro-files)
-        clj-mtimes (get-mtimes clj-files)
+        clj-mtimes (get-mtimes (mapcat second clj-files-in-cljs-paths))
         cljs-mtimes (get-mtimes cljs-files)
         js-mtimes (get-mtimes js-files)
         dependency-mtimes (merge macro-mtimes clj-mtimes cljs-mtimes js-mtimes)]
@@ -133,8 +131,11 @@
         (when (seq macro-modified)
           (reload-clojure (map macro-classpath-files macro-modified) compiler-options notify-command))
         (when (seq clj-modified)
-          ;; FIXME: figure out what this does, since it expects a single cljs-path and not a list of paths?
-          (reload-clojure (map (partial relativize (first cljs-paths)) clj-files) compiler-options notify-command))
+          (reload-clojure
+            (concat
+              (for [[cljs-path clj-files] clj-files-in-cljs-paths]
+                (map (partial relativize cljs-path) clj-files)))
+            compiler-options notify-command))
         (when (or (seq macro-modified) (seq clj-modified) (seq cljs-modified) (seq js-modified))
           (compile-cljs cljs-paths compiler-options notify-command incremental? assert?))))
     dependency-mtimes))

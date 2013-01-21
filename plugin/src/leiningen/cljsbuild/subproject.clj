@@ -48,7 +48,7 @@
      :repositories (:repositories project)
      :source-paths (concat
                      (:source-paths project)
-                     (map :source-path builds)
+                     (mapcat :source-paths builds)
                      [crossover-path])
      :resource-paths (:resource-paths project)
      :checkout-deps-shares (:checkout-deps-shares project)

@@ -54,11 +54,11 @@
                   {:crossover-path (get-in entries [:a :root])
                    :crossover-jar true
                    :builds
-                     [{:source-path (get-in entries [:b :root])
+                     [{:source-paths [(get-in entries [:b :root])]
                        :jar true}
-                      {:source-path  (get-in entries [:c :root])
+                      {:source-paths [(get-in entries [:c :root])]
                        :jar true}
-                      {:source-path "not-in-jar"}]}}
+                      {:source-paths ["not-in-jar"]}]}}
         root-a (get-in entries [:a :root])
         root-b (get-in entries [:b :root])
         root-c (get-in entries [:c :root])]

@@ -30,7 +30,7 @@
    :pretty-print true})
 
 (defn- default-build-options [target-path]
-  {:source-path "src-cljs"
+  {:source-paths ["src-cljs"]
    :jar false
    :notify-command nil
    :incremental true
@@ -46,12 +46,22 @@
 
 (defn- backwards-compat-builds [options]
   (cond
-    (and (map? options) (some #{:compiler :source-path} (keys options)))
+    (and (map? options) (some #{:compiler :source-path :source-paths} (keys options)))
       {:builds [options]}
     (vector? options)
       {:builds options}
     :else
       options))
+
+(defn- backwards-compat-source-path [{:keys [builds] :as options}]
+  (assoc options :builds
+    (for [build builds]
+      (if-let [source-path (:source-path build)]
+        (dissoc
+          (assoc build :source-paths
+            (vec (concat (:source-paths build) [source-path])))
+          :source-path)
+        build))))
 
 (defn- backwards-compat-crossovers [{:keys [builds crossovers] :as options}]
   (let [all-crossovers (->> builds
@@ -69,6 +79,7 @@
 (defn backwards-compat [options]
   (-> options
     backwards-compat-builds
+    backwards-compat-source-path
     backwards-compat-crossovers))
 
 (defn- warn-deprecated [options]

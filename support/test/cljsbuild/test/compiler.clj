@@ -8,8 +8,14 @@
     [clojure.java.io :as io]
     [fs.core :as fs]))
 
-(def cljs-path "src-cljs")
+(def cljs-path-a "src-cljs-a")
+(def cljs-file-a (str cljs-path-a "/file-a.cljs"))
+(def cljs-path-b "src-cljs-b")
+(def cljs-file-b (str cljs-path-b "/file-b.cljs"))
+(def cljs-paths [cljs-path-a cljs-path-b])
+(def cljs-sourcepaths (cljsbuild.compiler.SourcePaths. cljs-paths))
 (def crossover-path "crossovers")
+(def crossover-file (str crossover-path "/file-c.cljs"))
 (def crossover-macro-absolute "/a/b/crossovers/macros.clj")
 (def crossover-macro-classpath "crossovers/macros.clj")
 (def crossover-macro-paths [{:absolute crossover-macro-absolute
@@ -25,27 +31,33 @@
 (def incremental? true)
 (def mtime 1234)
 
+; TODO: We really need more tests here, particularly for the crossover/clojure reloading stuff.
+
 (fact "run-compiler calls cljs/build correctly"
   (run-compiler
-    cljs-path
+    cljs-paths
     crossover-path
     crossover-macro-paths
     compiler-options
     notify-command
     incremental?
     assert?
-    {}) => (just {"src-cljs/a.cljs" mtime,
-                  "crossovers/b.cljs" mtime,
+    {}) => (just {cljs-file-a mtime
+                  cljs-file-b mtime
+                  crossover-file mtime
                   crossover-macro-absolute mtime})
   (provided
     (fs/exists? output-to) => false :times 1
-    (util/find-files cljs-path #{"clj"}) => [] :times 1
-    (util/find-files cljs-path #{"cljs"}) => ["src-cljs/a.cljs"] :times 1
-    (util/find-files crossover-path #{"cljs"}) => ["crossovers/b.cljs"] :times 1
+    (util/find-files cljs-path-a #{"clj"}) => [] :times 1
+    (util/find-files cljs-path-b #{"clj"}) => [] :times 1
+    (util/find-files cljs-path-a #{"cljs"}) => [cljs-file-a] :times 1
+    (util/find-files cljs-path-b #{"cljs"}) => [cljs-file-b] :times 1
+    (util/find-files crossover-path #{"cljs"}) => [crossover-file] :times 1
     (util/sh anything) => nil :times 1
-    (fs/mod-time "src-cljs/a.cljs") => mtime :times 1
-    (fs/mod-time "crossovers/b.cljs") => mtime :times 1
+    (fs/mod-time cljs-file-a) => mtime :times 1
+    (fs/mod-time cljs-file-b) => mtime :times 1
+    (fs/mod-time crossover-file) => mtime :times 1
     (fs/mod-time crossover-macro-absolute) => mtime :times 1
     (fs/mkdirs anything) => nil
     (reload-clojure [crossover-macro-classpath] compiler-options notify-command) => nil :times 1
-    (cljs/build cljs-path compiler-options) => nil :times 1))
+    (cljs/build cljs-sourcepaths compiler-options) => nil :times 1))
