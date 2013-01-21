@@ -132,7 +132,7 @@
           (reload-clojure (map macro-classpath-files macro-modified) compiler-options notify-command))
         (when (seq clj-modified)
           (reload-clojure
-            (concat
+            (apply concat
               (for [[cljs-path clj-files] clj-files-in-cljs-paths]
                 (map (partial relativize cljs-path) clj-files)))
             compiler-options notify-command))
