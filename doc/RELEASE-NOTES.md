@@ -2,7 +2,7 @@
 
 ## 0.3.0
 
-1. Dropped support for Leiningen 1.x, now that Leiningen 2.0 is available.  '''REPEAT: Leiningen 1.x is no longer supported.'''
+1. Dropped support for Leiningen 1.x, now that Leiningen 2.0 is available.  **REPEAT: Leiningen 1.x is no longer supported.**
 2. Changed all default output paths (e.g. for temporary compiler files, crossover files, and REPL files) to be in the `:target-path` directory.  Explicitly configured paths can still be whatever you like.
 3. For compatibility with Leiningen 2.0, `:resource-paths` is now used instead of `:resources-path`.
 4. Fixed a long delay before exiting that could sometimes occur after one-shot tasks (like `cljsbuild once`).
