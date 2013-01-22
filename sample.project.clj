@@ -60,7 +60,7 @@
     ; compiler configuration.
     :builds {
       :main {
-        ; The path under which lein-cljsbuild will look for ClojureScript
+        ; The paths under which lein-cljsbuild will look for ClojureScript
         ; files to compile.  Defaults to ["src-cljs"].
         :source-paths ["src-cljs"]
         ; If hooks are enabled, this flag determines whether files from these
