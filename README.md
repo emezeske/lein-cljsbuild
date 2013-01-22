@@ -55,7 +55,7 @@ of your `project.clj` file.  A simple project might look like this:
   :cljsbuild {
     :builds [{
         ; The path to the top-level ClojureScript source directory:
-        :source-path "src-cljs"
+        :source-paths ["src-cljs"]
         ; The standard ClojureScript compiler options:
         ; (See the ClojureScript compiler documentation for details.)
         :compiler {
@@ -133,9 +133,9 @@ and will build all of them in parallel:
   :plugins [[lein-cljsbuild "0.3.0"]]
   :cljsbuild {
     :builds [
-      {:source-path "src-cljs-main"
-       :compiler {:output-to "main.js"}}
-      {:source-path "src-cljs-other"
+      {:source-paths ["src-cljs-main"]
+       :compiler {:output-to "main.js"}
+      {:source-paths ["src-cljs-other"]
        :compiler {:output-to "other.js"}}]})
 ```
 
@@ -151,10 +151,10 @@ only that one:
   :plugins [[lein-cljsbuild "0.3.0"]]
   :cljsbuild {
     :builds [
-      {:source-path "src-cljs-main"
+      {:source-paths ["src-cljs-main"]
        :compiler {:output-to "main.js"}}
       {:id "other"
-       :source-path "src-cljs-other"
+       :source-paths ["src-cljs-other"]
        :compiler {:output-to "other.js"}}]})
 ```
 
@@ -169,10 +169,10 @@ them as a map instead of a vector:
   :cljsbuild {
     :builds {
       :main
-      {:source-path "src-cljs-main"
+      {:source-paths ["src-cljs-main"]
        :compiler {:output-to "main.js"}}
       :other
-      {:source-path "src-cljs-other"
+      {:source-paths ["src-cljs-other"]
        :compiler {:output-to "other.js"}}}})
 ```
 
