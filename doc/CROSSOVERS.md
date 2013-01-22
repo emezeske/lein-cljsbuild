@@ -4,7 +4,7 @@ Sharing code with lein-cljsbuild is accomplished via the configuration
 of "crossovers".  A crossover specifies a Clojure namespace, the content
 of which should be copied into your ClojureScript project.  This can be any
 namespace that is available via the Java CLASSPATH, which includes your
-project's main :source-path by default.
+project's main :source-paths by default.
 
 When a crossover namespace is provided by your current project (either via the
 main `:source-dir` or one of the `:extra-classpath-dirs` in your project.clj file),
@@ -36,7 +36,7 @@ And your `project.clj` file looks like this:
 ```clj
 (defproject lein-cljsbuild-example "1.2.3"
   :plugins [[lein-cljsbuild "0.3.0"]]
-  :source-path "src-clj"
+  :source-paths ["src-clj"]
   :cljsbuild {
     ; Each entry in the :crossovers vector describes a Clojure namespace
     ; that is meant to be used with the ClojureScript code as well.
