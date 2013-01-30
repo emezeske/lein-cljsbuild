@@ -13,6 +13,7 @@
      [org.clojure/google-closure-library-third-party "0.0-2029"]
      [fs "1.1.2"]
      [clj-stacktrace "0.2.5"]]
+  :aot [cljsbuild.test]
   :profiles {
     :dev {
       :dependencies [[midje "1.4.0"]]

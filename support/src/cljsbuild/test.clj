@@ -1,6 +1,11 @@
 (ns cljsbuild.test
   (:require
-    [cljsbuild.util :as util]))
+    [cljsbuild.util :as util])
+  (:import
+    [java.lang Exception]))
+
+(gen-class :name cljsbuild.test.TestsFailedException
+           :extends java.lang.Exception)
 
 (defmacro dofor [seq-exprs body-expr]
   `(doall (for ~seq-exprs ~body-expr)))
