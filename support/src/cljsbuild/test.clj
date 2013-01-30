@@ -15,4 +15,4 @@
                   (dofor [test-command test-commands]
                     (util/sh test-command)))]
     (when (not success)
-      (throw (Exception. "Test failed.")))))
+      (throw (cljsbuild.test.TestsFailedException. "Test failed.")))))
