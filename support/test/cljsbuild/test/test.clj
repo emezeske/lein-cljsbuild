@@ -20,7 +20,7 @@
   (let [command-1 {:shell ["command1"]}
         command-2 {:shell ["command2"]}
         commands [command-1 command-2]]
-    (run-tests commands) => (throws Exception)
+    (run-tests commands) => (throws cljsbuild.test.TestsFailedException)
     (provided
       (util/sh command-1) => 0 :times 1
       (util/sh command-2) => 1 :times 1)))
