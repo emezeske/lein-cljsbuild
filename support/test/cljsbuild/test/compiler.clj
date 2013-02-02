@@ -42,7 +42,8 @@
     notify-command
     incremental?
     assert?
-    {}) => (just {cljs-file-a mtime
+    {}) => (just {"project.clj" mtime
+                  cljs-file-a mtime
                   cljs-file-b mtime
                   crossover-file mtime
                   crossover-macro-absolute mtime})
@@ -58,6 +59,7 @@
     (fs/mod-time cljs-file-b) => mtime :times 1
     (fs/mod-time crossover-file) => mtime :times 1
     (fs/mod-time crossover-macro-absolute) => mtime :times 1
+    (fs/mod-time "project.clj") => mtime :times 1
     (fs/mkdirs anything) => nil
     (reload-clojure [crossover-macro-classpath] compiler-options notify-command) => nil :times 1
     (cljs/build cljs-sourcepaths compiler-options) => nil :times 1))

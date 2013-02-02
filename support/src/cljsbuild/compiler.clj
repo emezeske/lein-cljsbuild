@@ -118,13 +118,15 @@
               [cljs-path (util/find-files cljs-path #{"clj"})]))
         cljs-files (mapcat #(util/find-files % #{"cljs"}) (conj cljs-paths crossover-path))
         js-files (mapcat #(util/find-files % #{"js"}) lib-paths)
+        project-mtime (get-mtimes ["project.clj"])
         macro-mtimes (get-mtimes macro-files)
         clj-mtimes (get-mtimes (mapcat second clj-files-in-cljs-paths))
         cljs-mtimes (get-mtimes cljs-files)
         js-mtimes (get-mtimes js-files)
-        dependency-mtimes (merge macro-mtimes clj-mtimes cljs-mtimes js-mtimes)]
+        dependency-mtimes (merge project-mtime macro-mtimes clj-mtimes cljs-mtimes js-mtimes)]
     (when (not= last-dependency-mtimes dependency-mtimes)
-      (let [macro-modified (list-modified output-mtime macro-mtimes)
+      (let [project-modified (list-modified output-mtime project-mtime)
+            macro-modified (list-modified output-mtime macro-mtimes)
             clj-modified (list-modified output-mtime clj-mtimes)
             cljs-modified (list-modified output-mtime cljs-mtimes)
             js-modified (list-modified output-mtime js-mtimes)]
@@ -136,6 +138,6 @@
               (for [[cljs-path clj-files] clj-files-in-cljs-paths]
                 (map (partial relativize cljs-path) clj-files)))
             compiler-options notify-command))
-        (when (or (seq macro-modified) (seq clj-modified) (seq cljs-modified) (seq js-modified))
+        (when (or (seq project-modified) (seq macro-modified) (seq clj-modified) (seq cljs-modified) (seq js-modified))
           (compile-cljs cljs-paths compiler-options notify-command incremental? assert?))))
     dependency-mtimes))
