@@ -3,11 +3,13 @@
     [cljs.repl :as repl]
     [cljs.repl.browser :as browser]
     [cljsbuild.util :as util]
-    [clojure.string :as string]))
+    [clojure.string :as string]
+    [cemerick.piggieback :as piggieback))
 
 (defn run-repl-listen [port output-dir]
   (let [env (browser/repl-env :port (Integer. port) :working-dir output-dir)]
-    (repl/repl env)))
+    (piggieback/cljs-repl
+      :repl-env (doto env (repl/-setup)))))
 
 (defn delayed-process-start [command]
   (future
