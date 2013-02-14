@@ -10,7 +10,6 @@
     :dev {
       :dependencies [
         [midje "1.4.0"]
-        [cljsbuild "0.3.0"]
-        [com.cemerick/piggieback "0.0.2"]]
+        [cljsbuild "0.3.0"]]
       :plugins [[lein-midje "2.0.4"]]}}
   :eval-in-leiningen true)
