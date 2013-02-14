@@ -14,10 +14,10 @@
 (fact
   (run-repl-listen port output-dir) => nil
 
-  (run-repl-launch port output-dir command) => nil
+  (comment (run-repl-launch port output-dir command) => nil
   (provided
-    (delayed-process-start command) => (future {:kill (fn [] nil) :wait (fn [] nil)}))
+    (delayed-process-start command) => (future {:kill (fn [] nil) :wait (fn [] nil)})))
 
-  (against-background
+  (comment (against-background
     (browser/repl-env :port port :working-dir output-dir) => {} :times 1
-    (repl/repl {}) => nil :times 1))
+    (repl/repl {}) => nil :times 1)))
