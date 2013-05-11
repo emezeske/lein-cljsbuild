@@ -7,7 +7,7 @@
      :distribution :repo}
   :dependencies
     [[org.clojure/clojure "1.4.0"]
-     [org.clojure/clojurescript "0.0-1552"
+     [org.clojure/clojurescript "0.0-1806"
        :exclusions [org.apache.ant/ant]]
      ; Ugly workaround for http://dev.clojure.org/jira/browse/CLJS-418
      [org.clojure/google-closure-library-third-party "0.0-2029"]
