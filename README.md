@@ -239,3 +239,5 @@ See the file COPYING.
 * Chris Allen (cma@bitemyapp.com)
 * Sean Grove (s@bushi.do)
 * Thomas Heller (info@zilence.net)
+* Micah Martin (micah@8thlight.com)
+* Harri Salokorpi (harri.salokorpi@reaktor.fi)
