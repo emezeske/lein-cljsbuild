@@ -1,6 +1,6 @@
 # Release Notes for lein-cljsbuild
 
-## 0.3.0
+## 0.3.1
 
 1. Dropped support for Leiningen 1.x, now that Leiningen 2.0 is available.  **REPEAT: Leiningen 1.x is no longer supported.**
 2. Changed the `:source-path "path"` option to `:source-paths ["path" "path"]`.  The new option accepts a vector of paths rather than a single path.  **The old singular `:source-path` is now deprecated and will be removed soon.**
