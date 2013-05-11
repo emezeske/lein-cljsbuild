@@ -26,6 +26,9 @@
        (do
          ~form
          (System/exit 0))
+       (catch cljsbuild.test.TestsFailedException e#
+         ; Do not print stack trace on test failure
+         (System/exit 1))
        (catch Exception e#
          (do
            (.printStackTrace e#)
