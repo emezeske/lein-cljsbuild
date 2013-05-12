@@ -1,5 +1,9 @@
 # Release Notes for lein-cljsbuild
 
+## 0.3.2
+
+1. Changed to use upstream ClojureScript version 0.0-1806.
+
 ## 0.3.1
 
 1. Changed to use upstream ClojureScript version 0.0-1803.
