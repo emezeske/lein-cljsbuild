@@ -2,6 +2,14 @@
 
 ## 0.3.1
 
+1. Changed to use upstream ClojureScript version 0.0-1803.
+2. Updated the Clojure version used in the plugin to 1.5.1.
+3. This plugin version requires Leiningen version 2.1.2 or higher.
+4. Fix `lein cljsbuild test` so that it exits quickly (i.e. without a 30-second delay).
+5. Hide the Clojure stacktrace when ClojureScript unit tests fail.
+
+## 0.3.0
+
 1. Dropped support for Leiningen 1.x, now that Leiningen 2.0 is available.  **REPEAT: Leiningen 1.x is no longer supported.**
 2. Changed the `:source-path "path"` option to `:source-paths ["path" "path"]`.  The new option accepts a vector of paths rather than a single path.  **The old singular `:source-path` is now deprecated and will be removed soon.**
 3. Changed all default output paths (e.g. for temporary compiler files, crossover files, and REPL files) to be in the `:target-path` directory.  Explicitly configured paths can still be whatever you like.
