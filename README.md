@@ -18,7 +18,7 @@ The latest version of lein-cljsbuild is `0.3.1`.
 
 The lein-cljsbuild plugin works with
 [Leiningen] (https://github.com/technomancy/leiningen/blob/master/README.md)
-version `2.0.0` or higher.
+version `2.1.2` or higher.
 
 ## Installation
 
