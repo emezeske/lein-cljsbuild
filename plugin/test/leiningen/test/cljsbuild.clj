@@ -56,7 +56,7 @@
   (:compiler (first parsed-builds)))
 
 (def project
- {:dependencies [['org.clojure/clojure "1.4.0"]]
+ {:dependencies [['org.clojure/clojure "1.5.1"]]
   :cljsbuild
    {:repl-listen-port repl-listen-port
     :repl-launch-commands {repl-launch-command-id repl-launch-command}

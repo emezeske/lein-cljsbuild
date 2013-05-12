@@ -14,5 +14,5 @@
   :aot [cljsbuild.test]
   :profiles {
     :dev {
-      :dependencies [[midje "1.4.0"]]
+      :dependencies [[midje "1.5.1"]]
       :plugins [[lein-midje "2.0.4"]]}})
