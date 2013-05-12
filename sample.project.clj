@@ -7,7 +7,7 @@
 (defproject org.example/sample "1.0.0-SNAPSHOT"
   ; Your project must use Clojure 1.4 or above to support
   ; ClojureScript compilation.
-  :dependencies [[org.clojure/clojure "1.4.0"]]
+  :dependencies [[org.clojure/clojure "1.5.1"]]
   ; Your project should plugin-depend on lein-cljsbuild, to ensure that
   ; the right version of the plugin is installed.
   :plugins [[lein-cljsbuild "0.3.1"]]
@@ -103,6 +103,9 @@
           ; compilation.  Must be unique among all :builds. Defaults to
           ; "target/cljsbuild-compiler-X" (where X is a unique integer).
           :output-dir "target/my-compiler-output-"
+          ; Wrap the JavaScript output in (function(){...};)() to avoid clobbering globals.
+          ; Defaults to false
+          :output-wrapper false
           ; Configure externs files for external libraries.
           ; Defaults to the empty vector [].
           ; For this entry, and those below, you can find a very good explanation at:
