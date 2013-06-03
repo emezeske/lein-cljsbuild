@@ -18,6 +18,7 @@
    :repl-listen-port 9000
    :test-commands {}
    :crossover-path (in-target-path target-path "crossover")
+   :crossover-transform 'cljsbuild.crossover/remove-cljsbuild-comments
    :crossover-jar false
    :crossovers []})
 

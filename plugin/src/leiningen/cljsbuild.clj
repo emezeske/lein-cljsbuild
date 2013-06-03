@@ -35,7 +35,7 @@
            (System/exit 1))))
     requires))
 
-(defn- run-compiler [project {:keys [crossover-path crossovers builds]} build-ids watch?]
+(defn- run-compiler [project {:keys [crossover-path crossover-transform crossovers builds]} build-ids watch?]
   (doseq [build-id build-ids]
     (if (empty? (filter #(= (:id %) build-id) builds))
       (throw (Exception. (str "Unknown build identifier: " build-id)))))
@@ -56,6 +56,7 @@
       `(do
         (letfn [(copy-crossovers# []
                   (cljsbuild.crossover/copy-crossovers
+                   ~(when crossover-transform `'~crossover-transform)
                     ~crossover-path
                     '~crossovers))]
           (copy-crossovers#)
