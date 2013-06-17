@@ -8,6 +8,7 @@
     [cljs.analyzer :as analyzer]
     [cljs.closure :as closure]
     [clojure.string :as string]
+    [clojure.java.io :as io]
     [fs.core :as fs]))
 
 (def reset-color "\u001b[0m")
@@ -95,7 +96,13 @@
   ; not affect any cljs file mtimes, we have to clear the cache here to force everything
   ; to be rebuilt.
   (fs/delete-dir (:output-dir compiler-options))
-  (doseq [path paths]
+  (doseq [path paths
+          ; only Clojure files that define macros can possibly affect
+          ; ClojureScript compilation; those that don't might define the "same"
+          ; namespace as a same-named ClojureScript file, and thus interfere
+          ; with cljsc's usage of Clojure namespaces during compilation. gh-210
+          :when (-> path (string/replace #"^/" "") io/resource
+                    ^String slurp (.contains "defmacro"))]
     (try
       (load (drop-extension path))
       (catch Throwable e
