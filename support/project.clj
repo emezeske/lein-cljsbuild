@@ -1,4 +1,4 @@
-(defproject cljsbuild "0.3.2"
+(defproject cljsbuild "0.3.3"
   :description "ClojureScript Autobuilder"
   :url "http://github.com/emezeske/lein-cljsbuild"
   :license
@@ -7,7 +7,7 @@
      :distribution :repo}
   :dependencies
     [[org.clojure/clojure "1.5.1"]
-     [org.clojure/clojurescript "0.0-1806"
+     [org.clojure/clojurescript "0.0-1835"
        :exclusions [org.apache.ant/ant]]
      [fs "1.1.2"]
      [clj-stacktrace "0.2.5"]]
