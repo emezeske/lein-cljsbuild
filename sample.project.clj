@@ -115,7 +115,7 @@
           ; watched and a rebuild will occur if they are modified.
           ; Defaults to the empty vector [].
           :libs ["closure/library/third_party/closure"]
-          ; Adds dependencies on foreign libraries.
+          ; Adds dependencies on foreign libraries. Be sure that the url returns a HTTP Code 200
           ; Defaults to the empty vector [].
           :foreign-libs [{:file "http://example.com/remote.js"
                            :provides  ["my.example"]}]}}}})
