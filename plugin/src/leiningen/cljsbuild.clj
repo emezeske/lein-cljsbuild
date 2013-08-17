@@ -35,7 +35,14 @@
            (System/exit 1))))
     requires))
 
-(defn- run-compiler [project {:keys [crossover-path crossovers builds]} build-ids watch?]
+(defn- run-compiler
+  "Run the clojurescript compiler.
+
+watch?   : flag to run continuously
+requires : a sequence of forms to require before the expression is evaluated.
+exec     : forms to execute after the compilation."
+  [project {:keys [crossover-path crossovers builds]} build-ids
+                     {:keys [watch? requires exec]}]
   (doseq [build-id build-ids]
     (if (empty? (filter #(= (:id %) build-id) builds))
       (throw (Exception. (str "Unknown build identifier: " build-id)))))
@@ -51,37 +58,45 @@
     (doseq [build parsed-builds]
       (config/warn-unsupported-warn-on-undeclared build)
       (config/warn-unsupported-notify-command build))
-    (run-local-project project crossover-path parsed-builds
-      '(require 'cljsbuild.compiler 'cljsbuild.crossover 'cljsbuild.util)
-      `(do
+    (run-local-project
+     project crossover-path parsed-builds
+     `(do
+        (require '~'cljsbuild.compiler '~'cljsbuild.crossover '~'cljsbuild.util)
+        ~@requires)
+     `(do
         (letfn [(copy-crossovers# []
                   (cljsbuild.crossover/copy-crossovers
-                    ~crossover-path
-                    '~crossovers))]
+                   ~crossover-path
+                   '~crossovers))]
           (copy-crossovers#)
           (when ~watch?
-            (cljsbuild.util/once-every-bg 1000 "copying crossovers" copy-crossovers#))
-          (let [crossover-macro-paths# (cljsbuild.crossover/crossover-macro-paths '~crossovers)
+            (cljsbuild.util/once-every-bg
+             1000 "copying crossovers" copy-crossovers#))
+          (let [crossover-macro-paths# (cljsbuild.crossover/crossover-macro-paths
+                                        '~crossovers)
                 builds# '~parsed-builds]
             (loop [dependency-mtimes# (repeat (count builds#) {})]
               (let [builds-mtimes# (map vector builds# dependency-mtimes#)
                     new-dependency-mtimes#
-                      (doall
-                        (for [[build# mtimes#] builds-mtimes#]
-                          (cljsbuild.compiler/run-compiler
-                            (:source-paths build#)
-                            ~crossover-path
-                            crossover-macro-paths#
-                            (:compiler build#)
-                            (:parsed-notify-command build#)
-                            (:incremental build#)
-                            (:assert build#)
-                            mtimes#)))]
-                 (when ~watch?
-                   (Thread/sleep 100)
-                   (recur new-dependency-mtimes#))))))))))
+                    (doall
+                     (for [[build# mtimes#] builds-mtimes#]
+                       (cljsbuild.compiler/run-compiler
+                        (:source-paths build#)
+                        ~crossover-path
+                        crossover-macro-paths#
+                        (:compiler build#)
+                        (:parsed-notify-command build#)
+                        (:incremental build#)
+                        (:assert build#)
+                        mtimes#)))]
+                (when-not (= dependency-mtimes# new-dependency-mtimes#)
+                  ~@exec)
+                (when ~watch?
+                  (Thread/sleep 1000)
+                  (recur new-dependency-mtimes#))))))))))
 
-(defn- run-tests [project {:keys [test-commands crossover-path builds]} args]
+(defn- test-forms
+  [project {:keys [test-commands crossover-path builds]} args throw-on-error?]
   (when (> (count args) 1)
     (throw (Exception. "Only expected zero or one arguments.")))
   (let [selected-tests (if (empty? args)
@@ -92,9 +107,14 @@
                            (println "Running ClojureScript test:" (first args))
                            [(test-commands (first args))]))
         parsed-tests (map config/parse-shell-command selected-tests)]
-  (run-local-project project crossover-path builds
-    '(require 'cljsbuild.test)
-    `(cljsbuild.test/run-tests '~parsed-tests))))
+    ['(require 'cljsbuild.test)
+     `(cljsbuild.test/run-tests '~parsed-tests ~throw-on-error?)]))
+
+(defn- run-tests
+  [project {:keys [test-commands crossover-path builds] :as options} args]
+  (apply
+   run-local-project project crossover-path builds
+   (test-forms project options args true)))
 
 (defmacro require-trampoline [& forms]
   `(if ltrampoline/*trampoline?*
@@ -106,12 +126,12 @@
 (defn- once
   "Compile the ClojureScript project once."
   [project options build-ids]
-  (run-compiler project options build-ids false))
+  (run-compiler project options build-ids {:watch? false}))
 
 (defn- auto
   "Automatically recompile when files are modified."
   [project options build-ids]
-  (run-compiler project options build-ids true))
+  (run-compiler project options build-ids {:watch? true}))
 
 (defn- clean
   "Remove automatically generated files."
@@ -137,8 +157,16 @@
 (defn- test
   "Run ClojureScript tests."
   [project options args]
-    (run-compiler project options nil false)
-    (run-tests project options args))
+  (let [[requires form] (test-forms project options args true)]
+    (run-compiler project options nil
+                  {:watch? true :requires [requires] :exec [form]})))
+
+(defn- auto-test
+  "Run ClojureScript tests automatically when files are modified."
+  [project options args]
+  (let [[requires exec] (test-forms project options args false)]
+    (run-compiler project options nil
+                  {:watch? true :requires [requires] :exec [exec]})))
 
 (defn- repl-listen
   "Run a REPL that will listen for incoming connections."
@@ -197,6 +225,7 @@
         "auto" (auto project options args)
         "clean" (clean project options)
         "test" (test project options args)
+        "auto-test" (auto-test project options args)
         "repl-listen" (repl-listen project options)
         "repl-launch" (repl-launch project options args)
         "repl-rhino" (repl-rhino project options)
