@@ -85,6 +85,8 @@ automatically generated during compilation, run:
 
     $ lein cljsbuild clean
 
+If you've upgraded any libraries, you *probably* want to run `lein cljsbuild clean` afterward.
+
 ## Hooks
 
 Some common lein-cljsbuild tasks can hook into the main Leiningen tasks
