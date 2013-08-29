@@ -92,6 +92,9 @@
                            (println "Running ClojureScript test:" (first args))
                            [(test-commands (first args))]))
         parsed-tests (map config/parse-shell-command selected-tests)]
+  (when (empty? (:shell (first parsed-tests)))
+    (println (str "Could not locate test command " (first args) "."))
+    (lmain/abort))
   (run-local-project project crossover-path builds
     '(require 'cljsbuild.test)
     `(cljsbuild.test/run-tests '~parsed-tests))))
