@@ -19,6 +19,7 @@ for d in support plugin; do
 done
 for d in $projects; do
 	pushd example-projects/$d
+    printf "\n** Testing project '$d'\n\n"
 	if [ $d = advanced ]; then
 		extra_command=', cljsbuild test'
 	fi
