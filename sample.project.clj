@@ -52,6 +52,9 @@
     ; The directory into which the :crossovers namespaces should be copied.
     ; Defaults to "target/cljsbuild-crossover".
     :crossover-path "target/my-crossovers"
+    ; The function used to transform source code into crossover. The function should
+    ; accept string and return a string or sequence of clojure expressions.
+    :crossover-transform cljsbuild.crossover/remove-cljsbuild-comments
     ; If hooks are enabled, this flag determines whether files from :crossover-path
     ; are added to the JAR file created by "lein jar".
     :crossover-jar true
