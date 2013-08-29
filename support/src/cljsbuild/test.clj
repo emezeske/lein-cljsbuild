@@ -10,9 +10,11 @@
 (defmacro dofor [seq-exprs body-expr]
   `(doall (for ~seq-exprs ~body-expr)))
 
-(defn run-tests [test-commands]
+(defn run-tests [test-commands throw-on-error?]
   (let [success (every? #(= % 0)
                   (dofor [test-command test-commands]
                     (util/sh test-command)))]
     (when (not success)
-      (throw (cljsbuild.test.TestsFailedException. "Test failed.")))))
+      (if throw-on-error?
+        (throw (cljsbuild.test.TestsFailedException. "Test failed."))
+        (println "Test failed.")))))

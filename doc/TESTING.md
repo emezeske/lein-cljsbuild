@@ -26,6 +26,10 @@ If hooks are enabled, this will also result in the tests being run:
 
     $ lein test
 
+To run tests whenever the source files are changed:
+
+    $ lein cljsbuild auto-test
+
 ## Testing with PhantomJS
 
 For ClojureScript code that targets web browsers (as opposed to Node.js), it is often
