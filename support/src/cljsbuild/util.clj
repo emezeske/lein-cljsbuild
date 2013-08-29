@@ -73,7 +73,7 @@
   ; FIXME: These writers get left open.  Not a huge deal, but...
   (let [stdout-writer (maybe-writer stdout *out*)
         stderr-writer (maybe-writer stderr *err*)
-        process (.exec (Runtime/getRuntime) (into-array shell))
+        process (.exec (Runtime/getRuntime) (into-array String shell))
         pumper (future (process-pump process stdout-writer stderr-writer))]
     {:kill (fn []
              (.destroy process))
