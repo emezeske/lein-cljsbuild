@@ -67,7 +67,7 @@
       ; be run via PhantomJS.  See the phantom/unit-test.js file
       ; for details on how it's run.
       :test
-      {:source-paths ["test-cljs"]
+      {:source-paths ["src-cljs" "test-cljs"]
        :compiler {:output-to "resources/private/js/unit-test.js"
                   :optimizations :whitespace
                   :pretty-print true}}}}
