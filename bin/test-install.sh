@@ -14,7 +14,7 @@ pushd $project_root
 rm -rf ~/.m2/repository/lein-cljsbuild ~/.m2/repository/cljsbuild/
 for d in support plugin; do
 	pushd $d
-	lein do install, test
+	lein do clean, install, test
 	popd
 done
 for d in $projects; do

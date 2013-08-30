@@ -29,11 +29,9 @@ git branch -D $branch
 git push origin :refs/heads/$branch
 
 pushd support
-lein jar
-scp pom.xml target/cljsbuild-$branch.jar clojars@clojars.org:
+lein do clean, deploy clojars
 popd
 
 pushd plugin
-lein jar
-scp pom.xml target/lein-cljsbuild-$branch.jar clojars@clojars.org:
+lein do clean, deploy clojars
 popd

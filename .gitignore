@@ -1,5 +1,6 @@
 .lein*
 pom.xml
+*.asc
 lib
 classes/
 lein-cljsbuild-*.*.*
