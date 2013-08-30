@@ -38,6 +38,12 @@
   (let [project (dependency-map project-dependencies)
         cljsbuild (dependency-map cljsbuild-dependencies)]
     (check-clojure-version project)
+    (when-not ('org.clojure/clojurescript project)
+      (println "\033[33mWARNING: It appears your project does not contain a ClojureScript"
+               "dependency. One will be provided for you by lein-cljsbuild, but it"
+               "is strongly recommended that you add your own.  You can find a list"
+               "of all ClojureScript releases here:")
+      (println "http://search.maven.org/#search|ga|1|g%3A%22org.clojure%22%20AND%20a%3A%22clojurescript%22\033[0m"))
     (map (fn [[k v]] (vec (cons k v)))
       (merge cljsbuild project))))
 
