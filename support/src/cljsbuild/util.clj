@@ -4,28 +4,28 @@
     [clojure.string :as string]
     [fs.core :as fs])
   (:import
-    (java.io OutputStreamWriter)))
+    (java.io File OutputStreamWriter)))
 
 (defn join-paths [& paths]
   (apply str (interpose "/" paths)))
 
-(defn filter-by-ext [files types]
-  (let [ext #(last (string/split % #"\."))]
+(defn- filter-by-ext [types files]
+  (let [ext #(nth (re-matches #".+\.([^\.]+)$" %) 1)]
     (filter #(types (ext %)) files)))
 
-(defn remove-hidden [files]
-  (remove #(.startsWith % ".") files))
-
-(defn find-dir-files [root files types]
-  (for [file (remove-hidden (filter-by-ext files types))]
-    (join-paths root file)))
-
 (defn find-files [dir types]
-  (let [iter (fs/iterate-dir dir)]
-    (mapcat
-      (fn [[root _ files]]
-        (find-dir-files root files types))
-      iter)))
+  ; not using fs because it's slow for listing directories; 40ms vs 1ms for
+  ; ~typical `cljsbuild auto` scanning
+  (letfn [(files-in-dir [^File dir]
+            (let [fs (.listFiles dir)]
+              (->> (.listFiles dir)
+                   (remove #(.isHidden ^File %))
+                   (mapcat #(if (.isFile ^File %)
+                              [%]
+                              (files-in-dir %))))))]
+    (->> (files-in-dir (io/file dir))
+      (map #(.getAbsolutePath ^File %))
+      (filter-by-ext types))))
 
 (defn sleep [ms]
   (Thread/sleep ms))

@@ -12,23 +12,18 @@
   (join-paths "a" "b" "c") => "a/b/c")
 
 (fact
-  (let [files ["a.a" "b.b" "c.c" "d.d" "e.d" "f.d" "1/2/3/4/5.e"]]
-    (filter-by-ext files #{"q" "r" "s"}) => []
-    (filter-by-ext files #{"a"}) => ["a.a"]
-    (filter-by-ext files #{"d"}) => ["d.d" "e.d" "f.d"]
-    (filter-by-ext files #{"e"}) => ["1/2/3/4/5.e"]
-    (filter-by-ext files #{"a" "b" "c" "d" "e"}) => files))
+  (let [files ["a.a" "b.b" "c.c" "d.d" "e.d" "f.d" "1/2/3/4/5.e"]
+        filter-by-ext #'cljsbuild.util/filter-by-ext]
+    (filter-by-ext #{"q" "r" "s"} files) => []
+    (filter-by-ext #{"a"} files) => ["a.a"]
+    (filter-by-ext #{"d"} files) => ["d.d" "e.d" "f.d"]
+    (filter-by-ext #{"e"} files) => ["1/2/3/4/5.e"]
+    (filter-by-ext #{"a" "b" "c" "d" "e"} files) => files))
 
-(fact
-  (let [files ["a.a" "b.a" "c.a" ".a.a"]]
-    (remove-hidden files) => ["a.a" "b.a" "c.a"]))
+(defn- path-ends-with? [exts path]
+  (some #(.endsWith path %) exts))
 
-(fact
-  (find-files "a" #{"z"}) => ["a/j.z" "a/k.z" "a/l.z" "a/b/m.z" "a/b/n.z"]
-  (provided (fs/iterate-dir "a") =>
-    [["a" "" ["i.a" "j.z" "k.z" "l.z" ".l.z"]]
-     ["a/b" "" ["m.z" "n.z" "o.b" ".p.b"]]]
-    :times 1))
+(fact (find-files ".." #{"md"}) => #(every? (partial path-ends-with? #{".md"}) %))
 
 (unfinished call-once-every)
 (unfinished keep-going)
