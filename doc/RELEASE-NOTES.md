@@ -1,5 +1,16 @@
 # Release Notes for lein-cljsbuild
 
+## [0.3.3](https://github.com/emezeske/lein-cljsbuild/issues?milestone=28&state=closed)
+
+1. Changed to use upstream ClojureScript version 0.0-1859.
+2. cljsbuild now warns if you have not explicitly specified a ClojureScript
+   dependency in your project. (gh-224)
+3. The file scanning associated with `cljsbuild auto` has been improved
+   significantly, and should now represent a negligible CPU load. (gh-219)
+4. Under `cljsbuild auto`, Clojure files are now only reloaded if they define
+   macros. (gh-210)
+4. Various documentation and example project tweaks.
+
 ## 0.3.2
 
 1. Changed to use upstream ClojureScript version 0.0-1806.
