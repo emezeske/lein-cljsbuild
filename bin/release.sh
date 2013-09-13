@@ -28,10 +28,5 @@ git checkout master
 git branch -D $branch
 git push origin :refs/heads/$branch
 
-pushd support
-lein do clean, deploy clojars
-popd
+bin/deploy.sh
 
-pushd plugin
-lein do clean, deploy clojars
-popd
