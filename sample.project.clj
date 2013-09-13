@@ -7,7 +7,11 @@
 (defproject org.example/sample "1.0.0-SNAPSHOT"
   ; Your project must use Clojure 1.4 or above to support
   ; ClojureScript compilation.
-  :dependencies [[org.clojure/clojure "1.5.1"]]
+  :dependencies [[org.clojure/clojure "1.5.1"]
+                 ; Your project should specify its own dependency on
+                 ; ClojureScript
+                 [org.clojure/clojurescript "0.0-1859"
+                  :exclusions [org.apache.ant/ant]]]
   ; Your project should plugin-depend on lein-cljsbuild, to ensure that
   ; the right version of the plugin is installed.
   :plugins [[lein-cljsbuild "0.3.2"]]

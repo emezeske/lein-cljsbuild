@@ -30,6 +30,17 @@ file in the `:plugins` section:
   :plugins [[lein-cljsbuild "0.3.2"]])
 ```
 
+In addition, _you should add an explicit ClojureScript dependency to your
+project_, like this:
+
+```clojure
+:dependencies [[org.clojure/clojurescript "0.0-XXXX"]]
+```
+
+lein-cljsbuild will add a dependency to your project if it doesn't already
+contain one, but that functionality will not remain for long.  In general, you
+can use lein-cljsbuild with any ClojureScript version.
+
 ## Just Give Me a Damned Example Already!
 
 See the
