@@ -1,4 +1,4 @@
-(defproject lein-cljsbuild "0.3.3"
+(defproject lein-cljsbuild "0.3.4-SNAPSHOT"
   :description "ClojureScript Autobuilder Plugin"
   :url "http://github.com/emezeske/lein-cljsbuild"
   :license
@@ -10,6 +10,6 @@
     :dev {
       :dependencies [
         [midje "1.5.1"]
-        [cljsbuild "0.3.3"]]
+        [cljsbuild "0.3.4-SNAPSHOT"]]
       :plugins [[lein-midje "2.0.4"]]}}
   :eval-in-leiningen true)
