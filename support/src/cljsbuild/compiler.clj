@@ -114,7 +114,9 @@
 (defn run-compiler [cljs-paths crossover-path crossover-macro-paths
                     compiler-options notify-command incremental?
                     assert? last-dependency-mtimes]
-  (let [output-file (:output-to compiler-options)
+  (let [compiler-options (merge {:output-wrapper (= :advanced (:optimizations compiler-options))}
+                                compiler-options)
+        output-file (:output-to compiler-options)
         lib-paths (:libs compiler-options)
         output-mtime (if (fs/exists? output-file) (fs/mod-time output-file) 0)
         macro-files (map :absolute crossover-macro-paths)

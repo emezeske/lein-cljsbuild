@@ -108,7 +108,7 @@
           ; "target/cljsbuild-compiler-X" (where X is a unique integer).
           :output-dir "target/my-compiler-output-"
           ; Wrap the JavaScript output in (function(){...};)() to avoid clobbering globals.
-          ; Defaults to false.
+          ; Defaults to true when using advanced compilation, false otherwise.
           :output-wrapper false
           ; Configure externs files for external libraries.
           ; Defaults to the empty vector [].
