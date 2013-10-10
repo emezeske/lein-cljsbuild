@@ -63,7 +63,7 @@
           (notify-cljs
             notify-command
             (str "Compiling \"" output-file "\" failed.") red)
-          (pst+ e))))))
+          (throw e))))))
 
 (defn- get-mtimes [paths]
   (into {}
