@@ -84,8 +84,8 @@
       path)))
 
 (defn- relativize [parent path]
-  (let [path (fs/absolute-path path)
-        parent (fs/absolute-path parent)]
+  (let [path (.getCanonicalPath (fs/file path))
+        parent (.getCanonicalPath (fs/file parent))]
     (if (.startsWith path parent)
       (subs path (count parent))
       path)))
