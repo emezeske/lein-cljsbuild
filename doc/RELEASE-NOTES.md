@@ -1,5 +1,17 @@
 # Release Notes for lein-cljsbuild
 
+## [0.3.4](https://github.com/emezeske/lein-cljsbuild/issues?milestone=31&state=closed)
+
+* Added new `sample` subtask that emits the contents of the `sample.project.clj`
+  details cljsbuild's options (gh-232)
+* _Clojure_ compilation failures now properly fail the broader Leiningen
+  invocation (gh-234)
+* The `:output-wrapper` ClojureScript compiler option is now defaulted to `true`
+  if the `:optimizations` option is set to `:advanced` (gh-201)
+* Fixed an issue where case-sensitivity of the drive letter on windows prevented
+  the proper relativization of paths to Clojure files containing macros to be
+  (re)loaded (gh-240)
+
 ## [0.3.3](https://github.com/emezeske/lein-cljsbuild/issues?milestone=28&state=closed)
 
 1. Changed to use upstream ClojureScript version 0.0-1859.
