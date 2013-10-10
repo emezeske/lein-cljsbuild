@@ -14,7 +14,8 @@
     [leiningen.jar :as ljar]
     [leiningen.test :as ltest]
     [leiningen.trampoline :as ltrampoline]
-    [robert.hooke :as hooke]))
+    [robert.hooke :as hooke]
+    [clojure.java.io :as io]))
 
 (def ^:private repl-output-path "repl")
 
@@ -185,10 +186,15 @@
       '(require 'cljsbuild.repl.rhino)
       `(cljsbuild.repl.rhino/run-repl-rhino))))
 
+(defn- sample
+  "Display a sample project.clj."
+  []
+  (-> (io/resource "sample.project.clj") slurp println))
+
 (defn cljsbuild
   "Run the cljsbuild plugin."
-  {:help-arglists '([once auto clean test repl-listen repl-launch repl-rhino])
-   :subtasks [#'once #'auto #'clean #'test #'repl-listen #'repl-launch #'repl-rhino]}
+  {:help-arglists '([once auto clean test repl-listen repl-launch repl-rhino sample])
+   :subtasks [#'once #'auto #'clean #'test #'repl-listen #'repl-launch #'repl-rhino #'sample]}
   ([project]
     (println
       (lhelp/help-for "cljsbuild"))
@@ -203,6 +209,7 @@
         "repl-listen" (repl-listen project options)
         "repl-launch" (repl-launch project options args)
         "repl-rhino" (repl-rhino project options)
+        "sample" (sample)
         (do
           (println
             "Subtask" (str \" subtask \") "not found."
