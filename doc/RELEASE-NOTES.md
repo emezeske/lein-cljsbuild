@@ -9,7 +9,9 @@
    significantly, and should now represent a negligible CPU load. (gh-219)
 4. Under `cljsbuild auto`, Clojure files are now only reloaded if they define
    macros. (gh-210)
-4. Various documentation and example project tweaks.
+5. A sane error message is now emitted if you attempt to run a nonexistent
+   cljsbuild task (gh-215)
+6. Various documentation and example project tweaks.
 
 ## 0.3.2
 
