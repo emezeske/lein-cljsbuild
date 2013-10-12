@@ -1,9 +1,24 @@
 (ns leiningen.cljsbuild.subproject
   "Utilities for running cljsbuild in a subproject"
   (:require
+    [clojure.java.io :refer (resource)]
     [clojure.string :as string]))
 
-(def cljsbuild-version "0.3.4-SNAPSHOT")
+(def cljsbuild-version
+  (let [[_ coords version]
+        (-> (or (resource "META-INF/leiningen/lein-cljsbuild/lein-cljsbuild/project.clj")
+                ; this should only ever come into play when testing cljsbuild itself
+                "project.clj")
+            slurp
+            read-string)]
+    (assert (= coords 'lein-cljsbuild)
+            (str "Something very wrong, could not find lein-cljsbuild's project.clj, actually found: "
+                 coords))
+    (assert (string? version)
+            (str "Something went wrong, version of lein-cljsbuild is not a string: "
+                 version))
+    version))
+
 (def required-clojure-version "1.5.1")
 
 (def cljsbuild-dependencies
