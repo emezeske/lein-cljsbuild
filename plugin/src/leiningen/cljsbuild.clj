@@ -93,12 +93,17 @@
                            (println "Running ClojureScript test:" (first args))
                            [(test-commands (first args))]))
         parsed-tests (map config/parse-shell-command selected-tests)]
-  (when (empty? (:shell (first parsed-tests)))
-    (println (str "Could not locate test command " (first args) "."))
-    (lmain/abort))
-  (run-local-project project crossover-path builds
-    '(require 'cljsbuild.test)
-    `(cljsbuild.test/run-tests '~parsed-tests))))
+    (doseq [[_ test-command] test-commands]
+      (when-not (every? string? test-command)
+        (binding [*out* *err*]
+          (println "Invalid :test-command, contains non-string value:" test-command)
+          (lmain/abort))))
+    (when (empty? (:shell (first parsed-tests)))
+      (println (str "Could not locate test command " (first args) "."))
+      (lmain/abort))
+    (run-local-project project crossover-path builds
+                       '(require 'cljsbuild.test)
+                       `(cljsbuild.test/run-tests '~parsed-tests))))
 
 (defmacro require-trampoline [& forms]
   `(if ltrampoline/*trampoline?*

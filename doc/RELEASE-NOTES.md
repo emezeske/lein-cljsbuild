@@ -11,6 +11,8 @@
 * Fixed an issue where case-sensitivity of the drive letter on windows prevented
   the proper relativization of paths to Clojure files containing macros to be
   (re)loaded (gh-240)
+* Test runs now properly fail if any `:test-commands` vector contains any
+  non-string values (gh-243)
 
 ## [0.3.3](https://github.com/emezeske/lein-cljsbuild/issues?milestone=28&state=closed)
 
