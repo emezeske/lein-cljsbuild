@@ -86,25 +86,30 @@
 (defn- run-tests [project {:keys [test-commands crossover-path builds]} args]
   (when (> (count args) 1)
     (throw (Exception. "Only expected zero or one arguments.")))
+  (when (and (= (count args) 1) (not (get test-commands (first args))))
+    (throw (Exception.
+             (format "No such test name: %s - valid names are: %s"
+                     (first args)
+                     (apply str (interpose ", " (keys test-commands)))))))
   (let [selected-tests (if (empty? args)
-                         (do
-                           (println "Running all ClojureScript tests.")
-                           (vals test-commands))
-                         (do
-                           (println "Running ClojureScript test:" (first args))
-                           [(test-commands (first args))]))
-        parsed-tests (map config/parse-shell-command selected-tests)]
+                           (seq test-commands)
+                           [[(first args) (test-commands (first args))]])
+        parsed-tests (map (fn [[test-name test-cmd]]
+                            [test-name (config/parse-shell-command test-cmd)])
+                          selected-tests)]
     (doseq [[_ test-command] test-commands]
       (when-not (every? string? test-command)
         (binding [*out* *err*]
           (println "Invalid :test-command, contains non-string value:" test-command)
           (lmain/abort))))
-    (when (empty? (:shell (first parsed-tests)))
+    (when (empty? (:shell (second (first parsed-tests))))
       (println (str "Could not locate test command " (first args) "."))
       (lmain/abort))
-    (run-local-project project crossover-path builds
-                       '(require 'cljsbuild.test)
-                       `(cljsbuild.test/run-tests '~parsed-tests))))
+    (doseq [[test-name test-cmd] parsed-tests]
+      (println "Running ClojureScript test:" test-name)
+      (run-local-project project crossover-path builds
+                         '(require 'cljsbuild.test)
+                         `(cljsbuild.test/run-tests '~(list test-cmd))))))
 
 (defmacro require-trampoline [& forms]
   `(if ltrampoline/*trampoline?*
