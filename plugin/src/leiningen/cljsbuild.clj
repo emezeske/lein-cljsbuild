@@ -84,12 +84,11 @@
 
 (defn- run-tests [project {:keys [test-commands crossover-path builds]} args]
   (when (> (count args) 1)
-    (throw (Exception. "Only expected zero or one arguments.")))
+    (lmain/abort "Only expected zero or one arguments."))
   (when (and (= (count args) 1) (not (get test-commands (first args))))
-    (throw (Exception.
-             (format "No such test name: %s - valid names are: %s"
-                     (first args)
-                     (apply str (interpose ", " (keys test-commands)))))))
+    (lmain/abort (format "No such test name: %s - valid names are: %s"
+                         (first args)
+                         (apply str (interpose ", " (keys test-commands))))))
   (let [selected-tests (if (empty? args)
                            (seq test-commands)
                            [[(first args) (test-commands (first args))]])
@@ -98,9 +97,8 @@
                           selected-tests)]
     (doseq [[_ test-command] test-commands]
       (when-not (every? string? test-command)
-        (binding [*out* *err*]
-          (println "Invalid :test-command, contains non-string value:" test-command)
-          (lmain/abort))))
+        (lmain/abort
+          "Invalid :test-command, contains non-string value:" test-command)))
     (when (empty? (:shell (second (first parsed-tests))))
       (println (str "Could not locate test command " (first args) "."))
       (lmain/abort))
