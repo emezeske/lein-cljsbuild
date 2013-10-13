@@ -3,9 +3,11 @@
 ## [0.3.4](https://github.com/emezeske/lein-cljsbuild/issues?milestone=31&state=closed)
 
 * Added new `sample` subtask that emits the contents of the `sample.project.clj`
-  details cljsbuild's options (gh-232)
-* _Clojure_ compilation failures now properly fail the broader Leiningen
+  file detailing cljsbuild's options (gh-232)
+* Hard compilation failures now properly fail the broader Leiningen
   invocation (gh-234)
+* Any non-string values in a `:test-command` vector now properly cause a failure
+  (gh-243)
 * The `:output-wrapper` ClojureScript compiler option is now defaulted to `true`
   if the `:optimizations` option is set to `:advanced` (gh-201)
 * Fixed an issue where case-sensitivity of the drive letter on windows prevented
