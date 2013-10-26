@@ -77,7 +77,8 @@
                             (:parsed-notify-command build#)
                             (:incremental build#)
                             (:assert build#)
-                            mtimes#)))]
+                            mtimes#
+                            ~watch?)))]
                  (when ~watch?
                    (Thread/sleep 100)
                    (recur new-dependency-mtimes#))))))))))

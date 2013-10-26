@@ -43,7 +43,7 @@
   (-compile [_ opts]
     (mapcat #(closure/-compile % opts) paths)))
 
-(defn- compile-cljs [cljs-paths compiler-options notify-command incremental? assert?]
+(defn- compile-cljs [cljs-paths compiler-options notify-command incremental? assert? watching?]
   (let [output-file (:output-to compiler-options)
         output-file-dir (fs/parent output-file)]
     (println (str "Compiling \"" output-file "\" from " (pr-str cljs-paths) "..."))
@@ -63,7 +63,9 @@
           (notify-cljs
             notify-command
             (str "Compiling \"" output-file "\" failed.") red)
-          (throw e))))))
+          (if watching?
+            (pst+ e)
+            (throw e)))))))
 
 (defn- get-mtimes [paths]
   (into {}
@@ -113,7 +115,7 @@
 
 (defn run-compiler [cljs-paths crossover-path crossover-macro-paths
                     compiler-options notify-command incremental?
-                    assert? last-dependency-mtimes]
+                    assert? last-dependency-mtimes watching?]
   (let [compiler-options (merge {:output-wrapper (= :advanced (:optimizations compiler-options))}
                                 compiler-options)
         output-file (:output-to compiler-options)
@@ -153,5 +155,5 @@
                 (map (partial relativize cljs-path) clj-files)))
             compiler-options notify-command))
         (when (or (seq macro-modified) (seq clj-modified) (seq cljs-modified) (seq js-modified))
-          (compile-cljs cljs-paths compiler-options notify-command incremental? assert?))))
+          (compile-cljs cljs-paths compiler-options notify-command incremental? assert? watching?))))
     dependency-mtimes))

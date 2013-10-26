@@ -44,7 +44,8 @@
     notify-command
     incremental?
     assert?
-    {}) => (just {cljs-file-a mtime
+    {}
+    false) => (just {cljs-file-a mtime
                   cljs-file-b mtime
                   crossover-file mtime
                   crossover-macro-absolute mtime})

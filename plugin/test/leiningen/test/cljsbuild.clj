@@ -30,6 +30,7 @@
 (def source-paths ["source-path-a" "source-path-b"])
 (def incremental? false)
 (def assert? false)
+(def watch? false)
 
 (def compiler
   {:output-to "target/output-to"
@@ -110,7 +111,8 @@
         anything
         incremental?
         assert?
-        {}) => nil :times 1)))
+        {}
+        watch?) => nil :times 1)))
 
 (fact "bad build IDs are detected"
   (with-mocks
@@ -143,7 +145,8 @@
       anything
       incremental?
       assert?
-      {}) => nil :times 1))
+      {}
+      watch?) => nil :times 1))
 
 (fact "compile-hook does not call through to the compiler when task fails"
   (with-mocks
@@ -155,6 +158,7 @@
       anything
       anything) => nil :times 0
     (cljsbuild.compiler/run-compiler
+      anything
       anything
       anything
       anything
@@ -190,7 +194,8 @@
           anything
           incremental?
           assert?
-          {}) => nil :times 1
+          {}
+          watch?) => nil :times 1
         (cljsbuild.test/run-tests parsed-commands) => nil :times 1)))
 
 (defmacro with-repl-env [& forms]
