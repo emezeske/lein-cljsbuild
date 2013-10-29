@@ -103,11 +103,9 @@
     (when (empty? (:shell (second (first parsed-tests))))
       (println (str "Could not locate test command " (first args) "."))
       (lmain/abort))
-    (doseq [[test-name test-cmd] parsed-tests]
-      (println "Running ClojureScript test:" test-name)
-      (run-local-project project crossover-path builds
-                         '(require 'cljsbuild.test)
-                         `(cljsbuild.test/run-tests '~(list test-cmd))))))
+    (run-local-project project crossover-path builds
+                       '(require 'cljsbuild.test)
+                       `(cljsbuild.test/run-tests '~parsed-tests))))
 
 (defmacro require-trampoline [& forms]
   `(if ltrampoline/*trampoline?*

@@ -12,7 +12,9 @@
 
 (defn run-tests [test-commands]
   (let [success (every? #(= % 0)
-                  (dofor [test-command test-commands]
-                    (util/sh test-command)))]
+                        (dofor [[test-name test-command] test-commands]
+                          (do
+                            (println "Running ClojureScript test:" test-name)
+                            (util/sh test-command))))]
     (when (not success)
       (throw (cljsbuild.test.TestsFailedException. "Test failed.")))))
