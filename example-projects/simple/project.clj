@@ -4,10 +4,10 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-1859"
                   :exclusions [org.apache.ant/ant]]
-                 [compojure "1.0.4"]
-                 [hiccup "1.0.0"]]
+                 [compojure "1.1.6"]
+                 [hiccup "1.0.4"]]
   :plugins [[lein-cljsbuild "0.3.4"]
-            [lein-ring "0.7.0"]]
+            [lein-ring "0.8.7"]]
   :cljsbuild {
     :builds [{:source-paths ["src-cljs"]
               :compiler {:output-to "resources/public/js/main.js"
