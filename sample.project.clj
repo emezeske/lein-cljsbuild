@@ -18,10 +18,9 @@
   ; The standard Leiningen :source-paths option is used by
   ; lein-cljsbuild to determine the source directory from which
   ; crossover files will be copied.  Leiningen defaults to ["src"].
-  ; If you use a bREPL connection (e.g. lein trampoline cljsbuild
-  ; repl-listen) you need to add to the Leiningen :source-paths any
-  ; pathname configured in the cljsbuild :source-paths for the build
-  ; used to bREPL with the project.
+  ; The rule of thumb is that the Leiningen :source-paths needs to be
+  ; valued as the superset of all of the pathnames valued in the
+  ; :source-paths in each cljsbuild build.
   :source-paths ["src-clj"]
   ; This is required for lein-cljsbuild to hook into the default Leningen
   ; tasks, e.g. the "lein compile", "lein clean", and "lein jar" tasks.
