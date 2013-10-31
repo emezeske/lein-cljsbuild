@@ -15,8 +15,15 @@ To play around with this example project, you will first need
 
 Set up and start the server like this:
 
-    $ lein deps
+    $ cd example-projects/advanced
     $ lein ring server-headless 3000
+
+> NOTE 1: You do not need to issue the `lein cljsbuild once`
+> subtask. This is because `cljsbuild` has been hooked to `lein` tasks
+> in the `project.clj` (i.e. `:hooks [leiningen.cljsbuild]`). This way
+> when the above `lein ring server-headless 3000` subtask is executed,
+> it implicitly executes the `lein compile` task which, in turn,
+> implicitly executes the `lein cljsbuild once` subtask as well.
 
 Now, point your web browser at `http://localhost:3000`, and see the web app in action!
 
