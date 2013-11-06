@@ -63,13 +63,14 @@
           (when ~watch?
             (cljsbuild.util/once-every-bg 1000 "copying crossovers" copy-crossovers#))
           (let [crossover-macro-paths# (cljsbuild.crossover/crossover-macro-paths '~crossovers)
-                builds# '~parsed-builds]
+                builds# (map vector '~parsed-builds (repeatedly cljs.env/default-compiler-env))]
             (loop [dependency-mtimes# (repeat (count builds#) {})]
               (let [builds-mtimes# (map vector builds# dependency-mtimes#)
                     new-dependency-mtimes#
                       (doall
-                        (for [[build# mtimes#] builds-mtimes#]
-                          (cljsbuild.compiler/run-compiler
+                       (for [[[build# compiler-env#] mtimes#] builds-mtimes#]
+                         (binding [cljs.env/*compiler* compiler-env#]
+                           (cljsbuild.compiler/run-compiler
                             (:source-paths build#)
                             ~crossover-path
                             crossover-macro-paths#
@@ -78,7 +79,7 @@
                             (:incremental build#)
                             (:assert build#)
                             mtimes#
-                            ~watch?)))]
+                            ~watch?))))]
                  (when ~watch?
                    (Thread/sleep 100)
                    (recur new-dependency-mtimes#))))))))))
