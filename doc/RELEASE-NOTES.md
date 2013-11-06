@@ -1,13 +1,15 @@
 # Release Notes for lein-cljsbuild
 
-## [1.0.0](https://github.com/emezeske/lein-cljsbuild/issues?milestone=31&state=closed)
+## [1.0.0-alpha1](https://github.com/emezeske/lein-cljsbuild/issues?milestone=29&state=closed)
 
 * The name of each `:test-command` entry is now printed prior to that test being
   run. (gh-244)
 * Fixed regression where `cljsbuild auto` would exit on a compilation error
   (gh-249)
+* Fixed regression where tests would halt on a failing `:test-command`, rather
+  than proceeding through all. (gh-252)
 
-## [0.3.4](https://github.com/emezeske/lein-cljsbuild/issues?milestone=31&state=closed)
+## [0.3.4](https://github.com/emezeske/lein-cljsbuild/issues?milestone=32&state=closed)
 
 * Added new `sample` subtask that emits the contents of the `sample.project.clj`
   file detailing cljsbuild's options (gh-232)
