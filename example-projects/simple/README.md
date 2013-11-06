@@ -11,7 +11,7 @@ To play around with this example project, you will first need
 
 Set up and start the server like this:
 
-    $ lein deps
+    $ cd example-projects/simple
     $ lein cljsbuild once
     $ lein ring server-headless 3000
 
