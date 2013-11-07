@@ -1,13 +1,16 @@
 (defproject cljsbuild-example-advanced "1.0.0-alpha1"
   :description "An advanced example of how to use lein-cljsbuild"
-  :source-paths ["src-clj"]
+  ; add src-cljs to Leiningen :source-paths
+  :source-paths ["src-clj" "src-cljs"]
+  ; add test-cljs to Leiningen :test-paths
+  :test-paths ["test" "test-cljs"]  
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-1859"
                   :exclusions [org.apache.ant/ant]]
                  [compojure "1.1.6"]
                  [hiccup "1.0.4"]]
   :plugins [[lein-cljsbuild "1.0.0-alpha1"]
-            [lein-ring "0.8.7"]]
+            [lein-ring "0.8.8"]]
   ; Enable the lein hooks for: clean, compile, test, and jar.
   :hooks [leiningen.cljsbuild]
   :cljsbuild {
@@ -54,7 +57,7 @@
       ; useful when debugging the app.
       :dev
       {:source-paths ["src-cljs"]
-       :jar true
+       ; :jar true ; don't do this when adding CLJS code to Leiningen :source-paths
        :compiler {:output-to "resources/public/js/main-debug.js"
                   :optimizations :whitespace
                   :pretty-print true}}
