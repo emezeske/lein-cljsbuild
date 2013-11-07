@@ -7,7 +7,7 @@ test:
 
 ```clj
 (defproject lein-cljsbuild-example "1.2.3"
-  :plugins [[lein-cljsbuild "1.0.0-alpha1"]]
+  :plugins [[lein-cljsbuild "1.0.0-alpha2"]]
   :cljsbuild {
     :test-commands
       {"my-test" ["phantomjs" "phantom/unit-test.js" "..."]})
@@ -38,7 +38,7 @@ browser to do, except it does not have a GUI.  PhantomJS can be automated via Ja
 and thus is convenient to use for running automated tests.
 
 The
-[advanced example project] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.0-alpha1/example-projects/advanced)
+[advanced example project] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.0-alpha2/example-projects/advanced)
 contains an example of how to use PhantomJS for running ClojureScript tests.  There are several
 components that come together to make this work:
 
@@ -46,10 +46,10 @@ components that come together to make this work:
 the unit tests into JavaScript (so that it they can be run by PhantomJS).
 
 2. A
-[static HTML page] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.0-alpha1/example-projects/advanced/resources/private/html/unit-test.html)
+[static HTML page] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.0-alpha2/example-projects/advanced/resources/private/html/unit-test.html)
 with a `<script>` tag that will pull in the compiled unit test code when the page is loaded.
 
 3. A `:test-commands` entry that runs PhantomJS, passing it
-[a simple script] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.0-alpha1/example-projects/advanced/phantom/unit-test.js)
+[a simple script] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.0-alpha2/example-projects/advanced/phantom/unit-test.js)
 .  This script directs PhantomJS to load the static HTML page, and once it's loaded,
 to call the ClojureScript unit test entry point.
