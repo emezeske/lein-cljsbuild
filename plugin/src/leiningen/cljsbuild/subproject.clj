@@ -71,6 +71,7 @@
                      (:source-paths project)
                      (mapcat :source-paths builds)
                      [crossover-path])
+     :jvm-opts ["-Xmx256m"]
      :resource-paths (:resource-paths project)
      :checkout-deps-shares (:checkout-deps-shares project)
      :eval-in (:eval-in project)}
