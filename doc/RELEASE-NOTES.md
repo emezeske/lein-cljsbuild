@@ -1,5 +1,17 @@
 # Release Notes for lein-cljsbuild
 
+## [1.0.0-alpha2](https://github.com/emezeske/lein-cljsbuild/issues?milestone=33&page=1&state=closed)
+
+* ClojureScript `0.0-2014` is now the default release added to projects that do
+  not specify a ClojureScript dependency explicitly.  Further, this version of
+  ClojureScript is now a **minimum requirement**; if upgrading to `0.0-2014` is
+  not possible for some reason, you must stick with prior revisions of
+  lein-cljsbuild. (gh-253, gh-264)
+* lein-cljsbuild will now halt your build if you are declaring a ClojureScript
+  dependency that is known to be incompatible with the version of lein-cljsbuild
+  you are using. (gh-266)
+* All tasks are now run with a max Java heap of 256MB. (gh-261)
+
 ## [1.0.0-alpha1](https://github.com/emezeske/lein-cljsbuild/issues?milestone=29&state=closed)
 
 * The name of each `:test-command` entry is now printed prior to that test being
