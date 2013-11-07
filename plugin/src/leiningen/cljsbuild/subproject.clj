@@ -76,7 +76,7 @@
                  "dependency. One will be provided for you by lein-cljsbuild, but it"
                  "is strongly recommended that you add your own.  You can find a list"
                  "of all ClojureScript releases here:")
-        (println "http://search.maven.org/#search|ga|1|g%3A%22org.clojure%22%20AND%20a%3A%22clojurescript%22")
+        (println "http://search.maven.org/#search|gav|1|g%3A%22org.clojure%22%20AND%20a%3A%22clojurescript%22")
         (when acceptable-cljs-range (apply println cljs-version-message))
         (println "\033[0m")))
      
