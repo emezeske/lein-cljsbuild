@@ -48,7 +48,13 @@
                           required-clojure-version))))))
 
 (defn dependency-map [dependency-vec]
-  (into {} (map (juxt first rest) dependency-vec)))
+  (apply array-map (mapcat (juxt first rest) dependency-vec)))
+
+(defn array-map-assoc
+  "As assoc, except that it preserves the ArrayMap's ordering. If the key is not
+  already in the array map, it is put at the end of the array map."
+  [amap k v]
+  (apply array-map (apply concat (concat (seq amap) [[k v]]))))
 
 (defn merge-dependencies [project-dependencies]
   (let [project (dependency-map project-dependencies)
@@ -79,9 +85,8 @@
         (println "http://search.maven.org/#search|gav|1|g%3A%22org.clojure%22%20AND%20a%3A%22clojurescript%22")
         (when acceptable-cljs-range (apply println cljs-version-message))
         (println "\033[0m")))
-     
-    (map (fn [[k v]] (vec (cons k v)))
-      (merge cljsbuild project))))
+    (->> (reduce-kv array-map-assoc project cljsbuild)
+         (map (fn [[k v]] (vec (cons k v)))))))
 
 (defn make-subproject [project crossover-path builds]
   (with-meta
