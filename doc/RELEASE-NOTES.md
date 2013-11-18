@@ -1,5 +1,9 @@
 # Release Notes for lein-cljsbuild
 
+## 1.0.0
+
+No changes since `1.0.0-alpha2`.
+
 ## [1.0.0-alpha2](https://github.com/emezeske/lein-cljsbuild/issues?milestone=33&page=1&state=closed)
 
 * ClojureScript `0.0-2014` is now the default release added to projects that do
