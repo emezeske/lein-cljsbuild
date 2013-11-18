@@ -1,7 +1,8 @@
 (ns cljsbuild.compat
   (:use clojure.test))
 
-(def matrix {"1.0.0-SNAPSHOT" {:cljs ["0.0-2014"]}
+(def matrix {"1.0.0" {:cljs ["0.0-2014"]}
+             "1.0.0-SNAPSHOT" {:cljs ["0.0-2014"]}
              "1.0.0-alpha2" {:cljs ["0.0-2014"]}})
 
 (defn parse-version
