@@ -56,6 +56,7 @@
       (try
         (binding [*assert* assert?]
           (build (SourcePaths. cljs-paths) compiler-options))
+        (fs/touch output-file (/ started-at 1000000))
         (notify-cljs
           notify-command
           (str "Successfully compiled \"" output-file "\" in " (elapsed started-at) ".") green)
