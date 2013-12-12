@@ -1,5 +1,15 @@
 # Release Notes for lein-cljsbuild
 
+## [1.0.1](https://github.com/emezeske/lein-cljsbuild/issues?milestone=34&page=1&state=closed)
+
+* Output files are now touched to change their mtime to match when the last
+  compilation was _started_, so that `cljsbuild auto` will pick up any source
+  file modifications made during the compile (gh-277)
+* `:jvm-opts` defined in `project.clj` is now used in all lein-cljsbuild tasks
+  (gh-271)
+* The order of project dependencies as specified in `project.clj` is now
+  preserved for the duration of all lein-cljsbuild tasks (gh-268)
+
 ## 1.0.0
 
 No changes since `1.0.0-alpha2`.
