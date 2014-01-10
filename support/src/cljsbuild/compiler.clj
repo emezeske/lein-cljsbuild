@@ -52,11 +52,11 @@
       (fs/delete-dir (:output-dir compiler-options)))
     (when output-file-dir
       (fs/mkdirs output-file-dir))
-    (let [started-at (System/nanoTime)]
+    (let [started-at (System/currentTimeMillis)]
       (try
         (binding [*assert* assert?]
           (build (SourcePaths. cljs-paths) compiler-options))
-        (fs/touch output-file (/ started-at 1000000))
+        (fs/touch output-file started-at)
         (notify-cljs
           notify-command
           (str "Successfully compiled \"" output-file "\" in " (elapsed started-at) ".") green)
