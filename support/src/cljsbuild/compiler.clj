@@ -23,9 +23,9 @@
 (def green (colorizer foreground-green))
 
 (defn- elapsed [started-at]
-  (let [elapsed-us (- (. System (nanoTime)) started-at)]
+  (let [elapsed-us (- (System/currentTimeMillis) started-at)]
     (with-precision 2
-      (str (/ (double elapsed-us) 1000000000) " seconds"))))
+      (str (/ (double elapsed-us) 1000) " seconds"))))
 
 (defn- notify-cljs [command message colorizer]
   (when (seq (:shell command))
