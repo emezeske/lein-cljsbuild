@@ -60,7 +60,7 @@ between them.  To configure a launch preset, add an entry to the `:repl-launch-c
 
 ```clj
 (defproject lein-cljsbuild-example "1.2.3"
-  :plugins [[lein-cljsbuild "1.0.2-SNAPSHOT"]]
+  :plugins [[lein-cljsbuild "1.0.2"]]
   :cljsbuild {
     :repl-listen-port 9000
     :repl-launch-commands
@@ -99,7 +99,7 @@ treated as an option map.  Currently, the only supported options are
 ```
 
 For more ideas on how to use `repl-launch`, take a look at the
-[advanced example project] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.2-SNAPSHOT/example-projects/advanced)
+[advanced example project] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.2/example-projects/advanced)
 It has several examples of useful launch commands, with descriptions in its README.
 Note that, in particular, the possibilities with
 [PhantomJS] (http://www.phantomjs.org)
