@@ -1,5 +1,14 @@
 # Release Notes for lein-cljsbuild
 
+## [1.0.2](https://github.com/emezeske/lein-cljsbuild/issues?milestone=35&page=1&state=closed)
+
+* ClojureScript `0.0-2156` is now the default release added to projects that do
+  not specify a ClojureScript dependency explicitly.
+* Crossovers are now officially deprecated, and will be removed in future
+  releases.  Please use [cljx](http://github.com/lynaghk/cljx) to target both
+  Clojure and ClojureScript from the same codebase.
+* Fixed timestamps applied to compiled output files (gh-281, gh-282)
+
 ## [1.0.1](https://github.com/emezeske/lein-cljsbuild/issues?milestone=34&page=1&state=closed)
 
 * Output files are now touched to change their mtime to match when the last
