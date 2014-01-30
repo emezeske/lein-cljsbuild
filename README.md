@@ -9,7 +9,11 @@ Beyond basic compiler support, lein-cljsbuild can optionally help with a few oth
 
 * [Launching REPLs for interactive development] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.2-SNAPSHOT/doc/REPL.md)
 * [Launching ClojureScript tests] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.2-SNAPSHOT/doc/TESTING.md)
-* [Sharing code between Clojure and ClojureScript] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.2-SNAPSHOT/doc/CROSSOVERS.md)
+* Sharing code between Clojure and ClojureScript: use
+  [cljx](http://github.com/lynaghk/cljx) to target both Clojure and
+  ClojureScript from the same codebase. ([cljsbuild
+  crossovers](https://github.com/emezeske/lein-cljsbuild/blob/1.0.2-SNAPSHOT/doc/CROSSOVERS.md)
+  are _deprecated_, and will be removed in v2.x [coming later in 2014].)
 
 The latest version of lein-cljsbuild is `1.0.2-SNAPSHOT`.
 [See the release notes here.](https://github.com/emezeske/lein-cljsbuild/blob/1.0.2-SNAPSHOT/doc/RELEASE-NOTES.md)
@@ -126,15 +130,6 @@ the ClojureScript as well if enabled.
 :jar true
 ```
 
-If you are using the
-[crossovers] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.2-SNAPSHOT/doc/CROSSOVERS.md)
-feature, and want the `:crossover-path` included in the JAR file, add this entry to your
-top-level `:cljsbuild` configuration:
-
-```clj
-:crossover-jar true
-```
-
 ## Multiple Build Configurations
 
 If the `:builds` sequence contains more than one map lein-cljsbuild
@@ -208,13 +203,6 @@ for more details.
 
 Lein-cljsbuild has built-in support for running external ClojureScript test processes.  See the
 [testing documentation] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.2-SNAPSHOT/doc/TESTING.md)
-for more details.
-
-## Sharing Code Between Clojure and ClojureScript
-
-Sharing code with lein-cljsbuild is accomplished via the configuration
-of "crossovers".  See the
-[crossovers documentation] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.2-SNAPSHOT/doc/CROSSOVERS.md)
 for more details.
 
 ## ClojureScript Version

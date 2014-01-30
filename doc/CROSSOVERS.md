@@ -1,5 +1,9 @@
 # Sharing Code Between Clojure and ClojureScript
 
+**Note: cljsbuild crossovers are _deprecated_, and will be removed in v2.x
+(coming later in 2014). Please use [cljx](http://github.com/lynaghk/cljx) to
+target both Clojure and ClojureScript from the same codebase.**
+
 Sharing code with lein-cljsbuild is accomplished via the configuration
 of "crossovers".  A crossover specifies a Clojure namespace, the content
 of which should be copied into your ClojureScript project.  This can be any

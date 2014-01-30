@@ -44,6 +44,7 @@
   ; If crossover-path does not exist before eval-in-project is called,
   ; the files it contains won't be classloadable, for some reason.
   (when (not-empty crossovers)
+    (println "\033[31mWARNING: lein-cljsbuild crossovers are deprecated, and will be removed in future versions. See https://github.com/emezeske/lein-cljsbuild/blob/master/doc/CROSSOVERS.md for details.\033[0m")
     (fs/mkdirs crossover-path))
   (let [filtered-builds (if (empty? build-ids)
                           builds
