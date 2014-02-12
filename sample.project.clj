@@ -96,6 +96,11 @@
           ; The optimization level.  May be :whitespace, :simple, or :advanced.
           ; Defaults to :whitespace.
           :optimizations :whitespace
+          ; This flag will cause all (assert x) calls to be removed during compilation
+          ; Useful for production. Default is always false even in advanced compilation.
+          ; Does NOT specify goog.asserts.ENABLE_ASSERTS which is different and used by
+          ; the closure library.
+          :elide-asserts true
           ; Determines whether the JavaScript output will be tabulated in
           ; a human-readable manner.  Defaults to true.
           :pretty-print true
