@@ -108,6 +108,11 @@
           ; can be used to determine the original source of the compiled code.
           ; Defaults to false.
           :print-input-delimiter false
+          ; If targeting nodejs add this line. Takes no other options at the moment.
+          :target :nodejs
+          ; See
+          ; https://github.com/clojure/clojurescript/wiki/Source-maps
+          :source-map "resources/public/js/main.js.map"
           ; Sets the output directory for temporary files used during
           ; compilation.  Must be unique among all :builds. Defaults to
           ; "target/cljsbuild-compiler-X" (where X is a unique integer).
