@@ -85,7 +85,7 @@
         (println "http://search.maven.org/#search|gav|1|g%3A%22org.clojure%22%20AND%20a%3A%22clojurescript%22")
         (when acceptable-cljs-range (apply println cljs-version-message))
         (println "\033[0m")))
-    (->> (reduce-kv array-map-assoc project cljsbuild)
+    (->> (reduce-kv array-map-assoc cljsbuild project)
          (map (fn [[k v]] (vec (cons k v)))))))
 
 (defn make-subproject [project crossover-path builds]
