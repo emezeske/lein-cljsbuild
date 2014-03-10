@@ -8,6 +8,7 @@
     [cljs.analyzer :as analyzer]
     [cljs.closure :as closure]
     [clojure.string :as string]
+    [clojure.set :as set]
     [clojure.java.io :as io]
     [fs.core :as fs]))
 
@@ -114,47 +115,64 @@
           (str "Reloading Clojure file \"" path "\" failed.") red)
         (pst+ e)))))
 
-(defn run-compiler [cljs-paths crossover-path crossover-macro-paths
-                    compiler-options notify-command incremental?
-                    assert? last-dependency-mtimes watching?]
-  (let [compiler-options (merge {:output-wrapper (= :advanced (:optimizations compiler-options))}
-                                compiler-options)
-        output-file (:output-to compiler-options)
-        lib-paths (:libs compiler-options)
-        output-mtime (if (fs/exists? output-file) (fs/mod-time output-file) 0)
-        macro-files (map :absolute crossover-macro-paths)
-        macro-classpath-files (into {} (map vector macro-files (map :classpath crossover-macro-paths)))
-        clj-files-in-cljs-paths
-          (into {}
-            (for [cljs-path cljs-paths]
-              [cljs-path (util/find-files cljs-path #{"clj"})]))
-        cljs-files (mapcat #(util/find-files % #{"cljs"}) (conj cljs-paths crossover-path))
-        js-files (->> lib-paths
-                      (mapcat #(util/find-files % #{"js"}))
-                      ; Don't include js files in output-dir or our output file itself,
-                      ; both possible if :libs is set to [""] (a cljs compiler workaround to
-                      ; load all libraries without enumerating them, see
-                      ; http://dev.clojure.org/jira/browse/CLJS-526)
-                      (remove #(.startsWith ^String % (:output-dir compiler-options)))
-                      (remove #(.endsWith ^String % (:output-to compiler-options))))
-        macro-mtimes (get-mtimes macro-files)
-        clj-mtimes (get-mtimes (mapcat second clj-files-in-cljs-paths))
-        cljs-mtimes (get-mtimes cljs-files)
-        js-mtimes (get-mtimes js-files)
-        dependency-mtimes (merge macro-mtimes clj-mtimes cljs-mtimes js-mtimes)]
-    (when (not= last-dependency-mtimes dependency-mtimes)
-      (let [macro-modified (list-modified output-mtime macro-mtimes)
-            clj-modified (list-modified output-mtime clj-mtimes)
-            cljs-modified (list-modified output-mtime cljs-mtimes)
-            js-modified (list-modified output-mtime js-mtimes)]
-        (when (seq macro-modified)
-          (reload-clojure (map macro-classpath-files macro-modified) compiler-options notify-command))
-        (when (seq clj-modified)
-          (reload-clojure
-            (apply concat
-              (for [[cljs-path clj-files] clj-files-in-cljs-paths]
-                (map (partial relativize cljs-path) clj-files)))
-            compiler-options notify-command))
-        (when (or (seq macro-modified) (seq clj-modified) (seq cljs-modified) (seq js-modified))
-          (compile-cljs cljs-paths compiler-options notify-command incremental? assert? watching?))))
-    dependency-mtimes))
+(defn union-extensions
+  [default source-extensions]
+  {:pre (set? source-extensions)}
+  (if-not (:replace (meta source-extensions))
+    (set/union default source-extensions)
+    source-extensions))
+
+(defn run-compiler
+  ([cljs-paths crossover-path crossover-macro-paths
+    compiler-options notify-command incremental?
+    assert? last-dependency-mtimes watching?]
+     (run-compiler cljs-paths crossover-path crossover-macro-paths
+                   #{} compiler-options notify-command
+                   incremental? assert? last-dependency-mtimes
+                   watching?))
+  ([cljs-paths crossover-path crossover-macro-paths
+    source-exts compiler-options notify-command
+    incremental?  assert? last-dependency-mtimes
+    watching?]
+     (let [compiler-options (merge {:output-wrapper (= :advanced (:optimizations compiler-options))}
+                                   compiler-options)
+           output-file (:output-to compiler-options)
+           lib-paths (:libs compiler-options)
+           output-mtime (if (fs/exists? output-file) (fs/mod-time output-file) 0)
+           macro-files (map :absolute crossover-macro-paths)
+           macro-classpath-files (into {} (map vector macro-files (map :classpath crossover-macro-paths)))
+           clj-files-in-cljs-paths
+           (into {}
+                 (for [cljs-path cljs-paths]
+                   [cljs-path (util/find-files cljs-path #{"clj"})]))
+           cljs-files (mapcat #(util/find-files % (union-extensions #{"cljs"} source-exts))
+                              (conj cljs-paths crossover-path))
+           js-files (->> lib-paths
+                         (mapcat #(util/find-files % #{"js"}))
+                                        ; Don't include js files in output-dir or our output file itself,
+                                        ; both possible if :libs is set to [""] (a cljs compiler workaround to
+                                        ; load all libraries without enumerating them, see
+                                        ; http://dev.clojure.org/jira/browse/CLJS-526)
+                         (remove #(.startsWith ^String % (:output-dir compiler-options)))
+                         (remove #(.endsWith ^String % (:output-to compiler-options))))
+           macro-mtimes (get-mtimes macro-files)
+           clj-mtimes (get-mtimes (mapcat second clj-files-in-cljs-paths))
+           cljs-mtimes (get-mtimes cljs-files)
+           js-mtimes (get-mtimes js-files)
+           dependency-mtimes (merge macro-mtimes clj-mtimes cljs-mtimes js-mtimes)]
+       (when (not= last-dependency-mtimes dependency-mtimes)
+         (let [macro-modified (list-modified output-mtime macro-mtimes)
+               clj-modified (list-modified output-mtime clj-mtimes)
+               cljs-modified (list-modified output-mtime cljs-mtimes)
+               js-modified (list-modified output-mtime js-mtimes)]
+           (when (seq macro-modified)
+             (reload-clojure (map macro-classpath-files macro-modified) compiler-options notify-command))
+           (when (seq clj-modified)
+             (reload-clojure
+              (apply concat
+                     (for [[cljs-path clj-files] clj-files-in-cljs-paths]
+                       (map (partial relativize cljs-path) clj-files)))
+              compiler-options notify-command))
+           (when (or (seq macro-modified) (seq clj-modified) (seq cljs-modified) (seq js-modified))
+             (compile-cljs cljs-paths compiler-options notify-command incremental? assert? watching?))))
+       dependency-mtimes)))

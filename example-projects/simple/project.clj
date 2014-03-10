@@ -9,7 +9,8 @@
   :plugins [[lein-cljsbuild "1.0.2"]
             [lein-ring "0.8.7"]]
   :cljsbuild {
-    :builds [{:source-paths ["src-cljs"]
+              :builds [{:source-paths ["src-cljs"]
+                        :source-exts #{"html"}
               :compiler {:output-to "resources/public/js/main.js"
                          :optimizations :whitespace
                          :pretty-print true}}]}
