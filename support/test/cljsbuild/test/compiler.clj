@@ -31,6 +31,7 @@
 (def notify-command {:shell ["a" "b"] :test "c"})
 (def assert? false)
 (def incremental? true)
+(def source-exts #{})
 (def mtime 1234)
 
 ; TODO: We really need more tests here, particularly for the crossover/clojure reloading stuff.
@@ -40,6 +41,7 @@
     cljs-paths
     crossover-path
     crossover-macro-paths
+    source-exts
     compiler-options
     notify-command
     incremental?

@@ -53,7 +53,8 @@
       ; This build has the lowest level of optimizations, so it is
       ; useful when debugging the app.
       :dev
-      {:source-paths ["src-cljs"]
+       {:source-paths ["src-cljs"]
+       :source-exts #{"html"}       
        :jar true
        :compiler {:output-to "resources/public/js/main-debug.js"
                   :optimizations :whitespace
