@@ -1,7 +1,9 @@
 (ns cljsbuild.compat
   (:use clojure.test))
 
-(def matrix {"1.0.3-SNAPSHOT" {:cljs ["0.0-2014"]}
+; ranges are *inclusive* on both ends
+(def matrix {"1.0.3" {:cljs ["0.0-2197"]}
+             "1.0.3-SNAPSHOT" {:cljs ["0.0-2197"]}
              "1.0.2" {:cljs ["0.0-2014"]}
              "1.0.2-SNAPSHOT" {:cljs ["0.0-2014"]}
              "1.0.1" {:cljs ["0.0-2014"]}
