@@ -10,7 +10,7 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  ; Your project should specify its own dependency on
                  ; ClojureScript
-                 [org.clojure/clojurescript "0.0-1859"
+                 [org.clojure/clojurescript "0.0-2197"
                   :exclusions [org.apache.ant/ant]]]
   ; Your project should plugin-depend on lein-cljsbuild, to ensure that
   ; the right version of the plugin is installed.

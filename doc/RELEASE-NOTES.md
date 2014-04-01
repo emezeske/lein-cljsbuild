@@ -1,5 +1,17 @@
 # Release Notes for lein-cljsbuild
 
+## [1.0.3](https://github.com/emezeske/lein-cljsbuild/issues?milestone=36&page=1&state=closed)
+
+* ClojureScript `0.0-2197` is now the default release added to projects that do
+  not specify a ClojureScript dependency explicitly, and is also the new minimum
+  required version of ClojureScript.
+* Older releases of lein-cljsbuild will only work with ClojureScript versions
+  `0.0-2014` - `0.0-2173`.
+* Fixed a problem where explicitly-specified Clojure and ClojureScript
+  dependencies were being overridden by lein-cljsbuild's defaults (gh-298)
+* The `:local-repo` `project.clj` configuration (if one exists) is now passed on
+  to subprocesses spawned by lein-cljsbuild (gh-291)
+
 ## [1.0.2](https://github.com/emezeske/lein-cljsbuild/issues?milestone=35&page=1&state=closed)
 
 * ClojureScript `0.0-2156` is now the default release added to projects that do
