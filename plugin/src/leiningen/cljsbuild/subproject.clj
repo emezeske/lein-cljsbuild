@@ -70,12 +70,12 @@
       (when-not (cljs-compat/version-in-range? (first desired-cljs-version) acceptable-cljs-range)
         (print "\033[31m")
         (apply println (concat cljs-version-message
-                               ["You are attempting to use ClojureScript"
-                                (str (first desired-cljs-version) ",")
-                                "which is not within this range. You can either change your"
-                                "ClojureScript dependency to fit in the range, or change your"
-                                "lein-cljsbuild plugin dependency to one that supports"
-                                "ClojureScript" (str (first desired-cljs-version) ".")]))
+                         ["You are attempting to use ClojureScript"
+                          (str (first desired-cljs-version) ",")
+                          "which is not within this range. You can either change your"
+                          "ClojureScript dependency to fit in the range, or change your"
+                          "lein-cljsbuild plugin dependency to one that supports"
+                          "ClojureScript" (str (first desired-cljs-version) ".")]))
         (lmain/abort "\033[0m"))
       (do
         (println "\033[33mWARNING: It appears your project does not contain a ClojureScript"
