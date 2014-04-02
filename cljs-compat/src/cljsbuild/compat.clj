@@ -2,15 +2,13 @@
   (:use clojure.test))
 
 ; ranges are *inclusive* on both ends
-(def matrix {"1.0.3" {:cljs ["0.0-2197"]}
-             "1.0.3-SNAPSHOT" {:cljs ["0.0-2197"]}
-             "1.0.2" {:cljs ["0.0-2014" "0.0-2173"]}
-             "1.0.2-SNAPSHOT" {:cljs ["0.0-2014" "0.0-2173"]}
-             "1.0.1" {:cljs ["0.0-2014" "0.0-2173"]}
-             "1.0.1-SNAPSHOT" {:cljs ["0.0-2014" "0.0-2173"]}
-             "1.0.0" {:cljs ["0.0-2014" "0.0-2173"]}
-             "1.0.0-SNAPSHOT" {:cljs ["0.0-2014" "0.0-2173"]}
-             "1.0.0-alpha2" {:cljs ["0.0-2014" "0.0-2173"]}})
+(def matrix
+  (->> {["0.0-2197"] #{"1.0.4" "1.0.4-SNAPSHOT" "1.0.3" "1.0.3-SNAPSHOT"}
+        ["0.0-2014" "0.0-2173"] #{"1.0.2" "1.0.2-SNAPSHOT" "1.0.1" "1.0.1-SNAPSHOT"
+                                  "1.0.0" "1.0.0-SNAPSHOT" "1.0.0-alpha2"}}
+    (mapcat (fn [[cljs-range cljsbuild-versions]]
+              (map #(vector % {:cljs cljs-range}) cljsbuild-versions)))
+    (into {})))
 
 (defn parse-version
   [version-string]
