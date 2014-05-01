@@ -132,4 +132,9 @@
           ; Adds dependencies on foreign libraries. Be sure that the url returns a HTTP Code 200
           ; Defaults to the empty vector [].
           :foreign-libs [{:file "http://example.com/remote.js"
-                           :provides  ["my.example"]}]}}}})
+                           :provides  ["my.example"]}]
+          ; Configure the input and output languages for the closure library.
+          ; May be :ecmascript3, ecmascript5, or ecmascript5-strict.
+          ; Defaults to ecmascript3.
+          :language-in :ecmascript5
+          :language-out :ecmascript5}}}})
