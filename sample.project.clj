@@ -132,4 +132,7 @@
           ; Adds dependencies on foreign libraries. Be sure that the url returns a HTTP Code 200
           ; Defaults to the empty vector [].
           :foreign-libs [{:file "http://example.com/remote.js"
-                           :provides  ["my.example"]}]}}}})
+                           :provides  ["my.example"]}]
+          ; Prepends the contents of the given files to each output file.
+          ; Defaults to the empty vector [].
+          :preamble ["license.js"]}}}})
