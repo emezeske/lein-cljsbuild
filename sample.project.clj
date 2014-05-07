@@ -15,9 +15,12 @@
   ; Your project should plugin-depend on lein-cljsbuild, to ensure that
   ; the right version of the plugin is installed.
   :plugins [[lein-cljsbuild "0.3.2"]]
-  ; The standard Leiningen :source-paths option is used by lein-cljsbuild
-  ; to determine the source directory from which crossover files will
-  ; be copied.  Leiningen defaults to ["src"].
+  ; The standard Leiningen :source-paths option is used by
+  ; lein-cljsbuild to determine the source directory from which
+  ; crossover files will be copied.  Leiningen defaults to ["src"].
+  ; The rule of thumb is that the Leiningen :source-paths needs to be
+  ; valued as the superset of all of the pathnames valued in the
+  ; :source-paths in each cljsbuild build.
   :source-paths ["src-clj"]
   ; This is required for lein-cljsbuild to hook into the default Leningen
   ; tasks, e.g. the "lein compile", "lein clean", and "lein jar" tasks.
