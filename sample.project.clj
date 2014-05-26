@@ -14,7 +14,7 @@
                   :exclusions [org.apache.ant/ant]]]
   ; Your project should plugin-depend on lein-cljsbuild, to ensure that
   ; the right version of the plugin is installed.
-  :plugins [[lein-cljsbuild "0.3.2"]]
+  :plugins [[lein-cljsbuild "1.0.3"]]
   ; The standard Leiningen :source-paths option is used by lein-cljsbuild
   ; to determine the source directory from which crossover files will
   ; be copied.  Leiningen defaults to ["src"].
