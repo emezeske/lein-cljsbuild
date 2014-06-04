@@ -135,4 +135,9 @@
                            :provides  ["my.example"]}]
           ; Prepends the contents of the given files to each output file.
           ; Defaults to the empty vector [].
-          :preamble ["license.js"]}}}})
+          :preamble ["license.js"]
+          ; Configure the input and output languages for the closure library.
+          ; May be :ecmascript3, ecmascript5, or ecmascript5-strict.
+          ; Defaults to ecmascript3.
+          :language-in :ecmascript5
+          :language-out :ecmascript5}}}})
