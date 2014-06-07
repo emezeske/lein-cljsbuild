@@ -143,7 +143,7 @@ and will build all of them in parallel:
   :cljsbuild {
     :builds [
       {:source-paths ["src-cljs-main"]
-       :compiler {:output-to "main.js"}
+       :compiler {:output-to "main.js"}}
       {:source-paths ["src-cljs-other"]
        :compiler {:output-to "other.js"}}]})
 ```
