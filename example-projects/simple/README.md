@@ -18,6 +18,6 @@ Set up and start the server like this:
 Now, point your web browser at `http://localhost:3000`, and see the web app in action!
 
 [1]: https://github.com/emezeske/lein-cljsbuild
-[2]: https://github.com/mmcgrana/ring
+[2]: https://github.com/ring-clojure/ring
 [3]: https://github.com/weavejester/compojure
 [4]: https://github.com/technomancy/leiningen
