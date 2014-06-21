@@ -76,6 +76,7 @@
                             (:source-paths build#)
                             ~crossover-path
                             crossover-macro-paths#
+                            (get build# :source-exts #{})
                             (:compiler build#)
                             (:parsed-notify-command build#)
                             (:incremental build#)

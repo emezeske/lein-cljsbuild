@@ -29,6 +29,7 @@
 (def build-id "build-id")
 (def source-paths ["source-path-a" "source-path-b"])
 (def incremental? false)
+(def source-exts #{})
 (def assert? false)
 (def watch? false)
 
@@ -107,6 +108,7 @@
         source-paths
         crossover-path
         crossover-macros
+        source-exts
         parsed-compiler
         anything
         incremental?
@@ -141,6 +143,7 @@
       source-paths
       crossover-path
       crossover-macros
+      source-exts
       parsed-compiler
       anything
       incremental?
@@ -158,6 +161,7 @@
       anything
       anything) => nil :times 0
     (cljsbuild.compiler/run-compiler
+      anything
       anything
       anything
       anything
@@ -190,6 +194,7 @@
           source-paths
           crossover-path
           crossover-macros
+          source-exts
           parsed-compiler
           anything
           incremental?

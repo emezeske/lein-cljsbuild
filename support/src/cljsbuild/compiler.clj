@@ -8,6 +8,7 @@
     [cljs.analyzer :as analyzer]
     [cljs.closure :as closure]
     [clojure.string :as string]
+    [clojure.set :as set]
     [clojure.java.io :as io]
     [fs.core :as fs]))
 
@@ -114,9 +115,18 @@
           (str "Reloading Clojure file \"" path "\" failed.") red)
         (pst+ e)))))
 
-(defn run-compiler [cljs-paths crossover-path crossover-macro-paths
-                    compiler-options notify-command incremental?
-                    assert? last-dependency-mtimes watching?]
+(defn union-extensions
+  [default source-extensions]
+  {:pre (set? source-extensions)}
+  (if-not (:replace (meta source-extensions))
+    (set/union default source-extensions)
+    source-extensions))
+
+(defn run-compiler
+  [cljs-paths crossover-path crossover-macro-paths
+   source-exts compiler-options notify-command
+   incremental?  assert? last-dependency-mtimes
+   watching?]
   (let [compiler-options (merge {:output-wrapper (= :advanced (:optimizations compiler-options))}
                                 compiler-options)
         output-file (:output-to compiler-options)
@@ -128,7 +138,8 @@
           (into {}
             (for [cljs-path cljs-paths]
               [cljs-path (util/find-files cljs-path #{"clj"})]))
-        cljs-files (mapcat #(util/find-files % #{"cljs"}) (conj cljs-paths crossover-path))
+        cljs-files (mapcat #(util/find-files % (union-extensions #{"cljs"} source-exts))
+                           (conj cljs-paths crossover-path))
         js-files (->> lib-paths
                       (mapcat #(util/find-files % #{"js"}))
                       ; Don't include js files in output-dir or our output file itself,
