@@ -103,6 +103,6 @@ running in the background:
     $ lein trampoline cljsbuild repl-launch phantom-naked
 
 [1]: https://github.com/emezeske/lein-cljsbuild
-[2]: https://github.com/mmcgrana/ring
+[2]: https://github.com/ring-clojure/ring
 [3]: https://github.com/weavejester/compojure
 [4]: https://github.com/technomancy/leiningen
