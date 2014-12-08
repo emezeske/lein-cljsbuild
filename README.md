@@ -103,6 +103,20 @@ automatically generated during compilation, run:
 
 If you've upgraded any libraries, you *probably* want to run `lein cljsbuild clean` afterward.
 
+### Color-coded output on Windows
+
+Colors are a big deal when reading ClojureScript compiler output, but Windows
+consoles don't support ANSI color codes.  This limitation is commonly corrected by
+installing ANSICON:
+
+1. Download and unzip [ANSICON](https://github.com/downloads/adoxa/ansicon/ansi160.zip) anywhere.
+1. Open a command prompt (Run as administrator).
+1. Navigate to the unzipped folder.
+1. cd x86 or x64 (depending on whether you have 32-bit or 64-bit machine, respectively)
+1. Run `ansicon -i` to install.
+
+Afterwards, you should get colored output from all future console sessions that use ANSI color codes.
+
 ## Hooks
 
 Some common lein-cljsbuild tasks can hook into the main Leiningen tasks
