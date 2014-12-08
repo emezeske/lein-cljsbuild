@@ -93,7 +93,11 @@
           ; This flag will turn on compiler warnings for references to
           ; undeclared vars, wrong function call arities, etc. Defaults to true.
           :warnings true
-          ; The optimization level.  May be :whitespace, :simple, or :advanced.
+          ; The optimization level.  May be :none, :whitespace, :simple, or :advanced.
+          ; :none is the recommended setting for development, while :advanced is the
+          ; recommended setting for production, unless something prevents it (incompatible
+          ; external library, bug, etc.).
+          ; :none requires manual code loading and hence a separate HTML from the other options.
           ; Defaults to :whitespace.
           :optimizations :whitespace
           ; This flag will cause all (assert x) calls to be removed during compilation
