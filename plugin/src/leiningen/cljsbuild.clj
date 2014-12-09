@@ -216,7 +216,7 @@
         "auto" (auto project options args)
         "clean" (clean project options)
         "test" (test project options args)
-        "list" (println options)
+        "list" (println (pr-str options))
         "repl-listen" (repl-listen project options)
         "repl-launch" (repl-launch project options args)
         "repl-rhino" (repl-rhino project options)
