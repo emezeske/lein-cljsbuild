@@ -129,14 +129,16 @@
             (for [cljs-path cljs-paths]
               [cljs-path (util/find-files cljs-path #{"clj"})]))
         cljs-files (mapcat #(util/find-files % #{"cljs"}) (conj cljs-paths crossover-path))
-        js-files (->> lib-paths
-                      (mapcat #(util/find-files % #{"js"}))
+        js-files (let [output-dir-str
+                       (.getAbsolutePath (io/file (:output-dir compiler-options)))]
+                   (->> lib-paths
+                        (mapcat #(util/find-files % #{"js"}))
                       ; Don't include js files in output-dir or our output file itself,
                       ; both possible if :libs is set to [""] (a cljs compiler workaround to
                       ; load all libraries without enumerating them, see
                       ; http://dev.clojure.org/jira/browse/CLJS-526)
-                      (remove #(.startsWith ^String % (:output-dir compiler-options)))
-                      (remove #(.endsWith ^String % (:output-to compiler-options))))
+                      (remove #(.startsWith ^String % output-dir-str))
+                      (remove #(.endsWith ^String % (:output-to compiler-options)))))
         macro-mtimes (get-mtimes macro-files)
         clj-mtimes (get-mtimes (mapcat second clj-files-in-cljs-paths))
         cljs-mtimes (get-mtimes cljs-files)
