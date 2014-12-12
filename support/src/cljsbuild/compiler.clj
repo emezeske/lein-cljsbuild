@@ -99,13 +99,7 @@
   ; not affect any cljs file mtimes, we have to clear the cache here to force everything
   ; to be rebuilt.
   (fs/delete-dir (:output-dir compiler-options))
-  (doseq [path paths
-          ; only Clojure files that define macros can possibly affect
-          ; ClojureScript compilation; those that don't might define the "same"
-          ; namespace as a same-named ClojureScript file, and thus interfere
-          ; with cljsc's usage of Clojure namespaces during compilation. gh-210
-          :when (-> path (string/replace #"^/" "") io/resource
-                    ^String slurp (.contains "defmacro"))]
+  (doseq [path paths]
     (try
       (load (drop-extension path))
       (catch Throwable e
