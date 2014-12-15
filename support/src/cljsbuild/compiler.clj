@@ -36,6 +36,29 @@
         (pst+ e))))
   (println (colorizer message)))
 
+(defn ns-from-file [f]
+  (try
+    (when (.exists f)
+      (with-open [rdr (io/reader f)]
+        (-> (java.io.PushbackReader. rdr)
+            read
+            second)))
+    ;; better exception here eh?
+    (catch java.lang.RuntimeException e
+      nil)))
+
+(defn cljs-target-file [opts cljs-file]
+  (let [target-dir (cljs.closure/output-directory opts)
+        ns-sym     (ns-from-file (io/file cljs-file))
+        relative-path (string/split
+                       (clojure.lang.Compiler/munge (str ns-sym))
+                       #"\.")
+        parents       (butlast relative-path)
+        path          (apply str (interpose java.io.File/separator
+                                            (cons target-dir parents)))]
+    (io/file (io/file path) 
+             (str (last relative-path) ".js"))))
+
 ;; Cannnot call build with ["src/cljs" "src/cljs-more"] cause build thinks a vector
 ;; denotes a cljs-form, so invent a new Compilable type cause thats what its expects
 (defrecord SourcePaths [paths]
@@ -93,12 +116,18 @@
       (subs path (count parent))
       path)))
 
-(defn reload-clojure [paths compiler-options notify-command]
+(defn reload-clojure [cljs-files paths compiler-options notify-command]
   ; Incremental builds will use cached JS output unless one of the cljs input files
   ; has been modified.  Since reloading a clj file *might* affect the build, but does
   ; not affect any cljs file mtimes, we have to clear the cache here to force everything
   ; to be rebuilt.
-  (fs/delete-dir (:output-dir compiler-options))
+  
+  ;; touch all cljs target files so that cljsc/build will rebuild them
+  (doseq [cljs-file cljs-files]
+    (let [target-file (cljs-target-file compiler-options cljs-file)]
+      (if (.exists target-file)
+        (.setLastModified target-file 5000))))
+
   (doseq [path paths
           ; only Clojure files that define macros can possibly affect
           ; ClojureScript compilation; those that don't might define the "same"
@@ -148,9 +177,9 @@
             cljs-modified (list-modified output-mtime cljs-mtimes)
             js-modified (list-modified output-mtime js-mtimes)]
         (when (seq macro-modified)
-          (reload-clojure (map macro-classpath-files macro-modified) compiler-options notify-command))
+          (reload-clojure cljs-files (map macro-classpath-files macro-modified) compiler-options notify-command))
         (when (seq clj-modified)
-          (reload-clojure
+          (reload-clojure cljs-files
             (apply concat
               (for [[cljs-path clj-files] clj-files-in-cljs-paths]
                 (map (partial relativize cljs-path) clj-files)))
