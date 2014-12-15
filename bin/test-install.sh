@@ -25,7 +25,6 @@ for d in $projects; do
 	if [ $d = advanced ]; then
 		extra_command=', cljsbuild test'
 	fi
-	lein clean
-	lein do cljsbuild clean, cljsbuild once$extra_command
+	lein do clean, cljsbuild once$extra_command
 	popd
 done

@@ -11,7 +11,6 @@
     cljsbuild.crossover
     cljsbuild.util
     cljsbuild.compiler
-    cljsbuild.clean
     cljsbuild.test
     cljsbuild.repl.listen
     cljsbuild.repl.rhino))
@@ -117,16 +116,6 @@
 (fact "bad build IDs are detected"
   (with-mocks
     (cljsbuild project "once" "wrong-build-id")) => (throws Exception))
-
-(fact "clean calls cleanup-files"
-  (with-mocks
-    (cljsbuild project "clean")) => nil
-  (with-mocks
-    (clean-hook hook-success project)) => nil
-  (with-mocks
-    (clean-hook hook-failure project)) => (throws Exception)
-  (against-background
-    (cljsbuild.clean/cleanup-files parsed-compiler) => nil :times 1))
 
 (fact "compile-hook calls through to the compiler when task succeeds"
   (with-mocks
