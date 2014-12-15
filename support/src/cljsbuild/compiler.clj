@@ -117,24 +117,13 @@
       path)))
 
 (defn reload-clojure [cljs-files paths compiler-options notify-command]
-  ; Incremental builds will use cached JS output unless one of the cljs input files
-  ; has been modified.  Since reloading a clj file *might* affect the build, but does
-  ; not affect any cljs file mtimes, we have to clear the cache here to force everything
-  ; to be rebuilt.
-  
   ;; touch all cljs target files so that cljsc/build will rebuild them
   (doseq [cljs-file cljs-files]
     (let [target-file (cljs-target-file compiler-options cljs-file)]
       (if (.exists target-file)
         (.setLastModified target-file 5000))))
 
-  (doseq [path paths
-          ; only Clojure files that define macros can possibly affect
-          ; ClojureScript compilation; those that don't might define the "same"
-          ; namespace as a same-named ClojureScript file, and thus interfere
-          ; with cljsc's usage of Clojure namespaces during compilation. gh-210
-          :when (-> path (string/replace #"^/" "") io/resource
-                    ^String slurp (.contains "defmacro"))]
+  (doseq [path paths]
     (try
       (load (drop-extension path))
       (catch Throwable e

@@ -7,7 +7,7 @@
      :distribution :repo}
   :dependencies
     [[org.clojure/clojure "1.5.1"]
-     [org.clojure/clojurescript "0.0-2197"
+     [org.clojure/clojurescript "0.0-2411"
        :exclusions [org.apache.ant/ant]]
      [fs "1.1.2"]
      [clj-stacktrace "0.2.5"]]
