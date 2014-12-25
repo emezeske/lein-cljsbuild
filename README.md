@@ -99,7 +99,7 @@ avoids the time-consuming JVM startup for each build:
 To delete all of the JavaScript and ClojureScript files that lein-cljsbuild
 automatically generated during compilation, run:
 
-    $ lein cljsbuild clean
+    $ lein clean
 
 If you've upgraded any libraries, you *probably* want to run `lein cljsbuild clean` afterward.
 
