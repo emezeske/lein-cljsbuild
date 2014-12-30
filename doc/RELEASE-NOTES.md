@@ -1,5 +1,15 @@
 # Release Notes for lein-cljsbuild
 
+## [1.0.4](https://github.com/emezeske/lein-cljsbuild/issues?q=milestone%3A1.0.4+is%3Aclosed)
+
+* Refactoring applied to minimize the amount of rework performed by
+  `cljsbuild auto`, yielding significant workflow responsiveness improvements
+  (gh-349, gh-348, gh-345)
+* The `cljsbuild clean` subtask is now a no-op. You should use `lein clean` to
+  remove prior compilation results, and ensure that your output configurations
+  direct those results into a Leiningen `:clean-target` (which includes
+  `./target` by default) (gh-297)
+
 ## [1.0.3](https://github.com/emezeske/lein-cljsbuild/issues?milestone=36&page=1&state=closed)
 
 * ClojureScript `0.0-2197` is now the default release added to projects that do
