@@ -96,12 +96,10 @@ avoids the time-consuming JVM startup for each build:
 
     $ lein cljsbuild auto
 
-To delete all of the JavaScript and ClojureScript files that lein-cljsbuild
-automatically generated during compilation, run:
-
-    $ lein cljsbuild clean
-
-If you've upgraded any libraries, you *probably* want to run `lein cljsbuild clean` afterward.
+Assuming you have configured cljsbuild to emit compiler output to one of
+Leiningen's `:clean-targets` (which includes `./target` by default), running
+`lein clean` will delete all of the JavaScript and ClojureScript files that lein-cljsbuild
+generates during compilation.
 
 ### Color-coded output on Windows
 
