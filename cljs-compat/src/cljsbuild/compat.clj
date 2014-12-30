@@ -18,8 +18,9 @@
     (throw (IllegalArgumentException. (str "Unparseable version: " version-string)))))
 
 (defn version-in-range?
-   [version [low high]]
-   (let [[version low high] (map parse-version [version low (or high "9.9.9-99999")])]
-     (and (<= (compare low version) 0)
-          (<= 0 (compare high version)))))
-
+  [version [low high]]
+  (if (.contains version "SNAPSHOT")
+    true
+    (let [[version low high] (map parse-version [version low (or high "9.9.9-99999")])]
+      (and (<= (compare low version) 0)
+           (<= 0 (compare high version))))))
