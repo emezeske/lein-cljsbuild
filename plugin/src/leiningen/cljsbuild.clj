@@ -71,7 +71,7 @@
                       (doall
                        (for [[[build# compiler-env#] mtimes#] builds-mtimes#]
                        (cljs.analyzer/with-warning-handlers
-                         (if-let [handler# (:exception-handlers build#)]
+                         (if-let [handler# (:warning-handlers build#)]
                            (eval handler#)
                            cljs.analyzer/*cljs-warning-handlers*)
                          (binding [cljs.env/*compiler* compiler-env#]
