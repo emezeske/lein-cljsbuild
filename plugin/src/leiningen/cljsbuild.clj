@@ -14,7 +14,8 @@
     [leiningen.test :as ltest]
     [leiningen.trampoline :as ltrampoline]
     [robert.hooke :as hooke]
-    [clojure.java.io :as io]))
+    [clojure.java.io :as io]
+    [clojure.string :as string]))
 
 (def ^:private repl-output-path "repl")
 
@@ -65,14 +66,31 @@
           (let [crossover-macro-paths# (cljsbuild.crossover/crossover-macro-paths '~crossovers)
                 builds# (for [opts# '~parsed-builds]
                           [opts# (cljs.env/default-compiler-env (:compiler opts#))])]
+            ;; Prep the environments
+            (doseq [[build# compiler-env#] builds#]
+              ;; Require any ns if necessary
+              (doseq [handler# (:warning-handlers build#)]
+                (when (symbol? handler#)
+                  (let [[n# sym#] (string/split (str handler#) #"/")]
+                    (assert (and n# sym#)
+                            (str "Symbols for :warning-handlers must be fully-qualified, " (pr-str handler#) " is missing namespace."))
+                    (when (and n# sym#)
+                      (require (symbol n#)))))))
             (loop [dependency-mtimes# (repeat (count builds#) {})]
               (let [builds-mtimes# (map vector builds# dependency-mtimes#)
                     new-dependency-mtimes#
                       (doall
                        (for [[[build# compiler-env#] mtimes#] builds-mtimes#]
                        (cljs.analyzer/with-warning-handlers
-                         (if-let [handler# (:warning-handlers build#)]
-                           (eval handler#)
+                         (if-let [handlers# (:warning-handlers build#)]
+                           ;; Prep the warning handlers via eval and
+                           ;; resolve if custom, otherwise default to
+                           ;; built-in warning handlers
+                           (mapv (fn [handler#]
+                                   ;; Resolve symbols to their fns
+                                   (if (symbol? handler#)
+                                     (resolve handler#)
+                                     handler#)) (eval handlers#))
                            cljs.analyzer/*cljs-warning-handlers*)
                          (binding [cljs.env/*compiler* compiler-env#]
                            (cljsbuild.compiler/run-compiler
