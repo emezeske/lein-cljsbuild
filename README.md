@@ -218,6 +218,27 @@ Lein-cljsbuild has built-in support for running external ClojureScript test proc
 [testing documentation] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.4/doc/TESTING.md)
 for more details.
 
+## Extended Configuration
+
+### Custom warning handlers
+
+You can place custom warning handlers for the ClojureScript compiler under the `:warning-handlers` key. The value should be a vector of either 1.) fully-qualified symbols that resolve to your custom handler, or 2.) anonymous functions that will get eval'd at project build-time.
+
+```clj
+(defproject lein-cljsbuild-example "1.2.3"
+  :plugins [[lein-cljsbuild "1.0.4"]]
+  :cljsbuild {
+    :builds {:id           "example
+             :compiler     {}
+             :warning-handlers [my.ns/custom-warning-handler ;; Fully-qualified symbol
+                                ;; Custom function (to be evaluated at project build-time)
+                                (fn [warning-type env extra]
+                                  (when-let [s (cljs.analyzer/error-message warning-type extra)]
+                                    (binding [*out* *err*]
+                                      (cljs.analyzer/message env s))))]}})
+```
+
+
 ## ClojureScript Version
 
 After configuring lein-cljsbuild, `lein deps` will fetch a known-good version of the ClojureScript compiler.
