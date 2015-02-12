@@ -70,6 +70,10 @@
                     new-dependency-mtimes#
                       (doall
                        (for [[[build# compiler-env#] mtimes#] builds-mtimes#]
+                       (cljs.analyzer/with-warning-handlers
+                         (if-let [handler# (:exception-handler build#)]
+                           (eval handler#)
+                           cljs.analyzer/*cljs-warning-handlers*)
                          (binding [cljs.env/*compiler* compiler-env#]
                            (cljsbuild.compiler/run-compiler
                             (:source-paths build#)
@@ -80,7 +84,7 @@
                             (:incremental build#)
                             (:assert build#)
                             mtimes#
-                            ~watch?))))]
+                            ~watch?)))))]
                  (when ~watch?
                    (Thread/sleep 100)
                    (recur new-dependency-mtimes#))))))))))
