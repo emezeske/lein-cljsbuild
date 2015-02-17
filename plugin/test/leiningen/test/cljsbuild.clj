@@ -7,6 +7,7 @@
     [leiningen.cljsbuild.config :as config]
     [leiningen.cljsbuild.jar :as jar]
     [leiningen.cljsbuild.subproject :as subproject]
+    [leiningen.core.main :as lmain]
     [leiningen.core.eval :as leval]
     cljsbuild.crossover
     cljsbuild.util
@@ -75,10 +76,13 @@
 (defn eval-locally [_ body _]
   (eval body))
 
-(defmacro with-mocks [& forms]
-  `(with-redefs [leval/eval-in-project eval-locally
-                 cljsbuild.util/once-every-bg (fn [_# _# _#] nil)]
-     ~@forms))
+(background
+  (around
+    :facts (with-redefs [leval/eval-in-project eval-locally
+                         cljsbuild.util/once-every-bg (fn [_# _# _#] nil)]
+             (binding [*suppress-exit?* true
+                       lmain/*exit-process?* false]
+               ?form))))
 
 (fact "fail when no arguments present"
   (cljsbuild project) => (throws Exception))
@@ -94,8 +98,7 @@
 
 (fact "once task calls the compiler correctly"
   (doseq [extra-args [[] [build-id]]]
-    (with-mocks
-      (apply cljsbuild project "once" extra-args)) => nil
+    (apply cljsbuild project "once" extra-args) => nil
     (provided
       (cljsbuild.crossover/crossover-macro-paths
         crossovers) => crossover-macros :times 1
@@ -114,12 +117,10 @@
         watch?) => nil :times 1)))
 
 (fact "bad build IDs are detected"
-  (with-mocks
-    (cljsbuild project "once" "wrong-build-id")) => (throws Exception))
+  (cljsbuild project "once" "wrong-build-id") => (throws Exception))
 
 (fact "compile-hook calls through to the compiler when task succeeds"
-  (with-mocks
-    (compile-hook hook-success project)) => nil
+  (compile-hook hook-success project) => nil
   (provided
     (cljsbuild.crossover/crossover-macro-paths
       crossovers) => crossover-macros :times 1
@@ -138,8 +139,7 @@
       watch?) => nil :times 1))
 
 (fact "compile-hook does not call through to the compiler when task fails"
-  (with-mocks
-    (compile-hook hook-failure project)) => (throws Exception)
+  (compile-hook hook-failure project) => (throws Exception)
   (provided
     (cljsbuild.crossover/crossover-macro-paths
       anything) => nil :times 0
@@ -159,16 +159,12 @@
 
 ; NOTE: This let has to be outside the fact, because against-background does not
 ;       like being directly inside a let.
-(let [parsed-commands [(config/parse-shell-command test-command)]]
+(let [parsed-commands [[test-command-id (config/parse-shell-command test-command)]]]
   (fact "tests work correctly"
-      (with-mocks
-        (cljsbuild project "test")) => nil
-      (with-mocks
-        (cljsbuild project "test" test-command-id)) => nil
-      (with-mocks
-        (test-hook hook-success project)) => nil
-      (with-mocks
-        (test-hook hook-failure project)) => (throws Exception)
+      (cljsbuild project "test") => nil
+      (cljsbuild project "test" test-command-id) => nil
+      (test-hook hook-success project) => nil
+      (test-hook hook-failure project) => (throws Exception)
       (against-background
         (cljsbuild.crossover/crossover-macro-paths
           crossovers) => crossover-macros :times 0
@@ -187,40 +183,34 @@
           watch?) => nil :times 1
         (cljsbuild.test/run-tests parsed-commands) => nil :times 1)))
 
-(defmacro with-repl-env [& forms]
-  `(with-mocks
-    (binding [ltrampoline/*trampoline?* true]
-      ~@forms)))
+(against-background [(around :checks
+                       (binding [ltrampoline/*trampoline?* true]
+                         ?form))]
 
-(fact "repl-listen calls run-repl-listen"
-  (with-repl-env
-    (cljsbuild project "repl-listen")) => nil
-  (provided
-    (cljsbuild.repl.listen/run-repl-listen repl-listen-port anything) => nil :times 1))
-
-(fact "repl-launch with no ID fails"
-  (with-repl-env
-    (cljsbuild project "repl-launch")) => (throws Exception))
-
-(fact "repl-launch with bad ID fails"
-  (with-repl-env
-    (cljsbuild project "repl-launch" "wrong-repl-launch-id")) => (throws Exception))
-
-(fact "repl-launch calls run-repl-launch"
-  (let [parsed-command (config/parse-shell-command repl-launch-command)]
-    (with-repl-env
-      (cljsbuild project "repl-launch" repl-launch-command-id)) => nil
+  (fact "repl-listen calls run-repl-listen"
+    (cljsbuild project "repl-listen") => nil
     (provided
-      (cljsbuild.repl.listen/run-repl-launch
-        repl-listen-port
-        anything
-        parsed-command) => nil :times 1)))
+      (cljsbuild.repl.listen/run-repl-listen repl-listen-port anything) => nil :times 1))
 
-(fact "repl-rhino calls run-repl-rhino"
-  (with-repl-env
-    (cljsbuild project "repl-rhino")) => nil
-  (provided
-    (cljsbuild.repl.rhino/run-repl-rhino) => nil :times 1))
+  (fact "repl-launch with no ID fails"
+    (cljsbuild project "repl-launch") => (throws Exception))
+
+  (fact "repl-launch with bad ID fails"
+    (cljsbuild project "repl-launch" "wrong-repl-launch-id") => (throws Exception))
+
+  (fact "repl-launch calls run-repl-launch"
+    (let [parsed-command (config/parse-shell-command repl-launch-command)]
+      (cljsbuild project "repl-launch" repl-launch-command-id) => nil
+      (provided
+        (cljsbuild.repl.listen/run-repl-launch
+          repl-listen-port
+          anything
+          parsed-command) => nil :times 1)))
+
+  (fact "repl-rhino calls run-repl-rhino"
+    (cljsbuild project "repl-rhino") => nil
+    (provided
+      (cljsbuild.repl.rhino/run-repl-rhino) => nil :times 1)))
 
 (unfinished jar-task)
 
