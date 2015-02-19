@@ -1,5 +1,15 @@
 # Release Notes for lein-cljsbuild
 
+## [1.0.5](https://github.com/emezeske/lein-cljsbuild/issues?q=milestone%3A1.0.5)
+
+* Added `:warning-handlers` option so that compiler warnings/errors/messages can
+  be displayed or potentially fail the build (gh-370, gh-367)
+* Stop attempting to reload `data_readers.clj` (gh-360)
+* Failing tests now properly cause cljsbuild to exit Leiningen with a non-zero
+  error code (gh-356, regression in `1.0.4`)
+* Fix the version compatibility checks to allow any SNAPSHOT version of
+  cljsbuild. (gh-346)
+
 ## [1.0.4](https://github.com/emezeske/lein-cljsbuild/issues?q=milestone%3A1.0.4+is%3Aclosed)
 
 * Refactoring applied to minimize the amount of rework performed by
