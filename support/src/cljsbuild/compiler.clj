@@ -123,7 +123,8 @@
       (if (.exists target-file)
         (.setLastModified target-file 5000))))
 
-  (doseq [path paths]
+  (doseq [path paths
+          :when (not= path "/data_readers.clj")]
     (try
       (load (drop-extension path))
       (catch Throwable e
