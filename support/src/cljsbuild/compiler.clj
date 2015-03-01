@@ -140,7 +140,7 @@
           (str "Reloading Clojure file \"" path "\" failed.") red)
         (pst+ e)))))
 
-(defn run-compiler [cljs-paths crossover-path crossover-macro-paths
+(defn run-compiler [cljs-paths checkout-paths crossover-path crossover-macro-paths
                     compiler-options notify-command incremental?
                     assert? last-dependency-mtimes watching?]
   (let [compiler-options (merge {:output-wrapper (= :advanced (:optimizations compiler-options))}
@@ -152,9 +152,9 @@
         macro-classpath-files (into {} (map vector macro-files (map :classpath crossover-macro-paths)))
         clj-files-in-cljs-paths
           (into {}
-            (for [cljs-path cljs-paths]
+            (for [cljs-path (concat cljs-paths checkout-paths)]
               [cljs-path (util/find-files cljs-path (conj additional-file-extensions "clj"))]))
-        cljs-files (mapcat #(util/find-files % (conj additional-file-extensions "cljs")) (conj cljs-paths crossover-path))
+        cljs-files (mapcat #(util/find-files % (conj additional-file-extensions "cljs")) (concat cljs-paths checkout-paths [crossover-path]))
         js-files (let [output-dir-str
                        (.getAbsolutePath (io/file (:output-dir compiler-options)))]
                    (->> lib-paths
