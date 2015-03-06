@@ -13,7 +13,7 @@
     cljsbuild.compiler
     cljsbuild.test
     cljsbuild.repl.listen
-    cljsbuild.repl.rhino))
+    cljsbuild.repl.embedded))
 
 (def repl-listen-port 10000)
 (def repl-launch-command-id "launch-id")
@@ -56,7 +56,7 @@
   (:compiler (first parsed-builds)))
 
 (def project
- {:dependencies [['org.clojure/clojure "1.5.1"]]
+  {:dependencies [['org.clojure/clojure "1.6.0"]]
   :cljsbuild
    {:repl-listen-port repl-listen-port
     :repl-launch-commands {repl-launch-command-id repl-launch-command}
@@ -220,7 +220,19 @@
   (with-repl-env
     (cljsbuild project "repl-rhino")) => nil
   (provided
-    (cljsbuild.repl.rhino/run-repl-rhino) => nil :times 1))
+   (cljsbuild.repl.embedded/run-repl :rhino) => nil :times 1))
+
+(fact "repl-nashorn calls run-repl-nashorn"
+  (with-repl-env
+    (cljsbuild project "repl-nashorn")) => nil
+  (provided
+   (cljsbuild.repl.embedded/run-repl :nashorn) => nil :times 1))
+
+(fact "repl-node calls run-repl-noden"
+  (with-repl-env
+    (cljsbuild project "repl-node")) => nil
+  (provided
+    (cljsbuild.repl.embedded/run-repl :node) => nil :times 1))
 
 (unfinished jar-task)
 

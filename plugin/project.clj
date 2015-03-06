@@ -11,7 +11,7 @@
   :profiles {
     :dev {
       :dependencies [
-        [midje "1.5.1"]
+        [midje "1.6.3"]
         [cljsbuild "1.0.5"]]
-      :plugins [[lein-midje "2.0.4"]]}}
+      :plugins [[lein-midje "3.1.3"]]}}
   :eval-in-leiningen true)
