@@ -7,7 +7,7 @@
      :distribution :repo}
     :dependencies [; SNAPSHOT is intentional here, https://github.com/emezeske/lein-cljsbuild/issues/266
                    [lein-cljsbuild/cljs-compat "1.0.0-SNAPSHOT"]
-                   [fs "1.1.2"]]
+                   [fs "1.3.3"]]
   :profiles {
     :dev {
       :dependencies [
