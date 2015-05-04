@@ -228,7 +228,7 @@ You can place custom warning handlers for the ClojureScript compiler under the `
 (defproject lein-cljsbuild-example "1.2.3"
   :plugins [[lein-cljsbuild "1.0.4"]]
   :cljsbuild {
-    :builds {:id           "example
+    :builds {:id           "example"
              :compiler     {}
              :warning-handlers [my.ns/custom-warning-handler ;; Fully-qualified symbol
                                 ;; Custom function (to be evaluated at project build-time)
