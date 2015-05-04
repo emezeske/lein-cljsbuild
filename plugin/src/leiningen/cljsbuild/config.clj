@@ -23,7 +23,6 @@
 
 (defn- default-compiler-options [target-path]
   {:output-to (in-target-path target-path "main.js")
-   :optimizations :whitespace
    :warnings true
    :externs []
    :libs []
