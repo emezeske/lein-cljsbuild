@@ -193,14 +193,29 @@
               ~repl-output-path
               '~command))))))
 
+(defn- repl-embedded
+  "Run an embedded REPL (one of Rhino, Nashorn or Node)"
+  [project {:keys [crossover-path builds]} type]
+  (require-trampoline
+    (println "Running ClojureScript REPL:" (name type))
+    (run-local-project project crossover-path builds
+      '(require 'cljsbuild.repl.embedded)
+      `(cljsbuild.repl.embedded/run-repl ~type))))
+
 (defn- repl-rhino
   "Run a Rhino-based REPL."
-  [project {:keys [crossover-path builds]}]
-  (require-trampoline
-    (println "Running Rhino-based ClojureScript REPL.")
-    (run-local-project project crossover-path builds
-      '(require 'cljsbuild.repl.rhino)
-      `(cljsbuild.repl.rhino/run-repl-rhino))))
+  [project options]
+  (repl-embedded project options :rhino))
+
+(defn- repl-nashorn
+  "Run a Nashorn-based REPL."
+  [project options]
+  (repl-embedded project options :nashorn))
+
+(defn- repl-node
+  "Run a Node.js-based REPL (running Node as a child process)"
+  [project options]
+  (repl-embedded project options :node))
 
 (defn- sample
   "Display a sample project.clj."
@@ -209,8 +224,8 @@
 
 (defn cljsbuild
   "Run the cljsbuild plugin."
-  {:help-arglists '([once auto test repl-listen repl-launch repl-rhino sample])
-   :subtasks [#'once #'auto #'test #'repl-listen #'repl-launch #'repl-rhino #'sample]}
+  {:help-arglists '([once auto test repl-listen repl-launch repl-rhino repl-nashorn repl-node sample])
+   :subtasks [#'once #'auto #'test #'repl-listen #'repl-launch #'repl-rhino #'repl-nashorn #'repl-node #'sample]}
   ([project]
     (println
       (lhelp/help-for "cljsbuild"))
@@ -225,6 +240,8 @@
         "repl-listen" (repl-listen project options)
         "repl-launch" (repl-launch project options args)
         "repl-rhino" (repl-rhino project options)
+        "repl-nashorn" (repl-nashorn project options)
+        "repl-node" (repl-node project options)
         "sample" (sample)
         (do
           (println

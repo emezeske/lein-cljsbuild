@@ -6,13 +6,13 @@
      :url "http://www.eclipse.org/legal/epl-v10.html"
      :distribution :repo}
   :dependencies
-    [[org.clojure/clojure "1.5.1"]
-     [org.clojure/clojurescript "0.0-2411"
+    [[org.clojure/clojure "1.6.0"]
+     [org.clojure/clojurescript "0.0-2985"
        :exclusions [org.apache.ant/ant]]
      [fs "1.1.2"]
      [clj-stacktrace "0.2.5"]]
   :aot [cljsbuild.test]
   :profiles {
     :dev {
-      :dependencies [[midje "1.5.1"]]
-      :plugins [[lein-midje "2.0.4"]]}})
+      :dependencies [[midje "1.6.3"]]
+      :plugins [[lein-midje "3.1.3"]]}})

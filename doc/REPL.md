@@ -4,15 +4,36 @@ Lein-cljsbuild has built-in support for launching ClojureScript REPLs in a varie
 of ways.  Note as of Leiningen 1.x, all plugin REPL commands must be launched
 via `lein trampoline` to work correctly.
 
+## repl-nashorn
+
+The simplest REPL uses the Nashorn JS engine bundled with the JVM to
+evaluate the JavaScript that results from compiling your ClojureScript
+input. This REPL is not evaluated in a browser context. It is,
+however, useful for running simple pure-ClojureScript commands. It has
+access to and can load namespaces from the Java classpath, but is not
+aware of any source paths set up in your `:cljsbuild` config.
+
+    $ lein trampoline cljsbuild repl-nashorn
+
+## repl-node
+
+ClojureScript can launch a ClojureScript repl running in a Node.js
+environment. Internally, this works by forking a Node.js child process
+from the Clojure REPL process.
+
+This REPL is not evaluated in a browser context but has full access to
+the Node.js environment. It has access to and can load namespaces from
+the Java classpath.
+
+    $ lein trampoline cljsbuild repl-node
+
 ## repl-rhino
 
-The simplest REPL uses Rhino to evaluate the JavaScript that results from compiling
-your ClojureScript input.  This REPL does not have access to your project's namespaces,
-and is not evaluated in a browser context.  It is, however, useful for running simple
-pure-ClojureScript commands.  It is also the only REPL option that does not require
-your application to provide additional support code:
+This REPL uses the legacy Rhino JS engine bundled with the JVM. Rhino
+has been superseded by Nashorn and should be considered obsolete.
 
     $ lein trampoline cljsbuild repl-rhino
+
 
 ## repl-listen
 
