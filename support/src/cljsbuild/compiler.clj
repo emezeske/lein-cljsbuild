@@ -146,8 +146,8 @@
         clj-files-in-cljs-paths
           (into {}
             (for [cljs-path cljs-paths]
-              [cljs-path (util/find-files cljs-path #{"clj"})]))
-        cljs-files (mapcat #(util/find-files % #{"cljs"}) (conj cljs-paths crossover-path))
+              [cljs-path (util/find-files cljs-path #{"cljc" "clj"})]))
+        cljs-files (mapcat #(util/find-files % #{"cljc" "cljs"}) (conj cljs-paths crossover-path))
         js-files (let [output-dir-str
                        (.getAbsolutePath (io/file (:output-dir compiler-options)))]
                    (->> lib-paths
