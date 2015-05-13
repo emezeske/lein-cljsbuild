@@ -116,6 +116,13 @@
       (subs path (count parent))
       path)))
 
+(def valid-file-extensions
+  (try
+    (apply #'read-string [{:read-cond :allow} "#?(:clj 5 :default nil)"])
+    #{"clj" "cljc"}
+    (catch Throwable t
+      #{"clj"})))
+
 (defn reload-clojure [cljs-files paths compiler-options notify-command]
   ;; touch all cljs target files so that cljsc/build will rebuild them
   (doseq [cljs-file cljs-files]
@@ -146,8 +153,8 @@
         clj-files-in-cljs-paths
           (into {}
             (for [cljs-path cljs-paths]
-              [cljs-path (util/find-files cljs-path #{"cljc" "clj"})]))
-        cljs-files (mapcat #(util/find-files % #{"cljc" "cljs"}) (conj cljs-paths crossover-path))
+              [cljs-path (util/find-files cljs-path valid-file-extensions)]))
+        cljs-files (mapcat #(util/find-files % valid-file-extensions) (conj cljs-paths crossover-path))
         js-files (let [output-dir-str
                        (.getAbsolutePath (io/file (:output-dir compiler-options)))]
                    (->> lib-paths
