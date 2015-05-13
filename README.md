@@ -7,16 +7,16 @@ to install and allows you to configure the ClojureScript compiler from within yo
 
 Beyond basic compiler support, lein-cljsbuild can optionally help with a few other things:
 
-* [Launching REPLs for interactive development] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.5/doc/REPL.md)
-* [Launching ClojureScript tests] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.5/doc/TESTING.md)
+* [Launching REPLs for interactive development] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.6-SNAPSHOT/doc/REPL.md)
+* [Launching ClojureScript tests] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.6-SNAPSHOT/doc/TESTING.md)
 * Sharing code between Clojure and ClojureScript: use
   [cljx](http://github.com/lynaghk/cljx) to target both Clojure and
   ClojureScript from the same codebase. ([cljsbuild
-  crossovers](https://github.com/emezeske/lein-cljsbuild/blob/1.0.5/doc/CROSSOVERS.md)
+  crossovers](https://github.com/emezeske/lein-cljsbuild/blob/1.0.6-SNAPSHOT/doc/CROSSOVERS.md)
   are _deprecated_, and will be removed in v2.x [coming later in 2014].)
 
-The latest version of lein-cljsbuild is `1.0.5`.
-[See the release notes here.](https://github.com/emezeske/lein-cljsbuild/blob/1.0.5/doc/RELEASE-NOTES.md)
+The latest version of lein-cljsbuild is `1.0.6-SNAPSHOT`.
+[See the release notes here.](https://github.com/emezeske/lein-cljsbuild/blob/1.0.6-SNAPSHOT/doc/RELEASE-NOTES.md)
 
 ## Requirements
 
@@ -31,7 +31,7 @@ file in the `:plugins` section:
 
 ```clj
 (defproject lein-cljsbuild-example "1.2.3"
-  :plugins [[lein-cljsbuild "1.0.5"]])
+  :plugins [[lein-cljsbuild "1.0.6-SNAPSHOT"]])
 ```
 
 In addition, _you should add an explicit ClojureScript dependency to your
@@ -49,15 +49,15 @@ version of lein-cljsbuild currently requires a minimum of ClojureScript
 ## Just Give Me a Damned Example Already!
 
 See the
-[example-projects] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.5/example-projects)
+[example-projects] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.6-SNAPSHOT/example-projects)
 directory for a couple of simple examples of how to use lein-cljsbuild.  The
-[simple project] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.5/example-projects/simple)
+[simple project] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.6-SNAPSHOT/example-projects/simple)
 shows a dead-simple "compile only" configuration, which is a good place to start.  The
-[advanced project] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.5/example-projects/advanced)
+[advanced project] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.6-SNAPSHOT/example-projects/advanced)
 contains examples of how to use the extended features of the plugin.
 
 Also, see the
-[sample.project.clj] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.5/sample.project.clj)
+[sample.project.clj] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.6-SNAPSHOT/sample.project.clj)
 file for an exhaustive list of all options supported by lein-cljsbuild.
 
 ## Basic Configuration
@@ -67,7 +67,7 @@ of your `project.clj` file.  A simple project might look like this:
 
 ```clj
 (defproject lein-cljsbuild-example "1.2.3"
-  :plugins [[lein-cljsbuild "1.0.5"]]
+  :plugins [[lein-cljsbuild "1.0.6-SNAPSHOT"]]
   :cljsbuild {
     :builds [{
         ; The path to the top-level ClojureScript source directory:
@@ -81,7 +81,7 @@ of your `project.clj` file.  A simple project might look like this:
 ```
 
 For an exhaustive list of the configuration options supported by lein-cljsbuild, see the
-[sample.project.clj] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.5/sample.project.clj)
+[sample.project.clj] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.6-SNAPSHOT/sample.project.clj)
 file.
 
 ## Basic Usage
@@ -151,7 +151,7 @@ and will build all of them in parallel:
 
 ```clj
 (defproject lein-cljsbuild-example "1.2.3"
-  :plugins [[lein-cljsbuild "1.0.5"]]
+  :plugins [[lein-cljsbuild "1.0.6-SNAPSHOT"]]
   :cljsbuild {
     :builds [
       {:source-paths ["src-cljs-main"]
@@ -169,7 +169,7 @@ only that one:
 
 ```clj
 (defproject lein-cljsbuild-example "1.2.3"
-  :plugins [[lein-cljsbuild "1.0.5"]]
+  :plugins [[lein-cljsbuild "1.0.6-SNAPSHOT"]]
   :cljsbuild {
     :builds [
       {:source-paths ["src-cljs-main"]
@@ -186,7 +186,7 @@ them as a map instead of a vector:
 
 ```clj
 (defproject lein-cljsbuild-example "1.2.3"
-  :plugins [[lein-cljsbuild "1.0.5"]]
+  :plugins [[lein-cljsbuild "1.0.6-SNAPSHOT"]]
   :cljsbuild {
     :builds {
       :main
@@ -202,20 +202,20 @@ You can also build multiple configurations at once:
     $ lein cljsbuild auto main other
 
 See the
-[example-projects/advanced] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.5/example-projects/advanced)
+[example-projects/advanced] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.6-SNAPSHOT/example-projects/advanced)
 directory for a working example of a project that uses this feature.
 
 ## REPL Support
 
 Lein-cljsbuild has built-in support for launching ClojureScript REPLs in a variety
 of ways.  See the
-[REPL documentation] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.5/doc/REPL.md)
+[REPL documentation] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.6-SNAPSHOT/doc/REPL.md)
 for more details.
 
 ## Testing Support
 
 Lein-cljsbuild has built-in support for running external ClojureScript test processes.  See the
-[testing documentation] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.5/doc/TESTING.md)
+[testing documentation] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.6-SNAPSHOT/doc/TESTING.md)
 for more details.
 
 ## Extended Configuration
