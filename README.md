@@ -9,14 +9,17 @@ Beyond basic compiler support, lein-cljsbuild can optionally help with a few oth
 
 * [Launching REPLs for interactive development] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.6-SNAPSHOT/doc/REPL.md)
 * [Launching ClojureScript tests] (https://github.com/emezeske/lein-cljsbuild/blob/1.0.6-SNAPSHOT/doc/TESTING.md)
-* Sharing code between Clojure and ClojureScript: use
-  [cljx](http://github.com/lynaghk/cljx) to target both Clojure and
-  ClojureScript from the same codebase. ([cljsbuild
-  crossovers](https://github.com/emezeske/lein-cljsbuild/blob/1.0.6-SNAPSHOT/doc/CROSSOVERS.md)
-  are _deprecated_, and will be removed in v2.x [coming later in 2014].)
 
 The latest version of lein-cljsbuild is `1.0.6-SNAPSHOT`.
 [See the release notes here.](https://github.com/emezeske/lein-cljsbuild/blob/1.0.6-SNAPSHOT/doc/RELEASE-NOTES.md)
+
+(Note that cljsbuild crossovers are deprecated, and will be removed eventually.
+You should never use them. Please use either [reader
+conditionals](http://dev.clojure.org/display/design/Reader+Conditionals)
+(available in Clojure
+>= 1.7.0-beta2 and ClojureScript >= 0.0-3255), or
+>[cljx](http://github.com/lynaghk/cljx) to
+target both Clojure and ClojureScript from the same codebase.
 
 ## Requirements
 

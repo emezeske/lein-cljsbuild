@@ -1,7 +1,11 @@
 # Sharing Code Between Clojure and ClojureScript
 
-**Note: cljsbuild crossovers are _deprecated_, and will be removed in v2.x
-(coming later in 2014). Please use [cljx](http://github.com/lynaghk/cljx) to
+**Note: cljsbuild crossovers are _deprecated_, and will be removed in v2.x.
+Please use either [reader
+conditionals](http://dev.clojure.org/display/design/Reader+Conditionals)
+(available in Clojure
+>= 1.7.0-beta2 and ClojureScript >= 0.0-3255), or
+>[cljx](http://github.com/lynaghk/cljx) to
 target both Clojure and ClojureScript from the same codebase.**
 
 Sharing code with lein-cljsbuild is accomplished via the configuration
