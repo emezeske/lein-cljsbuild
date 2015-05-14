@@ -1,5 +1,15 @@
 # Release Notes for lein-cljsbuild
 
+## [1.0.6](https://github.com/emezeske/lein-cljsbuild/issues?q=milestone%3A1.0.6+is%3Aclosed)
+
+* Added support for
+  [reader conditionals](http://dev.clojure.org/display/design/Reader+Conditionals)
+  and the new `.cljc` file type.
+* Completely removed the `cljsbuild clean` subtask.
+* cljsbuild configurations now have no default `:optimizations` setting beyond
+  the ClojureScript compiler's own defaults (net effect currently:
+  `:optimizations :none`, unless specified otherwise in your configs)
+
 ## [1.0.5](https://github.com/emezeske/lein-cljsbuild/issues?q=milestone%3A1.0.5)
 
 * Added `:warning-handlers` option so that compiler warnings/errors/messages can
