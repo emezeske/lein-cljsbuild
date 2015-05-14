@@ -149,11 +149,6 @@
   [project options build-ids]
   (run-compiler project options build-ids true))
 
-(defn- clean
-  "Remove automatically generated files."
-  [project {:keys [crossover-path builds repl-launch-commands test-commands]}]
-  (lmain/abort "\033[31m`cljsbuild clean` is deprecated as of 1.0.4; please just use `lein clean`, and either direct ClojureScript compilation output to `target/*`, or add your ClojureScript output paths to Leiningen's `:clean-targets` vector.\033[0m"))
-
 (defn- test
   "Run ClojureScript tests."
   [project options args]
@@ -220,7 +215,6 @@
       (case subtask
         "once" (once project options args)
         "auto" (auto project options args)
-        "clean" (clean project options)
         "test" (test project options args)
         "repl-listen" (repl-listen project options)
         "repl-launch" (repl-launch project options args)
