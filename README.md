@@ -15,7 +15,7 @@ The latest version of lein-cljsbuild is `1.0.6`.
 
 (Note that cljsbuild crossovers are deprecated, and will be removed eventually.
 You should never use them. Please use either [reader conditionals](http://dev.clojure.org/display/design/Reader+Conditionals)
-(available in Clojure &lt;= 1.7.0-beta2 and ClojureScript &gt;= 0.0-3255), or [cljx](http://github.com/lynaghk/cljx)
+(available in Clojure &gt;= 1.7.0-beta2 and ClojureScript &gt;= 0.0-3255), or [cljx](http://github.com/lynaghk/cljx)
 to target both Clojure and ClojureScript from the same codebase.
 
 ## Requirements
