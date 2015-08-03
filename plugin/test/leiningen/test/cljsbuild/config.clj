@@ -82,7 +82,8 @@
 
 (fact "missing compiler settings have defaults provided"
   (let [compiler (:compiler (get-build config-in))]
-    (doseq [compiler-option (keys compiler)]
+    (doseq [compiler-option (keys compiler)
+            :when (not= compiler-option :optimizations)]
       (let [defaulted (default-compiler-option config-in compiler compiler-option)]
         (get-compiler defaulted) => (contains {compiler-option anything})))))
 
