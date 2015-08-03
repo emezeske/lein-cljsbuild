@@ -22,7 +22,7 @@ Alternately, this command will run *all* configured tests:
 
     $ lein cljsbuild test
 
-If hooks are enabled, this will also result in the tests being run:
+If [hooks](https://github.com/emezeske/lein-cljsbuild#hooks) are enabled, this will also result in the tests being run:
 
     $ lein test
 
