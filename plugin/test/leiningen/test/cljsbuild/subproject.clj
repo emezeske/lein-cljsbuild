@@ -1,7 +1,14 @@
 (ns leiningen.test.cljsbuild.subproject
+  (:require
+    [leiningen.core.main :as lmain])
   (:use
     leiningen.cljsbuild.subproject
     midje.sweet))
+
+(background
+  (around
+    :facts (binding [lmain/*exit-process?* false]
+             ?form)))
 
 (fact
   (check-clojure-version {}) => nil
@@ -14,11 +21,11 @@
 (fact
   (let [original [clojure-dependency ['a "1"] ['b "2"]]
         merged (conj original ['cljsbuild cljsbuild-version])]
-    (merge-dependencies original) => (in-any-order merged))
+    (merge-dependencies original) => (just merged :in-any-order))
 
   (let [original [['a "1"] ['b "2"]]
         merged (concat original [clojure-dependency ['cljsbuild cljsbuild-version]])]
-    (merge-dependencies original) => (in-any-order merged)))
+    (merge-dependencies original) => (just merged :in-any-order)))
 
 (def lein-crossover ".crossovers")
 (def lein-build-source-paths ["src-cljs-a"])
@@ -50,4 +57,4 @@
     (:repositories subproject) => lein-repositories
     (:eval-in subproject) => lein-eval-in
     (:resource-paths subproject) => lein-resource-paths
-    (:dependencies subproject) => (in-any-order expected-dependencies)))
+    (:dependencies subproject) => (just expected-dependencies :in-any-order)))

@@ -8,7 +8,7 @@ set -e
 
 projects="$@"
 [ -z "$projects" ] && projects='simple advanced'
-project_root=$(dirname $(realpath $0))/..
+project_root=$(dirname $0)/..
 pushd $project_root
 
 # needed to allow for post-release updates to cljs-compat

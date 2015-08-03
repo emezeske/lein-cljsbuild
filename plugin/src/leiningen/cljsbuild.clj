@@ -19,21 +19,28 @@
 
 (def ^:private repl-output-path "repl")
 
+(def ^:dynamic *suppress-exit?* false)
+
+(defn- exit
+  ([code]
+    (if-not *suppress-exit?*
+      `(System/exit ~code)
+      (when-not (zero? code)
+        `(throw (ex-info "Suppress exit" {:exit-code ~code})))))
+  ([] (exit 0)))
+
 (defn- run-local-project [project crossover-path builds requires form]
   (leval/eval-in-project (subproject/make-subproject project crossover-path builds)
-    ; Without an explicit exit, the in-project subprocess seems to just hang for
-    ; around 30 seconds before exiting.  I don't fully understand why...
     `(try
-       (do
-         ~form
-         (System/exit 0))
+       ~form
+       ~(exit)
        (catch cljsbuild.test.TestsFailedException e#
          ; Do not print stack trace on test failure
-         (System/exit 1))
+         ~(exit 1))
        (catch Exception e#
          (do
            (.printStackTrace e#)
-           (System/exit 1))))
+           ~(exit 1))))
     requires))
 
 (defn- run-compiler [project {:keys [crossover-path crossovers builds]} build-ids watch?]

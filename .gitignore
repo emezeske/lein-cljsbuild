@@ -8,6 +8,7 @@ cljsbuild-*.*.*
 target
 plugin/target
 support/target
+support/output-to
 example-projects/*/*.jar
 example-projects/simple/resources
 example-projects/advanced/resources/public/js
