@@ -13,6 +13,13 @@
 (def cljs-path-b "src-cljs-b")
 (def cljs-file-b (str cljs-path-b "/file-b.cljs"))
 (def cljs-paths [cljs-path-a cljs-path-b])
+
+(def cljs-checkout-path-a "checkouts/dep-a/cljs-src")
+(def cljs-checkout-file-a "checkouts/dep-a/cljs-src/file-a.cljs")
+(def cljs-checkout-path-b "checkouts/dep-b/cljs-src")
+(def cljs-checkout-file-b "checkouts/dep-b/cljs-src/file-b.cljs")
+(def checkout-paths [cljs-checkout-path-a cljs-checkout-path-b])
+
 (def cljs-sourcepaths (cljsbuild.compiler.SourcePaths. cljs-paths))
 (def crossover-path "crossovers")
 (def crossover-file (str crossover-path "/file-c.cljs"))
@@ -38,6 +45,7 @@
 (fact "run-compiler calls cljs/build correctly"
   (run-compiler
     cljs-paths
+    checkout-paths
     crossover-path
     crossover-macro-paths
     compiler-options
@@ -47,6 +55,8 @@
     {}
     false) => (just {cljs-file-a mtime
                   cljs-file-b mtime
+                  cljs-checkout-file-a mtime
+                  cljs-checkout-file-b mtime
                   crossover-file mtime
                   crossover-macro-absolute mtime})
   (provided
@@ -55,15 +65,23 @@
     (util/find-files cljs-path-b #{"clj"}) => [] :times 1
     (util/find-files cljs-path-a #{"cljs"}) => [cljs-file-a] :times 1
     (util/find-files cljs-path-b #{"cljs"}) => [cljs-file-b] :times 1
+    (util/find-files cljs-checkout-path-a #{"clj"}) => [] :times 1
+    (util/find-files cljs-checkout-path-b #{"clj"}) => [] :times 1
+    (util/find-files cljs-checkout-path-a #{"cljs"}) => [cljs-checkout-file-a] :times 1
+    (util/find-files cljs-checkout-path-b #{"cljs"}) => [cljs-checkout-file-b] :times 1
     (util/find-files crossover-path #{"cljs"}) => [crossover-file] :times 1
     (util/sh anything) => nil :times 1
     (fs/mod-time cljs-file-a) => mtime :times 1
     (fs/mod-time cljs-file-b) => mtime :times 1
+    (fs/mod-time cljs-checkout-file-a) => mtime :times 1
+    (fs/mod-time cljs-checkout-file-b) => mtime :times 1
     (fs/mod-time crossover-file) => mtime :times 1
     (fs/mod-time crossover-macro-absolute) => mtime :times 1
     (fs/mkdirs anything) => nil
-    (reload-clojure ["src-cljs-a/file-a.cljs"
-                     "src-cljs-b/file-b.cljs"
-                     "crossovers/file-c.cljs"]
+    (reload-clojure [cljs-file-a
+                     cljs-file-b
+                     cljs-checkout-file-a
+                     cljs-checkout-file-b
+                     crossover-file]
                     [crossover-macro-classpath] compiler-options-with-defaults notify-command) => nil :times 1
     (cljs/build cljs-sourcepaths compiler-options-with-defaults) => nil :times 1))

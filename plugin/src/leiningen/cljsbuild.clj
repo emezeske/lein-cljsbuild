@@ -8,6 +8,7 @@
     [leiningen.cljsbuild.subproject :as subproject]
     [leiningen.compile :as lcompile]
     [leiningen.core.eval :as leval]
+    [leiningen.core.project :as lproject]
     [leiningen.core.main :as lmain]
     [leiningen.help :as lhelp]
     [leiningen.jar :as ljar]
@@ -43,6 +44,41 @@
            ~(exit 1))))
     requires))
 
+(defn- read-dependency-project [project-file]
+  (when (fs/exists? project-file)
+    (let [project (fs/absolute-path project-file)]
+      (try
+        (lproject/read project)
+        (catch Exception e
+          (throw (Exception. (format "Problem loading %s" project) e)))))))
+
+(defn- read-checkouts
+  [project]
+  (let [checkouts-dir (io/file (:root project) "checkouts")]
+    (for [dep (fs/list-dir checkouts-dir)
+          :let [project-file (io/file checkouts-dir dep "project.clj")
+                checkout-project (read-dependency-project project-file)]
+          :when checkout-project]
+      checkout-project)))
+
+(defn- walk-checkouts [root-project f]
+  (loop [[project & rest] (read-checkouts root-project)
+         walk-results []]
+    (if project
+      (recur (concat (read-checkouts project) rest)
+             (concat (f project) walk-results))
+      walk-results)))
+
+(defn- checkout-cljs-paths [project]
+  (walk-checkouts
+    project
+    (fn [checkout]
+      (let [{:keys [builds]} (config/extract-options checkout)
+            root (:root checkout)]
+        (for [build builds
+              path (:source-paths build)]
+          (fs/absolute-path (io/file root path)))))))
+
 (defn- run-compiler [project {:keys [crossover-path crossovers builds]} build-ids watch?]
   (doseq [build-id build-ids]
     (if (empty? (filter #(= (:id %) build-id) builds))
@@ -56,7 +92,8 @@
   (let [filtered-builds (if (empty? build-ids)
                           builds
                           (filter #(some #{(:id %)} build-ids) builds))
-        parsed-builds (map config/parse-notify-command filtered-builds)]
+        parsed-builds (map config/parse-notify-command filtered-builds)
+        checkout-cljs-paths (checkout-cljs-paths project)]
     (doseq [build parsed-builds]
       (config/warn-unsupported-warn-on-undeclared build)
       (config/warn-unsupported-notify-command build))
@@ -102,6 +139,7 @@
                          (binding [cljs.env/*compiler* compiler-env#]
                            (cljsbuild.compiler/run-compiler
                             (:source-paths build#)
+                            '~checkout-cljs-paths
                             ~crossover-path
                             crossover-macro-paths#
                             (:compiler build#)

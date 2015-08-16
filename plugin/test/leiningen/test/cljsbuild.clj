@@ -9,6 +9,9 @@
     [leiningen.cljsbuild.subproject :as subproject]
     [leiningen.core.main :as lmain]
     [leiningen.core.eval :as leval]
+    [leiningen.core.project :as lproject]
+    [fs.core :as fs]
+    [clojure.java.io :as io]
     cljsbuild.crossover
     cljsbuild.util
     cljsbuild.compiler
@@ -56,8 +59,12 @@
 (def parsed-compiler
   (:compiler (first parsed-builds)))
 
+(def project-dir "/project")
+(def checkouts-dir (io/file project-dir "checkouts"))
+
 (def project
  {:dependencies [['org.clojure/clojure "1.5.1"]]
+  :root project-dir
   :cljsbuild
    {:repl-listen-port repl-listen-port
     :repl-launch-commands {repl-launch-command-id repl-launch-command}
@@ -100,6 +107,7 @@
   (doseq [extra-args [[] [build-id]]]
     (apply cljsbuild project "once" extra-args) => nil
     (provided
+      (fs/list-dir checkouts-dir) => nil, :times 1
       (cljsbuild.crossover/crossover-macro-paths
         crossovers) => crossover-macros :times 1
       (cljsbuild.crossover/copy-crossovers
@@ -107,6 +115,7 @@
         crossovers) => nil :times 1
       (cljsbuild.compiler/run-compiler
         source-paths
+        []
         crossover-path
         crossover-macros
         parsed-compiler
@@ -122,6 +131,7 @@
 (fact "compile-hook calls through to the compiler when task succeeds"
   (compile-hook hook-success project) => nil
   (provided
+    (fs/list-dir checkouts-dir) => nil, :times 1
     (cljsbuild.crossover/crossover-macro-paths
       crossovers) => crossover-macros :times 1
     (cljsbuild.crossover/copy-crossovers
@@ -129,6 +139,7 @@
       crossovers) => nil :times 1
     (cljsbuild.compiler/run-compiler
       source-paths
+      []
       crossover-path
       crossover-macros
       parsed-compiler
@@ -138,15 +149,59 @@
       {}
       watch?) => nil :times 1))
 
+(fact "checkouts path are recognized and passed correctly"
+  (let [checkout-a-dir (io/file checkouts-dir "lib-a")
+        checkout-a-project (io/file checkout-a-dir "project.clj")
+        checkout-a-checkouts (io/file checkout-a-dir "checkouts")
+
+        checkout-b-dir (io/file checkouts-dir "lib-b")
+        checkout-b-project (io/file checkout-b-dir "project.clj")
+        checkout-b-checkouts (io/file checkout-b-dir "checkouts")]
+
+    (cljsbuild project "once") => nil
+    (provided
+      (fs/list-dir checkouts-dir) => ["lib-a" "lib-b"], :times 1
+      (fs/list-dir checkout-a-checkouts) => nil, :times 1
+      (fs/list-dir checkout-b-checkouts) => nil, :times 1
+      (fs/exists? checkout-a-project) => true, :times 1
+      (fs/exists? checkout-b-project) => true, :times 1
+
+      (lproject/read "/project/checkouts/lib-a/project.clj") =>
+        (assoc project :root (fs/absolute-path checkout-a-dir)), :times 1
+      (lproject/read "/project/checkouts/lib-b/project.clj") =>
+        (assoc project :root (fs/absolute-path checkout-b-dir)), :times 1
+
+      (cljsbuild.crossover/crossover-macro-paths
+        crossovers) => crossover-macros :times 1
+      (cljsbuild.crossover/copy-crossovers
+        crossover-path
+        crossovers) => nil :times 1
+      (cljsbuild.compiler/run-compiler
+        source-paths
+        ["/project/checkouts/lib-b/source-path-a"
+         "/project/checkouts/lib-b/source-path-b"
+         "/project/checkouts/lib-a/source-path-a"
+         "/project/checkouts/lib-a/source-path-b"]
+        crossover-path
+        crossover-macros
+        parsed-compiler
+        anything
+        incremental?
+        assert?
+        {}
+        watch?) => nil :times 1)))
+
 (fact "compile-hook does not call through to the compiler when task fails"
   (compile-hook hook-failure project) => (throws Exception)
   (provided
+    (fs/list-dir checkouts-dir) => nil, :times 0
     (cljsbuild.crossover/crossover-macro-paths
       anything) => nil :times 0
     (cljsbuild.crossover/copy-crossovers
       anything
       anything) => nil :times 0
     (cljsbuild.compiler/run-compiler
+      anything
       anything
       anything
       anything
@@ -166,6 +221,7 @@
       (test-hook hook-success project) => nil
       (test-hook hook-failure project) => (throws Exception)
       (against-background
+        (fs/list-dir checkouts-dir) => nil, :times 1
         (cljsbuild.crossover/crossover-macro-paths
           crossovers) => crossover-macros :times 0
         (cljsbuild.crossover/copy-crossovers
@@ -173,6 +229,7 @@
           crossovers) => nil :times 1
         (cljsbuild.compiler/run-compiler
           source-paths
+          []
           crossover-path
           crossover-macros
           parsed-compiler
