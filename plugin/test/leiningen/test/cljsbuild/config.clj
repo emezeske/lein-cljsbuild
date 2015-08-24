@@ -70,23 +70,6 @@
       (let [defaulted (default-build-option config-in build build-option)]
         (get-build defaulted) => (contains {build-option anything})))))
 
-(defn- get-compiler [config]
-  (:compiler (get-build config)))
-
-(defn- default-compiler-option [config compiler option]
-  (set-default-options target-path
-    (assoc config :builds
-      (list
-        (assoc compiler :compiler
-          (dissoc compiler option))))))
-
-(fact "missing compiler settings have defaults provided"
-  (let [compiler (:compiler (get-build config-in))]
-    (doseq [compiler-option (keys compiler)
-            :when (not= compiler-option :optimizations)]
-      (let [defaulted (default-compiler-option config-in compiler compiler-option)]
-        (get-compiler defaulted) => (contains {compiler-option anything})))))
-
 (def config-out (set-compiler-global-dirs config-in))
 
 (fact
