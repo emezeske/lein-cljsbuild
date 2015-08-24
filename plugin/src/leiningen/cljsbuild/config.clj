@@ -23,10 +23,8 @@
 
 (defn- default-compiler-options [target-path]
   {:output-to (in-target-path target-path "main.js")
-   :warnings true
    :externs []
-   :libs []
-   :pretty-print true})
+   :libs []})
 
 (defn- default-build-options [target-path]
   {:source-paths ["src-cljs"]
