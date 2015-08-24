@@ -1,5 +1,11 @@
 # Release Notes for lein-cljsbuild
 
+## [1.1.0](https://github.com/emezeske/lein-cljsbuild/issues?q=milestone%3A1.1.0+is%3Aclosed)
+
+* Eliminated all remaining non-default ClojureScript compiler options
+* Changes in Leiningen `checkouts` directories now are taken into account when
+  triggering builds under `cljsbuild auto`
+
 ## [1.0.6](https://github.com/emezeske/lein-cljsbuild/issues?q=milestone%3A1.0.6+is%3Aclosed)
 
 * Added support for
