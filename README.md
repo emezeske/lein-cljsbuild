@@ -253,7 +253,9 @@ See the file COPYING.
 
 ## Contributors
 
-* Evan Mezeske **(Author)** (evan@mezeske.com)
+* Maria Geller **(Current Maintainer)** (https://github.com/mneise)
+* Chas Emerick **(Past Maintainer)** (chas@cemerick.com)
+* Evan Mezeske **(Author/Past Maintainer)** (evan@mezeske.com)
 * Shantanu Kumar (kumar.shantanu@gmail.com)
 * Luke VanderHart (http://github.com/levand)
 * Phil Hagelberg (phil@hagelb.org)
