@@ -143,6 +143,14 @@ the ClojureScript as well if enabled.
 :jar true
 ```
 
+> **Debug Note:** There is a known issue (#366) where the `lein uberjar` task fails
+> to build when using hooks and a cljsbuild configuration within an `:uberjar`
+> profile. Instead of hooks, you can use `:prep-tasks` as an alternative:
+>
+>```clojure
+>:prep-tasks ["compile" ["cljsbuild" "once"]]
+>```
+
 ## Multiple Build Configurations
 
 If the `:builds` sequence contains more than one map lein-cljsbuild
