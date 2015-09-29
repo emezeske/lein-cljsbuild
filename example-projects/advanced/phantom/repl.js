@@ -1,10 +1,23 @@
-if (phantom.args.length != 1) {
-    console.log('Expected a target URL parameter.');
-    phantom.exit(1);
+var system = require('system');
+var url,args;
+
+if (phantom.version.major > 1) {
+    args = system.args;
+    if (args.length < 2) {
+        system.stderr.write('Expected a target URL parameter.');
+        phantom.exit(1);
+    }
+    url = args[1];
+} else {
+    args = phantom.args;
+    if (args.length < 1) {
+        system.stderr.write('Expected a target URL parameter.');
+        phantom.exit(1);
+    }
+    url = args[0];
 }
 
 var page = require('webpage').create();
-var url = phantom.args[0];
 var page_opened = false;
 
 page.onConsoleMessage = function (message) {
