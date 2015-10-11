@@ -11,17 +11,6 @@
     [clojure.java.io :as io]
     [fs.core :as fs]))
 
-(def reset-color "\u001b[0m")
-(def foreground-red "\u001b[31m")
-(def foreground-green "\u001b[32m")
-
-(defn- colorizer [c]
-  (fn [& args]
-    (str c (apply str args) reset-color)))
-
-(def red (colorizer foreground-red))
-(def green (colorizer foreground-green))
-
 (defn- elapsed [started-at]
   (let [elapsed-us (- (System/currentTimeMillis) started-at)]
     (with-precision 2
@@ -32,9 +21,9 @@
     (try
       (util/sh (update-in command [:shell] (fn [old] (concat old [message]))))
       (catch Throwable e
-        (println (red "Error running :notify-command:"))
+        (util/log (util/red "Error running :notify-command:"))
         (pst+ e))))
-  (println (colorizer message)))
+  (util/log (colorizer message)))
 
 (defn ns-from-file [f]
   (try
@@ -56,7 +45,7 @@
         parents       (butlast relative-path)
         path          (apply str (interpose java.io.File/separator
                                             (cons target-dir parents)))]
-    (io/file (io/file path) 
+    (io/file (io/file path)
              (str (last relative-path) ".js"))))
 
 ;; Cannnot call build with ["src/cljs" "src/cljs-more"] cause build thinks a vector
@@ -69,7 +58,7 @@
 (defn- compile-cljs [cljs-paths compiler-options notify-command incremental? assert? watching?]
   (let [output-file (:output-to compiler-options)
         output-file-dir (fs/parent output-file)]
-    (println (str "Compiling \"" output-file "\" from " (pr-str cljs-paths) "..."))
+    (util/log (str "Compiling \"" output-file "\" from " (pr-str cljs-paths) "..."))
     (flush)
     (when (not incremental?)
       (fs/delete-dir (:output-dir compiler-options)))
@@ -82,11 +71,11 @@
         (fs/touch output-file started-at)
         (notify-cljs
           notify-command
-          (str "Successfully compiled \"" output-file "\" in " (elapsed started-at) ".") green)
+          (str "Successfully compiled \"" output-file "\" in " (elapsed started-at) ".") util/green)
         (catch Throwable e
           (notify-cljs
             notify-command
-            (str "Compiling \"" output-file "\" failed.") red)
+            (str "Compiling \"" output-file "\" failed.") util/red)
           (if watching?
             (pst+ e)
             (throw e)))))))
@@ -137,7 +126,7 @@
       (catch Throwable e
         (notify-cljs
           notify-command
-          (str "Reloading Clojure file \"" path "\" failed.") red)
+          (str "Reloading Clojure file \"" path "\" failed.") util/red)
         (pst+ e)))))
 
 (defn run-compiler [cljs-paths checkout-paths crossover-path crossover-macro-paths

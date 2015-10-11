@@ -4,7 +4,8 @@
     [clojure.string :as string]
     [fs.core :as fs])
   (:import
-    (java.io File OutputStreamWriter)))
+    (java.io File OutputStreamWriter)
+    (java.util Date)))
 
 (defn join-paths [& paths]
   (apply str (interpose "/" paths)))
@@ -85,3 +86,21 @@
 (defn sh [command]
   (let [process (process-start command)]
     ((:wait process))))
+
+(def reset-color "\u001b[0m")
+(def foreground-red "\u001b[31m")
+(def foreground-green "\u001b[32m")
+(def foreground-yellow "\u001b[33m")
+
+(defn- colorizer [c]
+  (fn [& args]
+    (str c (apply str args) reset-color)))
+
+(def red (colorizer foreground-red))
+(def green (colorizer foreground-green))
+(def yellow (colorizer foreground-yellow))
+
+(def log-format "%tr")
+
+(defn log [& args]
+  (apply println (format log-format (Date.)) "-" args))

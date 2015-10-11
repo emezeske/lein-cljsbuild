@@ -4,7 +4,8 @@
     [leiningen.core.main :as lmain]
     [cljsbuild.compat :as cljs-compat]
     [clojure.java.io :refer (resource)]
-    [clojure.string :as string]))
+    [clojure.string :as string]
+    [cljsbuild.util :as util]))
 
 (def cljsbuild-version
   (let [[_ coords version]
@@ -72,6 +73,7 @@
         ; we could emit a warning here indicating that we couldn't verify the cljsbuild/CLJS
         ; version pairing, but that would likely just confuse people
         (when-not (cljs-compat/version-in-range? (first desired-cljs-version) acceptable-cljs-range)
+          (util/log (util/yellow ))
           (print "\033[31m")
           (apply println (concat cljs-version-message
                            ["You are attempting to use ClojureScript"

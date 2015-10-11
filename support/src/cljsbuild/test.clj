@@ -14,7 +14,7 @@
   (let [success (every? #(= % 0)
                         (dofor [[test-name test-command] test-commands]
                           (do
-                            (println "Running ClojureScript test:" test-name)
+                            (util/log (str "Running ClojureScript test:" test-name))
                             (util/sh test-command))))]
     (when (not success)
       (throw (cljsbuild.test.TestsFailedException. "Test failed.")))))
