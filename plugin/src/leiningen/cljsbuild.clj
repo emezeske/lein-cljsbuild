@@ -83,7 +83,8 @@
   (doseq [build-id build-ids]
     (if (empty? (filter #(= (:id %) build-id) builds))
       (throw (Exception. (str "Unknown build identifier: " build-id)))))
-  (println (if watch? "Watching for changes before compiling ClojureScript..." "Compiling ClojureScript..."))
+  (lmain/info (if watch? "Watching for changes before compiling ClojureScript..."
+ "Compiling ClojureScript..."))
   ; If crossover-path does not exist before eval-in-project is called,
   ; the files it contains won't be classloadable, for some reason.
   (when (not-empty crossovers)

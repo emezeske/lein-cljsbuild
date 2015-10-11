@@ -4,6 +4,7 @@
     [clj-stacktrace.repl :only [pst+]]
     [cljs.closure :only [build]])
   (:require
+    [leiningen.core.main :as lmain]
     [cljsbuild.util :as util]
     [cljs.analyzer :as analyzer]
     [cljs.closure :as closure]
@@ -34,7 +35,7 @@
       (catch Throwable e
         (println (red "Error running :notify-command:"))
         (pst+ e))))
-  (println (colorizer message)))
+  (lmain/info (colorizer message)))
 
 (defn ns-from-file [f]
   (try
@@ -56,7 +57,7 @@
         parents       (butlast relative-path)
         path          (apply str (interpose java.io.File/separator
                                             (cons target-dir parents)))]
-    (io/file (io/file path) 
+    (io/file (io/file path)
              (str (last relative-path) ".js"))))
 
 ;; Cannnot call build with ["src/cljs" "src/cljs-more"] cause build thinks a vector
@@ -69,7 +70,7 @@
 (defn- compile-cljs [cljs-paths compiler-options notify-command incremental? assert? watching?]
   (let [output-file (:output-to compiler-options)
         output-file-dir (fs/parent output-file)]
-    (println (str "Compiling \"" output-file "\" from " (pr-str cljs-paths) "..."))
+    (lmain/info (str "Compiling \"" output-file "\" from " (pr-str cljs-paths) "..."))
     (flush)
     (when (not incremental?)
       (fs/delete-dir (:output-dir compiler-options)))
