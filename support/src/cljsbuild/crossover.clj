@@ -81,7 +81,7 @@
                     (comp is-macro-file? second)
                     all-resources)]
     (when (empty? all-resources)
-      (println "WARNING: Unable to find crossover: " crossover))
+      (util/log "WARNING: Unable to find crossover: " crossover))
     resources))
 
 (defn find-crossovers [crossovers macros?]

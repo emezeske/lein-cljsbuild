@@ -17,7 +17,7 @@
       (util/sleep 5000)
       (util/process-start command)
       (catch Exception e
-        (println "Error in background process: " e)
+        (util/log (str "Error in background process: " e))
         (throw e)))))
 
 (defn delayed-process-wait [process]

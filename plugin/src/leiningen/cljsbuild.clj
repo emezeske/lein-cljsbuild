@@ -16,7 +16,8 @@
     [leiningen.trampoline :as ltrampoline]
     [robert.hooke :as hooke]
     [clojure.java.io :as io]
-    [clojure.string :as string]))
+    [clojure.string :as string]
+    [cljsbuild.util :as util]))
 
 (def ^:private repl-output-path "repl")
 
@@ -83,11 +84,11 @@
   (doseq [build-id build-ids]
     (if (empty? (filter #(= (:id %) build-id) builds))
       (throw (Exception. (str "Unknown build identifier: " build-id)))))
-  (println (if watch? "Watching for changes before compiling ClojureScript..." "Compiling ClojureScript..."))
+  (util/log (if watch? "Watching for changes before compiling ClojureScript..." "Compiling ClojureScript..."))
   ; If crossover-path does not exist before eval-in-project is called,
   ; the files it contains won't be classloadable, for some reason.
   (when (not-empty crossovers)
-    (println "\033[31mWARNING: lein-cljsbuild crossovers are deprecated, and will be removed in future versions. See https://github.com/emezeske/lein-cljsbuild/blob/master/doc/CROSSOVERS.md for details.\033[0m")
+    (util/log (util/red "WARNING: lein-cljsbuild crossovers are deprecated, and will be removed in future versions. See https://github.com/emezeske/lein-cljsbuild/blob/master/doc/CROSSOVERS.md for details."))
     (fs/mkdirs crossover-path))
   (let [filtered-builds (if (empty? build-ids)
                           builds
