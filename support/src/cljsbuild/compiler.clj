@@ -4,8 +4,6 @@
     [clj-stacktrace.repl :only [pst+]])
   (:require
     [cljsbuild.util :as util]
-    [cljs.analyzer :as analyzer]
-    [cljs.closure]
     [cljs.build.api :as bapi]
     [clojure.string :as string]
     [clojure.java.io :as io]
@@ -46,18 +44,6 @@
     ;; better exception here eh?
     (catch java.lang.RuntimeException e
       nil)))
-
-(defn cljs-target-file [opts cljs-file]
-  (let [target-dir (cljs.closure/output-directory opts)
-        ns-sym     (ns-from-file (io/file cljs-file))
-        relative-path (string/split
-                       (clojure.lang.Compiler/munge (str ns-sym))
-                       #"\.")
-        parents       (butlast relative-path)
-        path          (apply str (interpose java.io.File/separator
-                                            (cons target-dir parents)))]
-    (io/file (io/file path) 
-             (str (last relative-path) ".js"))))
 
 (defn- compile-cljs [cljs-paths compiler-options notify-command incremental? assert? watching?]
   (let [output-file (:output-to compiler-options)
@@ -119,7 +105,7 @@
 (defn reload-clojure [cljs-files paths compiler-options notify-command]
   ;; touch all cljs target files so that cljsc/build will rebuild them
   (doseq [cljs-file cljs-files]
-    (let [target-file (cljs-target-file compiler-options cljs-file)]
+    (let [target-file (bapi/src-file->target-file (io/file cljs-file) compiler-options)]
       (if (.exists target-file)
         (.setLastModified target-file 5000))))
 
