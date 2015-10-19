@@ -1,12 +1,12 @@
 (ns cljsbuild.compiler
   (:use
     [clojure.pprint]
-    [clj-stacktrace.repl :only [pst+]]
-    [cljs.closure :only [build]])
+    [clj-stacktrace.repl :only [pst+]])
   (:require
     [cljsbuild.util :as util]
     [cljs.analyzer :as analyzer]
-    [cljs.closure :as closure]
+    [cljs.closure]
+    [cljs.build.api :as bapi]
     [clojure.string :as string]
     [clojure.java.io :as io]
     [fs.core :as fs]))
@@ -59,13 +59,6 @@
     (io/file (io/file path) 
              (str (last relative-path) ".js"))))
 
-;; Cannnot call build with ["src/cljs" "src/cljs-more"] cause build thinks a vector
-;; denotes a cljs-form, so invent a new Compilable type cause thats what its expects
-(defrecord SourcePaths [paths]
-  cljs.closure/Compilable
-  (-compile [_ opts]
-    (mapcat #(closure/-compile % opts) paths)))
-
 (defn- compile-cljs [cljs-paths compiler-options notify-command incremental? assert? watching?]
   (let [output-file (:output-to compiler-options)
         output-file-dir (fs/parent output-file)]
@@ -78,7 +71,7 @@
     (let [started-at (System/currentTimeMillis)]
       (try
         (binding [*assert* assert?]
-          (build (SourcePaths. cljs-paths) compiler-options))
+          (bapi/build (apply bapi/inputs cljs-paths) compiler-options))
         (fs/touch output-file started-at)
         (notify-cljs
           notify-command
