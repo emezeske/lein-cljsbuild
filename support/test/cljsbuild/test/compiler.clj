@@ -3,9 +3,9 @@
     cljsbuild.compiler
     midje.sweet)
   (:require
-    [cljs.closure :as cljs]
     [cljsbuild.util :as util]
     [clojure.java.io :as io]
+    [cljs.build.api :as bapi]
     [fs.core :as fs]))
 
 (def cljs-path-a "src-cljs-a")
@@ -20,7 +20,6 @@
 (def cljs-checkout-file-b "checkouts/dep-b/cljs-src/file-b.cljs")
 (def checkout-paths [cljs-checkout-path-a cljs-checkout-path-b])
 
-(def cljs-sourcepaths (cljsbuild.compiler.SourcePaths. cljs-paths))
 (def crossover-path "crossovers")
 (def crossover-file (str crossover-path "/file-c.cljs"))
 (def crossover-macro-absolute "/a/b/crossovers/macros.clj")
@@ -84,4 +83,8 @@
                      cljs-checkout-file-b
                      crossover-file]
                     [crossover-macro-classpath] compiler-options-with-defaults notify-command) => nil :times 1
-    (cljs/build cljs-sourcepaths compiler-options-with-defaults) => nil :times 1))
+    ; bapi/inputs returns different instance each time and it doesn't provide equals method
+    (bapi/build
+      (as-checker #(and (instance? cljs.closure.Compilable %) (instance? cljs.closure.Inputs %)))
+      compiler-options-with-defaults)
+    => nil :times 1))
