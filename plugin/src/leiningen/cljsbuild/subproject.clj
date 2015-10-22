@@ -102,6 +102,7 @@
                             :jvm-opts
                             :local-repo
                             :repositories
+                            :mirrors
                             :resource-paths])
       {:local-repo-classpath true
        :dependencies (merge-dependencies (:dependencies project))
