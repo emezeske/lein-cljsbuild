@@ -8,7 +8,7 @@
                  [hiccup "1.0.4"]]
   :plugins [[lein-cljsbuild "1.1.0"]
             [lein-ring "0.8.7"]]
-  ; Enable the lein hooks for: clean, compile, test, and jar.
+  ; Enable the lein hooks for: compile, test, and jar.
   :hooks [leiningen.cljsbuild]
   :cljsbuild {
     ; Configure the REPL support; see the README.md file for more details.
@@ -73,4 +73,8 @@
        :compiler {:output-to "resources/private/js/unit-test.js"
                   :optimizations :whitespace
                   :pretty-print true}}}}
+  ; Clean JS directories
+  :clean-targets ^{:protect false} ["resources/private/js" 
+                                    "resources/public/js"
+                                    :target-path]
   :ring {:handler example.routes/app})

@@ -122,7 +122,6 @@ to enable ClojureScript support in each of them.  The following tasks are
 supported:
 
     $ lein compile
-    $ lein clean
     $ lein test
     $ lein jar
 
