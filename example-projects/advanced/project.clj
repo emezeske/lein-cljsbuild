@@ -2,7 +2,7 @@
   :description "An advanced example of how to use lein-cljsbuild"
   :source-paths ["src-clj"]
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2411"
+                 [org.clojure/clojurescript "0.0-3211"
                   :exclusions [org.apache.ant/ant]]
                  [compojure "1.1.6"]
                  [hiccup "1.0.4"]]
