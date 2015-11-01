@@ -44,7 +44,7 @@ project_, like this:
 lein-cljsbuild will add a dependency to your project if it doesn't already
 contain one, but that functionality will not remain for long.  The latest
 version of lein-cljsbuild currently requires a minimum of ClojureScript
-`0.0-2197`.
+`0.0-3211`.
 
 ## Just Give Me a Damned Example Already!
 
