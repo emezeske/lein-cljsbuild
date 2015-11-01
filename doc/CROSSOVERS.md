@@ -43,7 +43,7 @@ And your `project.clj` file looks like this:
 
 ```clj
 (defproject lein-cljsbuild-example "1.2.3"
-  :plugins [[lein-cljsbuild "1.1.0"]]
+  :plugins [[lein-cljsbuild "1.1.1-SNAPSHOT"]]
   :source-paths ["src-clj"]
   :cljsbuild {
     ; Each entry in the :crossovers vector describes a Clojure namespace
