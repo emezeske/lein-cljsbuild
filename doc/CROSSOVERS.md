@@ -1,12 +1,28 @@
-# Sharing Code Between Clojure and ClojureScript
+# Sharing Code Between Clojure >= 1.7.0-beta2 and ClojureScript >= 0.0-3255
 
-**Note: cljsbuild crossovers are _deprecated_, and will be removed in v2.x.
+A very simple setup is to
+
+- put all shared code clojure files in a separate folder (without other cljs 
+or clj files)
+- adapt their namespace accordingly 
+- change their file ending to cljc and 
+- refer to the folder in the `:source-paths` settings of both the main project 
+and the cljsbuild. 
+
+You can then refer to the files via ordinary `require` from cljs and clj files.
+
+Once you hit the need for platform specific code, please refer 
+to [reader conditionals](http://dev.clojure.org/display/design/Reader+Conditionals)
+
+# Sharing Code Between Clojure and ClojureScript (deprecated)
+
+**cljsbuild crossovers are _deprecated_, and will be removed in v2.x.**
 Please use either [reader
 conditionals](http://dev.clojure.org/display/design/Reader+Conditionals)
 (available in Clojure
 >= 1.7.0-beta2 and ClojureScript >= 0.0-3255), or
 >[cljx](http://github.com/lynaghk/cljx) to
-target both Clojure and ClojureScript from the same codebase.**
+target both Clojure and ClojureScript from the same codebase.
 
 Sharing code with lein-cljsbuild is accomplished via the configuration
 of "crossovers".  A crossover specifies a Clojure namespace, the content
