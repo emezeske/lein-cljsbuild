@@ -5,7 +5,7 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-3211"]]
 
-  :plugins [[lein-cljsbuild "1.1.1-SNAPSHOT"]]
+  :plugins [[lein-cljsbuild "1.1.1"]]
 
   :source-paths ["src"]
 
