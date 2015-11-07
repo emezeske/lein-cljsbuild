@@ -1,5 +1,11 @@
 # Release Notes for lein-cljsbuild
 
+## [1.1.1](https://github.com/emezeske/lein-cljsbuild/pulls?utf8=%E2%9C%93&q=is%3Aclosed+is%3Apr+milestone%3A1.1.1)
+
+* Use ClojureScript build API to build project
+* Add support for mirrors project attribute
+* Update advanced example project to work with PhantomJS 2.0
+
 ## [1.1.0](https://github.com/emezeske/lein-cljsbuild/issues?q=milestone%3A1.1.0+is%3Aclosed)
 
 * Eliminated all remaining non-default ClojureScript compiler options
