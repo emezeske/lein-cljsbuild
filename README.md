@@ -1,5 +1,8 @@
 # lein-cljsbuild
 
+####Latest version:
+[![Clojars Project](http://clojars.org/lein-cljsbuild/latest-version.svg)](http://clojars.org/lein-cljsbuild)
+
 This is a Leiningen plugin that makes it quick and easy to automatically compile
 your ClojureScript code into Javascript whenever you modify it.  It's simple
 to install and allows you to configure the ClojureScript compiler from within your
@@ -13,10 +16,10 @@ Beyond basic compiler support, lein-cljsbuild can optionally help with a few oth
 The latest version of lein-cljsbuild is `1.1.1`.
 [See the release notes here.](https://github.com/emezeske/lein-cljsbuild/blob/1.1.1/doc/RELEASE-NOTES.md)
 
-Note that cljsbuild crossovers are deprecated, and will be removed eventually.
+*Note that cljsbuild crossovers are deprecated, and will be removed eventually.
 You should never use them. Please use either [reader conditionals](http://dev.clojure.org/display/design/Reader+Conditionals)
 (available in Clojure &gt;= 1.7.0-beta2 and ClojureScript &gt;= 0.0-3255), or [cljx](http://github.com/lynaghk/cljx)
-to target both Clojure and ClojureScript from the same codebase.
+to target both Clojure and ClojureScript from the same codebase.*
 
 **If you are using ClojureScript >= 1.7.170 you need to use a lein-cljsbuild version >= 1.1.1.**
 
