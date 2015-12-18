@@ -133,7 +133,9 @@
           (into {}
             (for [cljs-path (concat cljs-paths checkout-paths)]
               [cljs-path (util/find-files cljs-path (conj additional-file-extensions "clj"))]))
-        cljs-files (mapcat #(util/find-files % (conj additional-file-extensions "cljs")) (concat cljs-paths checkout-paths [crossover-path]))
+        cljs-files (->> (concat cljs-paths checkout-paths [crossover-path])
+                     (mapcat #(util/find-files % (conj additional-file-extensions "cljs")))
+                     (remove #(contains? cljs.compiler/cljs-reserved-file-names (.getName (io/file %)))))
         js-files (let [output-dir-str
                        (.getAbsolutePath (io/file (:output-dir compiler-options)))]
                    (->> lib-paths
