@@ -1,5 +1,9 @@
 # Release Notes for lein-cljsbuild
 
+## [1.1.2](https://github.com/emezeske/lein-cljsbuild/pulls?utf8=%E2%9C%93&q=is%3Aclosed+is%3Apr+milestone%3A1.1.2)
+
+* Avoid calls to cljs.build.api/src-file->target_file on deps.cljs
+
 ## [1.1.1](https://github.com/emezeske/lein-cljsbuild/pulls?utf8=%E2%9C%93&q=is%3Aclosed+is%3Apr+milestone%3A1.1.1)
 
 * Use ClojureScript build API to build project
