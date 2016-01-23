@@ -2,7 +2,6 @@
   "Utilities for running cljsbuild in a subproject"
   (:require
     [leiningen.core.main :as lmain]
-    [cljsbuild.compat :as cljs-compat]
     [clojure.java.io :refer (resource)]
     [clojure.string :as string]))
 
@@ -59,38 +58,15 @@
 (defn merge-dependencies [project-dependencies]
   (let [project (dependency-map project-dependencies)
         desired-cljs-version ('org.clojure/clojurescript project)
-        cljsbuild (dependency-map cljsbuild-dependencies)
-        {acceptable-cljs-range :cljs} (cljs-compat/matrix cljsbuild-version)
-        cljs-version-message [(format "You're using [lein-cljsbuild \"%s\"]," cljsbuild-version)
-                   "which is known to work"
-                   "well with ClojureScript" (first acceptable-cljs-range)
-                   "-" (str (or (second acceptable-cljs-range) "*") ".")]]
+        cljsbuild (dependency-map cljsbuild-dependencies)]
     (check-clojure-version project)
-    (if desired-cljs-version
-      (when acceptable-cljs-range
-        ; https://github.com/emezeske/lein-cljsbuild/issues/287
-        ; we could emit a warning here indicating that we couldn't verify the cljsbuild/CLJS
-        ; version pairing, but that would likely just confuse people
-        (when-not (cljs-compat/version-in-range? (first desired-cljs-version) acceptable-cljs-range)
-          (print "\033[31m")
-          (apply println (concat cljs-version-message
-                           ["You are attempting to use ClojureScript"
-                            (str (first desired-cljs-version) ",")
-                            "which is not within this range. This build may fail due to a"
-                            "hard API incompatibility, or simply yield undefined or incorrect"
-                            "ClojureScript compilation output. Your best next step would be to"
-                            "change your ClojureScript dependency to fit in the range, or"
-                            "change your lein-cljsbuild plugin dependency to one that supports"
-                            "ClojureScript" (str (first desired-cljs-version) ".")
-                            "\033[0m"]))))
-      (do
-        (println "\033[33mWARNING: It appears your project does not contain a ClojureScript"
-                 "dependency. One will be provided for you by lein-cljsbuild, but it"
-                 "is strongly recommended that you add your own.  You can find a list"
-                 "of all ClojureScript releases here:")
-        (println "http://search.maven.org/#search|gav|1|g%3A%22org.clojure%22%20AND%20a%3A%22clojurescript%22")
-        (when acceptable-cljs-range (apply println cljs-version-message))
-        (println "\033[0m")))
+    (when-not desired-cljs-version
+      (println "\033[33mWARNING: It appears your project does not contain a ClojureScript"
+               "dependency. One will be provided for you by lein-cljsbuild, but it"
+               "is strongly recommended that you add your own.  You can find a list"
+               "of all ClojureScript releases here:")
+      (println "http://search.maven.org/#search|gav|1|g%3A%22org.clojure%22%20AND%20a%3A%22clojurescript%22")
+      (println "\033[0m"))
     (->> (reduce-kv array-map-assoc cljsbuild project)
          (map (fn [[k v]] (vec (cons k v)))))))
 

@@ -11,11 +11,8 @@ projects="$@"
 project_root=$(dirname $0)/..
 pushd $project_root
 
-# needed to allow for post-release updates to cljs-compat
-export LEIN_SNAPSHOTS_IN_RELEASE=true
-
 rm -rf ~/.m2/repository/lein-cljsbuild ~/.m2/repository/cljsbuild/
-for d in cljs-compat support plugin; do
+for d in support plugin; do
 	pushd $d
 	lein do clean, install, test
 	popd
