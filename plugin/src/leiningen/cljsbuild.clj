@@ -34,7 +34,6 @@
   (leval/eval-in-project (subproject/make-subproject project crossover-path builds)
     `(try
        ~form
-       ~(exit)
        (catch cljsbuild.test.TestsFailedException e#
          ; Do not print stack trace on test failure
          ~(exit 1))
