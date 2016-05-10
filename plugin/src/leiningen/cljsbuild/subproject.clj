@@ -73,13 +73,7 @@
 (defn make-subproject [project crossover-path builds]
   (with-meta
     (merge
-      (select-keys project [:checkout-deps-shares
-                            :eval-in
-                            :jvm-opts
-                            :local-repo
-                            :repositories
-                            :mirrors
-                            :resource-paths])
+      project
       {:local-repo-classpath true
        :dependencies (merge-dependencies (:dependencies project))
        :source-paths (concat
