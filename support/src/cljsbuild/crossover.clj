@@ -5,7 +5,7 @@
     [cljsbuild.util :as util]
     [clojure.string :as string]
     [fs.core :as fs])
-  (import
+  (:import
     java.io.File
     java.net.URLDecoder))
 
