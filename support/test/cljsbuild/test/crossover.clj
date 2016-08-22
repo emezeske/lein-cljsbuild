@@ -5,7 +5,7 @@
   (:require
     [clojure.java.io :as io]
     [fs.core :as fs])
-  (import java.net.URL))
+  (:import java.net.URL))
 
 (def crossover-path "/project/crossovers")
 (def crossovers '[a a.a a.b])
