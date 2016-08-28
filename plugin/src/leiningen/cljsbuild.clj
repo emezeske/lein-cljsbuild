@@ -30,8 +30,8 @@
         `(throw (ex-info "Suppress exit" {:exit-code ~code})))))
   ([] (exit 0)))
 
-(defn- run-local-project [project crossover-path builds requires form]
-  (leval/eval-in-project (subproject/make-subproject project crossover-path builds)
+(defn- run-local-project [project builds requires form]
+  (leval/eval-in-project (subproject/make-subproject project builds)
     `(try
        ~form
        (catch cljsbuild.test.TestsFailedException e#
@@ -78,16 +78,11 @@
               path (:source-paths build)]
           (fs/absolute-path (io/file root path)))))))
 
-(defn- run-compiler [project {:keys [crossover-path crossovers builds]} build-ids watch?]
+(defn- run-compiler [project {:keys [builds]} build-ids watch?]
   (doseq [build-id build-ids]
     (if (empty? (filter #(= (:id %) build-id) builds))
       (throw (Exception. (str "Unknown build identifier: " build-id)))))
   (println (if watch? "Watching for changes before compiling ClojureScript..." "Compiling ClojureScript..."))
-  ; If crossover-path does not exist before eval-in-project is called,
-  ; the files it contains won't be classloadable, for some reason.
-  (when (not-empty crossovers)
-    (println "\033[31mWARNING: lein-cljsbuild crossovers are deprecated, and will be removed in future versions. See https://github.com/emezeske/lein-cljsbuild/blob/master/doc/CROSSOVERS.md for details.\033[0m")
-    (fs/mkdirs crossover-path))
   (let [filtered-builds (if (empty? build-ids)
                           builds
                           (filter #(some #{(:id %)} build-ids) builds))
@@ -96,62 +91,51 @@
     (doseq [build parsed-builds]
       (config/warn-unsupported-warn-on-undeclared build)
       (config/warn-unsupported-notify-command build))
-    (run-local-project project crossover-path parsed-builds
-      '(require 'cljsbuild.compiler 'cljsbuild.crossover 'cljsbuild.util)
-      `(do
-        (letfn [(copy-crossovers# []
-                  (cljsbuild.crossover/copy-crossovers
-                    ~crossover-path
-                    '~crossovers))]
-          (copy-crossovers#)
-          (when ~watch?
-            (cljsbuild.util/once-every-bg 1000 "copying crossovers" copy-crossovers#))
-          (let [crossover-macro-paths# (cljsbuild.crossover/crossover-macro-paths '~crossovers)
-                builds# (for [opts# '~parsed-builds]
-                          [opts# (cljs.env/default-compiler-env (:compiler opts#))])]
-            ;; Prep the environments
-            (doseq [[build# compiler-env#] builds#]
-              ;; Require any ns if necessary
-              (doseq [handler# (:warning-handlers build#)]
-                (when (symbol? handler#)
-                  (let [[n# sym#] (string/split (str handler#) #"/")]
-                    (assert (and n# sym#)
-                            (str "Symbols for :warning-handlers must be fully-qualified, " (pr-str handler#) " is missing namespace."))
-                    (when (and n# sym#)
-                      (require (symbol n#)))))))
-            (loop [dependency-mtimes# (repeat (count builds#) {})]
-              (let [builds-mtimes# (map vector builds# dependency-mtimes#)
-                    new-dependency-mtimes#
-                      (doall
-                       (for [[[build# compiler-env#] mtimes#] builds-mtimes#]
-                       (cljs.analyzer/with-warning-handlers
-                         (if-let [handlers# (:warning-handlers build#)]
-                           ;; Prep the warning handlers via eval and
-                           ;; resolve if custom, otherwise default to
-                           ;; built-in warning handlers
-                           (mapv (fn [handler#]
-                                   ;; Resolve symbols to their fns
-                                   (if (symbol? handler#)
-                                     (resolve handler#)
-                                     handler#)) (eval handlers#))
-                           cljs.analyzer/*cljs-warning-handlers*)
-                         (binding [cljs.env/*compiler* compiler-env#]
-                           (cljsbuild.compiler/run-compiler
-                            (:source-paths build#)
-                            '~checkout-cljs-paths
-                            ~crossover-path
-                            crossover-macro-paths#
-                            (:compiler build#)
-                            (:parsed-notify-command build#)
-                            (:incremental build#)
-                            (:assert build#)
-                            mtimes#
-                            ~watch?)))))]
-                 (when ~watch?
-                   (Thread/sleep 100)
-                   (recur new-dependency-mtimes#))))))))))
+    (run-local-project project parsed-builds
+      '(require 'cljsbuild.compiler 'cljsbuild.util)
+      `(let [builds# (for [opts# '~parsed-builds]
+                       [opts# (cljs.env/default-compiler-env (:compiler opts#))])]
+         ;; Prep the environments
+         (doseq [[build# compiler-env#] builds#]
+           ;; Require any ns if necessary
+           (doseq [handler# (:warning-handlers build#)]
+             (when (symbol? handler#)
+               (let [[n# sym#] (string/split (str handler#) #"/")]
+                 (assert (and n# sym#)
+                         (str "Symbols for :warning-handlers must be fully-qualified, " (pr-str handler#) " is missing namespace."))
+                 (when (and n# sym#)
+                   (require (symbol n#)))))))
+         (loop [dependency-mtimes# (repeat (count builds#) {})]
+           (let [builds-mtimes# (map vector builds# dependency-mtimes#)
+                 new-dependency-mtimes#
+                 (doall
+                  (for [[[build# compiler-env#] mtimes#] builds-mtimes#]
+                    (cljs.analyzer/with-warning-handlers
+                      (if-let [handlers# (:warning-handlers build#)]
+                        ;; Prep the warning handlers via eval and
+                        ;; resolve if custom, otherwise default to
+                        ;; built-in warning handlers
+                        (mapv (fn [handler#]
+                                ;; Resolve symbols to their fns
+                                (if (symbol? handler#)
+                                  (resolve handler#)
+                                  handler#)) (eval handlers#))
+                        cljs.analyzer/*cljs-warning-handlers*)
+                      (binding [cljs.env/*compiler* compiler-env#]
+                        (cljsbuild.compiler/run-compiler
+                         (:source-paths build#)
+                         '~checkout-cljs-paths
+                         (:compiler build#)
+                         (:parsed-notify-command build#)
+                         (:incremental build#)
+                         (:assert build#)
+                         mtimes#
+                         ~watch?)))))]
+             (when ~watch?
+               (Thread/sleep 100)
+               (recur new-dependency-mtimes#))))))))
 
-(defn- run-tests [project {:keys [test-commands crossover-path builds]} args]
+(defn- run-tests [project {:keys [test-commands builds]} args]
   (when (> (count args) 1)
     (lmain/abort "Only expected zero or one arguments."))
   (when (and (= (count args) 1) (not (get test-commands (first args))))
@@ -172,7 +156,7 @@
       (when (empty? (:shell (second (first parsed-tests))))
         (println (str "Could not locate test command " (first args) "."))
         (lmain/abort))
-      (run-local-project project crossover-path builds
+      (run-local-project project builds
                          '(require 'cljsbuild.test)
                          `(cljsbuild.test/run-tests '~parsed-tests)))))
 
@@ -201,10 +185,10 @@
 
 (defn- repl-listen
   "Run a REPL that will listen for incoming connections."
-  [project {:keys [crossover-path builds repl-listen-port]}]
+  [project {:keys [builds repl-listen-port]}]
   (require-trampoline
     (println (str "Running ClojureScript REPL, listening on port " repl-listen-port "."))
-    (run-local-project project crossover-path builds
+    (run-local-project project builds
       '(require 'cljsbuild.repl.listen)
       `(cljsbuild.repl.listen/run-repl-listen
         ~repl-listen-port
@@ -212,7 +196,7 @@
 
 (defn- repl-launch
   "Run a REPL and launch a custom command to connect to it."
-  [project {:keys [crossover-path builds repl-listen-port repl-launch-commands]} args]
+  [project {:keys [builds repl-listen-port repl-launch-commands]} args]
   (require-trampoline
     (when (< (count args) 1)
       (throw (Exception. "Must supply a launch command identifier.")))
@@ -225,7 +209,7 @@
             shell (concat (:shell parsed) command-args)
             command (assoc parsed :shell shell)]
         (println "Running ClojureScript REPL and launching command:" shell)
-        (run-local-project project crossover-path builds
+        (run-local-project project builds
           '(require 'cljsbuild.repl.listen)
           `(cljsbuild.repl.listen/run-repl-launch
               ~repl-listen-port
@@ -234,10 +218,10 @@
 
 (defn- repl-rhino
   "Run a Rhino-based REPL."
-  [project {:keys [crossover-path builds]}]
+  [project {:keys [builds]}]
   (require-trampoline
     (println "Running Rhino-based ClojureScript REPL.")
-    (run-local-project project crossover-path builds
+    (run-local-project project builds
       '(require 'cljsbuild.repl.rhino)
       `(cljsbuild.repl.rhino/run-repl-rhino))))
 

@@ -1,13 +1,13 @@
-(defproject cljsbuild-example-advanced "1.1.6"
+(defproject cljsbuild-example-advanced "2.0.0-SNAPSHOT"
   :description "An advanced example of how to use lein-cljsbuild"
-  :source-paths ["src-clj"]
+  :source-paths ["src-clj" "src-cljc"]
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.9.521"
                   :exclusions [org.apache.ant/ant]]
-                 [compojure "1.1.6"]
-                 [hiccup "1.0.4"]]
-  :plugins [[lein-cljsbuild "1.1.6"]
-            [lein-ring "0.8.7"]]
+                 [compojure "1.5.1"]
+                 [hiccup "1.0.5"]]
+  :plugins [[lein-cljsbuild "2.0.0-SNAPSHOT"]
+            [lein-ring "0.9.7"]]
   ; Enable the lein hooks for: compile, test, and jar.
   :hooks [leiningen.cljsbuild]
   :cljsbuild {
@@ -47,13 +47,11 @@
       {"unit" ["phantomjs"
                "phantom/unit-test.js"
                "resources/private/html/unit-test.html"]}
-    :crossovers [example.crossover]
-    :crossover-jar true
     :builds {
       ; This build has the lowest level of optimizations, so it is
       ; useful when debugging the app.
       :dev
-      {:source-paths ["src-cljs"]
+      {:source-paths ["src-cljs" "src-cljc"]
        :jar true
        :compiler {:output-to "resources/public/js/main-debug.js"
                   :optimizations :whitespace
@@ -61,7 +59,7 @@
       ; This build has the highest level of optimizations, so it is
       ; efficient when running the app in production.
       :prod
-      {:source-paths ["src-cljs"]
+      {:source-paths ["src-cljs" "src-cljc"]
        :compiler {:output-to "resources/public/js/main.js"
                   :optimizations :advanced
                   :pretty-print false}}
@@ -69,7 +67,7 @@
       ; be run via PhantomJS.  See the phantom/unit-test.js file
       ; for details on how it's run.
       :test
-      {:source-paths ["src-cljs" "test-cljs"]
+      {:source-paths ["src-cljs" "src-cljc" "test-cljs"]
        :compiler {:output-to "resources/private/js/unit-test.js"
                   :optimizations :whitespace
                   :pretty-print true}}}}

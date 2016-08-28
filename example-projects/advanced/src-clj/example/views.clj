@@ -1,6 +1,6 @@
 (ns example.views
   (:require
-    [example.crossover.shared :as shared]
+    [example.shared :as shared]
     [hiccup
       [page :refer [html5]]
       [element :refer [javascript-tag]]
@@ -40,8 +40,6 @@ lein trampoline cljsbuild repl-listen"]
       [:hr]
       [:h2 {:id "fun"} "Try some fun REPL commands!"]
       [:pre "> (js/alert \"Hello!\")
-> (load-namespace 'goog.date.Date)
-> (js/alert (goog.date.Date.))
 > (.log js/console (reduce + [1 2 3 4 5]))
 > (load-namespace 'goog.dom)
 > (goog.dom.setTextContent (goog.dom.getElement \"fun\") \"I changed something....\") "]

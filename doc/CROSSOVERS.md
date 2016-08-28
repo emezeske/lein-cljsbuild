@@ -16,13 +16,7 @@ to [reader conditionals](http://dev.clojure.org/display/design/Reader+Conditiona
 
 # Sharing Code Between Clojure and ClojureScript (deprecated)
 
-**cljsbuild crossovers are _deprecated_, and will be removed in v2.x.**
-Please use either [reader
-conditionals](http://dev.clojure.org/display/design/Reader+Conditionals)
-(available in Clojure
->= 1.7.0-beta2 and ClojureScript >= 0.0-3255), or
->[cljx](http://github.com/lynaghk/cljx) to
-target both Clojure and ClojureScript from the same codebase.
+> **Cljsbuild crossovers have been removed with version 2.0.0.** If your project still relies on crossovers use a version < 2.0.0, however it is advised to use [reader conditionals](http://dev.clojure.org/display/design/Reader+Conditionals) (available in Clojure &gt;= 1.7.0-beta2 and ClojureScript &gt;= 0.0-3255) to target both, Clojure and ClojureScript, from the same codebase.
 
 Sharing code with lein-cljsbuild is accomplished via the configuration
 of "crossovers". A crossover specifies a Clojure namespace, the content

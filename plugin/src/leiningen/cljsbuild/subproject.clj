@@ -64,7 +64,7 @@
     (when-not desired-cljs-version
       (println "\033[33mWARNING: It appears your project does not contain a ClojureScript"
                "dependency. One will be provided for you by lein-cljsbuild, but it"
-               "is strongly recommended that you add your own.  You can find a list"
+               "is strongly recommended that you add your own. You can find a list"
                "of all ClojureScript releases here:")
       (println "http://search.maven.org/#search|gav|1|g%3A%22org.clojure%22%20AND%20a%3A%22clojurescript%22")
       (println "\033[0m"))
@@ -81,7 +81,7 @@
      (get project :managed-dependencies))
     (get project :dependencies)))
 
-(defn make-subproject [project crossover-path builds]
+(defn make-subproject [project builds]
   (let [deps (get-deps-from-project project)]
     (with-meta
       (merge
@@ -96,6 +96,5 @@
         :dependencies (merge-dependencies deps)
         :source-paths (concat
                        (:source-paths project)
-                       (mapcat :source-paths builds)
-                       [crossover-path])})
+                       (mapcat :source-paths builds))})
       (meta project))))

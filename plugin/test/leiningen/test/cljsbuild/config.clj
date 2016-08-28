@@ -31,9 +31,6 @@
   {:repl-launch-commands {:a ["a"]}
    :repl-listen-port 10000
    :test-commands {:b ["b"]}
-   :crossover-path "c"
-   :crossover-jar true
-   :crossovers ["d" "e"]
    :builds
      '({:source-paths ["f"]
         :jar true

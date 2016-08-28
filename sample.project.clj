@@ -15,9 +15,8 @@
   ; Your project should plugin-depend on lein-cljsbuild, to ensure that
   ; the right version of the plugin is installed.
   :plugins [[lein-cljsbuild "1.1.1"]]
-  ; The standard Leiningen :source-paths option is used by lein-cljsbuild
-  ; to determine the source directory from which crossover files will
-  ; be copied.  Leiningen defaults to ["src"].
+  ; The standard Leiningen :source-paths option describes the location of
+  ; your source code and will be passed to the ClojureScript compiler
   :source-paths ["src-clj"]
   ; This is required for lein-cljsbuild to hook into the default Leningen
   ; tasks, e.g. the "lein compile" and "lein jar" tasks.
@@ -49,16 +48,6 @@
     ; Defaults to the empty map.
     :test-commands
       {"unit" ["phantomjs" "phantom/unit-test.js" "resources/private/html/unit-test.html"]}
-    ; A list of namespaces that should be copied from the Clojure classpath into
-    ; the :crossover-path, with some changes for ClojureScript compatibility. See
-    ; doc/CROSSOVERS.md for more details. Defaults to the empty vector [].
-    :crossovers [example.crossover]
-    ; The directory into which the :crossovers namespaces should be copied.
-    ; Defaults to "target/cljsbuild-crossover".
-    :crossover-path "target/my-crossovers"
-    ; If hooks are enabled, this flag determines whether files from :crossover-path
-    ; are added to the JAR file created by "lein jar".
-    :crossover-jar true
     ; The :builds option should be set to a sequence of maps.  Each
     ; map will be treated as a separate, independent, ClojureScript
     ; compiler configuration.

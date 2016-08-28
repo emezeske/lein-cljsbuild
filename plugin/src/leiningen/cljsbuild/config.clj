@@ -16,10 +16,7 @@
 (defn- default-global-options [target-path]
   {:repl-launch-commands {}
    :repl-listen-port 9000
-   :test-commands {}
-   :crossover-path (in-target-path target-path "crossover")
-   :crossover-jar false
-   :crossovers []})
+   :test-commands {}})
 
 (defn- default-compiler-options [target-path]
   {:output-to (in-target-path target-path "main.js")
@@ -60,24 +57,10 @@
           :source-path)
         build))))
 
-(defn- backwards-compat-crossovers [{:keys [builds crossovers] :as options}]
-  (let [all-crossovers (->> builds
-                         (mapcat :crossovers)
-                         (concat crossovers)
-                         (distinct)
-                         (vec))
-        no-crossovers (assoc options
-                        :builds (vec (map #(dissoc % :crossovers) builds)))]
-    (if (empty? all-crossovers)
-      no-crossovers
-      (assoc no-crossovers
-        :crossovers all-crossovers))))
-
 (defn backwards-compat [options]
   (-> options
     backwards-compat-builds
-    backwards-compat-source-path
-    backwards-compat-crossovers))
+    backwards-compat-source-path))
 
 (defn- warn-deprecated [options]
   (letfn [(delim [] (println (apply str (take 80 (repeat "-")))))]
@@ -86,7 +69,7 @@
       (str
         "WARNING: your :cljsbuild configuration is in a deprecated format.  It has been\n"
         "automatically converted it to the new format, which will be printed below.\n"
-        "It is recommended that you update your :cljsbuild configuration ASAP."))
+        "It is recommended that you update your :cljsbuild configuration."))
     (delim)
     (println ":cljsbuild")
     (pprint/pprint options)

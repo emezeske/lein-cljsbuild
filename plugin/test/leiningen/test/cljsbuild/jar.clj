@@ -49,27 +49,21 @@
     (into {} (map vector names directories))))
 
 (fact
-  (let [entries (make-jar-directories [:a :b :c])
+  (let [entries (make-jar-directories [:a :b])
         project {:cljsbuild
-                  {:crossover-path (get-in entries [:a :root])
-                   :crossover-jar true
-                   :builds
-                     [{:source-paths [(get-in entries [:b :root])]
+                  {:builds
+                     [{:source-paths [(get-in entries [:a :root])]
                        :jar true}
-                      {:source-paths [(get-in entries [:c :root])]
+                      {:source-paths [(get-in entries [:b :root])]
                        :jar true}
                       {:source-paths ["not-in-jar"]}]}}
         root-a (get-in entries [:a :root])
-        root-b (get-in entries [:b :root])
-        root-c (get-in entries [:c :root])]
+        root-b (get-in entries [:b :root])]
     (get-filespecs project) => (just (set (map :filespec (vals entries))))
     (provided
       (path-filespecs root-a) => [(get-in entries [:a :filespec])] :times 1
-      (path-filespecs root-b) => [(get-in entries [:b :filespec])] :times 1
-      (path-filespecs root-c) => [(get-in entries [:c :filespec])] :times 1)
-    (let [entries (dissoc entries :a)
-          project (assoc-in project [:cljsbuild :crossover-jar] false)]
-      (get-filespecs project) => (just (set (map :filespec (vals entries))))
-      (provided
-        (path-filespecs root-b) => [(get-in entries [:b :filespec])] :times 1
-        (path-filespecs root-c) => [(get-in entries [:c :filespec])] :times 1))))
+      (path-filespecs root-b) => [(get-in entries [:b :filespec])] :times 1)
+    (get-filespecs project) => (just (set (map :filespec (vals entries))))
+    (provided
+     (path-filespecs root-a) => [(get-in entries [:a :filespec])] :times 1
+     (path-filespecs root-b) => [(get-in entries [:b :filespec])] :times 1)))

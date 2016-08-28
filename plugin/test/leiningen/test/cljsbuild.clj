@@ -12,7 +12,6 @@
     [leiningen.core.project :as lproject]
     [fs.core :as fs]
     [clojure.java.io :as io]
-    cljsbuild.crossover
     cljsbuild.util
     cljsbuild.compiler
     cljsbuild.test
@@ -24,10 +23,6 @@
 (def repl-launch-command ["launch-me"])
 (def test-command-id "test-id")
 (def test-command ["test-me"])
-(def crossover-path "target/crossover-path")
-(def crossovers ['test.crossover])
-(def crossover-macros [{:absolute "/root/stuff/test/crossover.clj"
-                        :classpath "test/crossover.clj"}])
 
 (def build-id "build-id")
 (def source-paths ["source-path-a" "source-path-b"])
@@ -63,15 +58,13 @@
 (def checkouts-dir (io/file project-dir "checkouts"))
 
 (def project
- {:dependencies [['org.clojure/clojure "1.5.1"]]
-  :root project-dir
-  :cljsbuild
+  {:dependencies [['org.clojure/clojure "1.5.1"]
+                  ['org.clojure/clojurescript "0.0-3211"]]
+   :root project-dir
+   :cljsbuild
    {:repl-listen-port repl-listen-port
     :repl-launch-commands {repl-launch-command-id repl-launch-command}
     :test-commands {test-command-id test-command}
-    :crossover-path crossover-path
-    :crossover-jar true
-    :crossovers crossovers
     :builds builds}})
 
 (defn hook-success [& args]
@@ -99,7 +92,7 @@
     (cljsbuild project command) => nil
     (provided
       (leval/eval-in-project
-        (subproject/make-subproject project crossover-path parsed-builds)
+        (subproject/make-subproject project parsed-builds)
         anything
         anything) => nil :times 1)) )
 
@@ -108,16 +101,9 @@
     (apply cljsbuild project "once" extra-args) => nil
     (provided
       (fs/list-dir checkouts-dir) => nil, :times 1
-      (cljsbuild.crossover/crossover-macro-paths
-        crossovers) => crossover-macros :times 1
-      (cljsbuild.crossover/copy-crossovers
-        crossover-path
-        crossovers) => nil :times 1
       (cljsbuild.compiler/run-compiler
         source-paths
         []
-        crossover-path
-        crossover-macros
         parsed-compiler
         anything
         incremental?
@@ -132,16 +118,9 @@
   (compile-hook hook-success project) => nil
   (provided
     (fs/list-dir checkouts-dir) => nil, :times 1
-    (cljsbuild.crossover/crossover-macro-paths
-      crossovers) => crossover-macros :times 1
-    (cljsbuild.crossover/copy-crossovers
-      crossover-path
-      crossovers) => nil :times 1
     (cljsbuild.compiler/run-compiler
       source-paths
       []
-      crossover-path
-      crossover-macros
       parsed-compiler
       anything
       incremental?
@@ -171,19 +150,12 @@
       (lproject/read "/project/checkouts/lib-b/project.clj") =>
         (assoc project :root (fs/absolute-path checkout-b-dir)), :times 1
 
-      (cljsbuild.crossover/crossover-macro-paths
-        crossovers) => crossover-macros :times 1
-      (cljsbuild.crossover/copy-crossovers
-        crossover-path
-        crossovers) => nil :times 1
       (cljsbuild.compiler/run-compiler
         source-paths
         ["/project/checkouts/lib-b/source-path-a"
          "/project/checkouts/lib-b/source-path-b"
          "/project/checkouts/lib-a/source-path-a"
          "/project/checkouts/lib-a/source-path-b"]
-        crossover-path
-        crossover-macros
         parsed-compiler
         anything
         incremental?
@@ -195,11 +167,6 @@
   (compile-hook hook-failure project) => (throws Exception)
   (provided
     (fs/list-dir checkouts-dir) => nil, :times 0
-    (cljsbuild.crossover/crossover-macro-paths
-      anything) => nil :times 0
-    (cljsbuild.crossover/copy-crossovers
-      anything
-      anything) => nil :times 0
     (cljsbuild.compiler/run-compiler
       anything
       anything
@@ -222,16 +189,9 @@
       (test-hook hook-failure project) => (throws Exception)
       (against-background
         (fs/list-dir checkouts-dir) => nil, :times 1
-        (cljsbuild.crossover/crossover-macro-paths
-          crossovers) => crossover-macros :times 0
-        (cljsbuild.crossover/copy-crossovers
-          crossover-path
-          crossovers) => nil :times 1
         (cljsbuild.compiler/run-compiler
           source-paths
           []
-          crossover-path
-          crossover-macros
           parsed-compiler
           anything
           incremental?
