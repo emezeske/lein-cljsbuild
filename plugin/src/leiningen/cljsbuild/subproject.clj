@@ -3,7 +3,8 @@
   (:require
     [leiningen.core.main :as lmain]
     [clojure.java.io :refer (resource)]
-    [clojure.string :as string]))
+    [clojure.string :as string]
+    [leiningen.core.classpath :as classpath]))
 
 (def cljsbuild-version
   (let [[_ coords version]
@@ -70,14 +71,27 @@
     (->> (reduce-kv array-map-assoc cljsbuild project)
          (map (fn [[k v]] (vec (cons k v)))))))
 
+(defn- get-deps-from-project
+  [project]
+  ;; This checks to see if the user is running lein 2.7 or greater, and, if so,
+  ;; merges in the dependency versions from the `:managed-dependencies` vector.
+  (if-let [merge-versions-from-managed-coords (resolve 'leiningen.core.classpath/merge-versions-from-managed-coords)]
+    (merge-versions-from-managed-coords
+     (get project :dependencies)
+     (get project :managed-dependencies))
+    (get project :dependencies)))
+
 (defn make-subproject [project crossover-path builds]
-  (with-meta
-    (merge
+  (let [deps (get-deps-from-project project)]
+    (with-meta
+     (merge
       project
       {:local-repo-classpath true
-       :dependencies (merge-dependencies (:dependencies project))
+       :dependencies (merge-dependencies deps)
        :source-paths (concat
-                       (:source-paths project)
-                       (mapcat :source-paths builds)
-                       [crossover-path])})
-    (meta project)))
+                      (:source-paths project)
+                      (mapcat :source-paths builds)
+                      [crossover-path])})
+     (meta project))))
+
+
