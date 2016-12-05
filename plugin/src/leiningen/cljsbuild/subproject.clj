@@ -84,14 +84,18 @@
 (defn make-subproject [project crossover-path builds]
   (let [deps (get-deps-from-project project)]
     (with-meta
-     (merge
-      project
-      {:local-repo-classpath true
-       :dependencies (merge-dependencies deps)
-       :source-paths (concat
-                      (:source-paths project)
-                      (mapcat :source-paths builds)
-                      [crossover-path])})
-     (meta project))))
-
-
+      (merge
+       (select-keys project [:checkout-deps-shares
+                             :eval-in
+                             :jvm-opts
+                             :local-repo
+                             :repositories
+                             :mirrors
+                             :resource-paths])
+       {:local-repo-classpath true
+        :dependencies (merge-dependencies deps)
+        :source-paths (concat
+                       (:source-paths project)
+                       (mapcat :source-paths builds)
+                       [crossover-path])})
+      (meta project))))
