@@ -1,5 +1,10 @@
 # Release Notes for lein-cljsbuild
 
+## [1.1.5](https://github.com/emezeske/lein-cljsbuild/pulls?utf8=%E2%9C%93&q=is%3Aclosed+is%3Apr+milestone%3A1.1.5)
+
+* Add support for lein 2.7's `:managed-dependencies` (https://github.com/emezeske/lein-cljsbuild/pull/454)
+* Fix: 1.1.4 causes cljsbuild to sometimes compile sources in other build configs (https://github.com/emezeske/lein-cljsbuild/issues/451)
+
 ## [1.1.4](https://github.com/emezeske/lein-cljsbuild/pulls?utf8=%E2%9C%93&q=is%3Aclosed+is%3Apr+milestone%3A1.1.4)
 
 * Fix bad ns form with regard to core specs
