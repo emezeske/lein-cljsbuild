@@ -98,7 +98,7 @@
           ; recommended setting for production, unless something prevents it (incompatible
           ; external library, bug, etc.).
           ; :none requires manual code loading and hence a separate HTML from the other options.
-          ; Defaults to :whitespace.
+          ; Defaults to :none.
           :optimizations :whitespace
           ; This flag will cause all (assert x) calls to be removed during compilation
           ; Useful for production. Default is always false even in advanced compilation.
