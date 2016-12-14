@@ -7,7 +7,13 @@
     [cljs.build.api :as bapi]
     [clojure.string :as string]
     [clojure.java.io :as io]
-    [fs.core :as fs]))
+    [fs.core :as fs]
+    [clojure.tools.namespace
+     [track :as track]
+     [dir :as dir]
+     [reload :as reload]]))
+
+(defonce refresh-tracker (track/tracker))
 
 (def reset-color "\u001b[0m")
 (def foreground-red "\u001b[31m")
@@ -109,15 +115,13 @@
       (if (.exists target-file)
         (.setLastModified target-file 5000))))
 
-  (doseq [path paths
-          :when (not= path "/data_readers.clj")]
-    (try
-      (load (drop-extension path))
-      (catch Throwable e
-        (notify-cljs
-          notify-command
-          (str "Reloading Clojure file \"" path "\" failed.") red)
-        (pst+ e)))))
+  ;; reload Clojure files
+  (alter-var-root #'refresh-tracker dir/scan)
+  (alter-var-root #'refresh-tracker reload/track-reload)
+  (when-let [e (::reload/error refresh-tracker)]
+    (notify-cljs notify-command
+                 (str "Reloading Clojure file \"" (::reload/error-ns refresh-tracker) "\" failed.") red)
+    (pst+ e)))
 
 (defn run-compiler [cljs-paths checkout-paths crossover-path crossover-macro-paths
                     compiler-options notify-command incremental?
