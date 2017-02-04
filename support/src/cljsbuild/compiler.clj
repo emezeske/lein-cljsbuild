@@ -94,13 +94,6 @@
       (subs path 0 i)
       path)))
 
-(defn- relativize [parent path]
-  (let [path (.getCanonicalPath (fs/file path))
-        parent (.getCanonicalPath (fs/file parent))]
-    (if (.startsWith path parent)
-      (subs path (count parent))
-      path)))
-
 (def additional-file-extensions
   (try
     (apply #'read-string [{:read-cond :allow} "#?(:clj 5 :default nil)"])
@@ -155,7 +148,7 @@
             cljs-modified (list-modified output-mtime cljs-mtimes)
             js-modified (list-modified output-mtime js-mtimes)]
         (when (seq clj-modified)
-          (reload-clojure cljs-files clj-modified compiler-options notify-command))
+          (reload-clojure cljs-files clj-files compiler-options notify-command))
         (when (or (seq clj-modified) (seq cljs-modified) (seq js-modified))
           (compile-cljs cljs-paths compiler-options notify-command incremental? assert? watching?))))
     dependency-mtimes))
