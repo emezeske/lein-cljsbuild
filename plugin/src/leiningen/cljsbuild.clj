@@ -260,6 +260,7 @@
         "once" (once project options args)
         "auto" (auto project options args)
         "test" (test project options args)
+        "list" (println (pr-str options))
         "repl-listen" (repl-listen project options)
         "repl-launch" (repl-launch project options args)
         "repl-rhino" (repl-rhino project options)
