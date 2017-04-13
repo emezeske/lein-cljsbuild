@@ -4,7 +4,9 @@
     [clojure.string :as string]
     [fs.core :as fs])
   (:import
-    (java.io File OutputStreamWriter)))
+    (java.io File OutputStreamWriter)
+    (java.lang ProcessBuilder$Redirect)
+    (java.util List)))
 
 (defn join-paths [& paths]
   (apply str (interpose "/" paths)))
@@ -45,41 +47,15 @@
   (future
     (apply once-every args)))
 
-(defn- pump-file [reader out]
-  (let [buffer (make-array Character/TYPE 1000)]
-    (loop [len (.read reader buffer)]
-      (when-not (neg? len)
-        (.write out buffer 0 len)
-        (.flush out)
-        (Thread/sleep 100)
-        (recur (.read reader buffer))))))
-
-(defn- process-pump [process stdout stderr]
-  (with-open [out (io/reader (.getInputStream process))
-              err (io/reader (.getErrorStream process))]
-    (let [pump-out (doto (Thread. #(pump-file out stdout)) .start)
-          pump-err (doto (Thread. #(pump-file err stderr)) .start)]
-      (.join pump-out)
-      (.join pump-err))))
-
-(defn maybe-writer [file fallback]
-  (if file
-    (do
-      (fs/delete file)
-      (io/writer file))
-    fallback))
-
 (defn process-start [{:keys [shell stdout stderr]}]
-  ; FIXME: These writers get left open.  Not a huge deal, but...
-  (let [stdout-writer (maybe-writer stdout *out*)
-        stderr-writer (maybe-writer stderr *err*)
-        process (.exec (Runtime/getRuntime) (into-array String shell))
-        pumper (future (process-pump process stdout-writer stderr-writer))]
+  (let [process (-> (ProcessBuilder. ^List shell)
+                    (.redirectOutput (if stdout (ProcessBuilder$Redirect/to stdout) ProcessBuilder$Redirect/INHERIT))
+                    (.redirectError (if stderr (ProcessBuilder$Redirect/to stderr) ProcessBuilder$Redirect/INHERIT))
+                    (.start))]
     {:kill (fn []
              (.destroy process))
      :wait (fn []
              (.waitFor process)
-             (deref pumper)
              (.exitValue process))}))
 
 (defn sh [command]
