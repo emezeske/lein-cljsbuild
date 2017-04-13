@@ -35,15 +35,6 @@
     (call-once-every) => nil :times 3
     (sleep 1000) => nil :times 3))
 
-(fact
-  (maybe-writer "filename" *out*) => :success
-  (provided
-    (fs/delete "filename") => nil :times 1
-    (io/writer "filename") => :success :times 1))
-
-(fact
-  (maybe-writer nil *out*) => *out*)
-
 ; TODO: It would be nice to test process-start, but it does a lot of Java
 ;       interop so I'm not sure how to go about that just yet.  Maybe if
 ;       it was switched to using "conch" instead of raw interop it would
