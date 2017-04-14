@@ -10,8 +10,8 @@ to install and allows you to configure the ClojureScript compiler from within yo
 
 Beyond basic compiler support, lein-cljsbuild can optionally help with a few other things:
 
-* [Launching REPLs for interactive development] (https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/doc/REPL.md)
-* [Launching ClojureScript tests] (https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/doc/TESTING.md)
+* [Launching REPLs for interactive development](https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/doc/REPL.md)
+* [Launching ClojureScript tests](https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/doc/TESTING.md)
 
 The latest version of lein-cljsbuild is `1.1.5`.
 [See the release notes here.](https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/doc/RELEASE-NOTES.md)
