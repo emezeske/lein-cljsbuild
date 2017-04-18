@@ -1,6 +1,6 @@
 # lein-cljsbuild
 
-####Latest version:
+#### Latest version:
 [![Clojars Project](https://clojars.org/lein-cljsbuild/latest-version.svg)](http://clojars.org/lein-cljsbuild)
 
 This is a Leiningen plugin that makes it quick and easy to automatically compile
