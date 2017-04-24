@@ -4,7 +4,7 @@
 [![Clojars Project](https://clojars.org/lein-cljsbuild/latest-version.svg)](http://clojars.org/lein-cljsbuild)
 
 This is a Leiningen plugin that makes it quick and easy to automatically compile
-your ClojureScript code into Javascript whenever you modify it.  It's simple
+your ClojureScript code into Javascript whenever you modify it. It's simple
 to install and allows you to configure the ClojureScript compiler from within your
 `project.clj` file.
 
@@ -26,7 +26,7 @@ to target both Clojure and ClojureScript from the same codebase.*
 ## Requirements
 
 The lein-cljsbuild plugin works with
-[Leiningen] (https://github.com/technomancy/leiningen/blob/master/README.md)
+[Leiningen](https://github.com/technomancy/leiningen/blob/master/README.md)
 version `2.1.2` or higher.
 
 ## Installation
@@ -40,35 +40,35 @@ file in the `:plugins` section:
 ```
 
 In addition, _you should add an explicit ClojureScript dependency to your
-project_, like this:
+project using the ClojureScript version you want to use_:
 
 ```clojure
-:dependencies [[org.clojure/clojurescript "0.0-XXXX"]]
+:dependencies [[org.clojure/clojurescript "1.9.521"]]
 ```
 
 lein-cljsbuild will add a dependency to your project if it doesn't already
-contain one, but that functionality will not remain for long.  The latest
+contain one, but that functionality will not remain for long. The latest
 version of lein-cljsbuild currently requires a minimum of ClojureScript
 `0.0-3211`.
 
 ## Just Give Me a Damned Example Already!
 
 See the
-[example-projects] (https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/example-projects)
-directory for a couple of simple examples of how to use lein-cljsbuild.  The
-[simple project] (https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/example-projects/simple)
-shows a dead-simple "compile only" configuration, which is a good place to start.  The
-[advanced project] (https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/example-projects/advanced)
+[example-projects](https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/example-projects)
+directory for a couple of simple examples of how to use lein-cljsbuild. The
+[simple project](https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/example-projects/simple)
+shows a dead-simple "compile only" configuration, which is a good place to start. The
+[advanced project](https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/example-projects/advanced)
 contains examples of how to use the extended features of the plugin.
 
 Also, see the
-[sample.project.clj] (https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/sample.project.clj)
+[sample.project.clj](https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/sample.project.clj)
 file for an exhaustive list of all options supported by lein-cljsbuild.
 
 ## Basic Configuration
 
 The lein-cljsbuild configuration is specified under the `:cljsbuild` section
-of your `project.clj` file.  A simple project might look like this:
+of your `project.clj` file. A simple project might look like this:
 
 ```clj
 (defproject lein-cljsbuild-example "1.2.3"
@@ -86,7 +86,7 @@ of your `project.clj` file.  A simple project might look like this:
 ```
 
 For an exhaustive list of the configuration options supported by lein-cljsbuild, see the
-[sample.project.clj] (https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/sample.project.clj)
+[sample.project.clj](https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/sample.project.clj)
 file.
 
 ## Basic Usage
@@ -96,7 +96,7 @@ Once the plugin is installed, you can build the ClojureScript once:
     $ lein cljsbuild once
 
 Or you can have lein-cljsbuild watch your source files for changes and
-automatically rebuild them.  This is recommended for development, as it
+automatically rebuild them. This is recommended for development, as it
 avoids the time-consuming JVM startup for each build:
 
     $ lein cljsbuild auto
@@ -109,21 +109,21 @@ generates during compilation.
 ### Color-coded output on Windows
 
 Colors are a big deal when reading ClojureScript compiler output, but Windows
-consoles don't support ANSI color codes.  This limitation is commonly corrected by
+consoles don't support ANSI color codes. This limitation is commonly corrected by
 installing ANSICON:
 
 1. Download and unzip [ANSICON](https://github.com/downloads/adoxa/ansicon/ansi160.zip) anywhere.
-1. Open a command prompt (Run as administrator).
-1. Navigate to the unzipped folder.
-1. cd x86 or x64 (depending on whether you have 32-bit or 64-bit machine, respectively)
-1. Run `ansicon -i` to install.
+2. Open a command prompt (Run as administrator).
+3. Navigate to the unzipped folder.
+4. cd x86 or x64 (depending on whether you have 32-bit or 64-bit machine, respectively)
+5. Run `ansicon -i` to install.
 
 Afterwards, you should get colored output from all future console sessions that use ANSI color codes.
 
 ## Hooks
 
 Some common lein-cljsbuild tasks can hook into the main Leiningen tasks
-to enable ClojureScript support in each of them.  The following tasks are
+to enable ClojureScript support in each of them. The following tasks are
 supported:
 
     $ lein compile
@@ -138,7 +138,7 @@ your project configuration:
 ```
 
 Note that by default the `lein jar` task does *not* package your ClojureScript
-code in the JAR file.  This feature needs to be explicitly enabled by adding
+code in the JAR file. This feature needs to be explicitly enabled by adding
 the following entry to each of the `:builds` that you want included in the
 JAR file. `lein uberjar` derives its behavior from `lein jar` and will include
 the ClojureScript as well if enabled.
@@ -214,20 +214,20 @@ You can also build multiple configurations at once:
     $ lein cljsbuild auto main other
 
 See the
-[example-projects/advanced] (https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/example-projects/advanced)
+[example-projects/advanced](https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/example-projects/advanced)
 directory for a working example of a project that uses this feature.
 
 ## REPL Support
 
 Lein-cljsbuild has built-in support for launching ClojureScript REPLs in a variety
-of ways.  See the
-[REPL documentation] (https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/doc/REPL.md)
+of ways. See the
+[REPL documentation](https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/doc/REPL.md)
 for more details.
 
 ## Testing Support
 
-Lein-cljsbuild has built-in support for running external ClojureScript test processes.  See the
-[testing documentation] (https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/doc/TESTING.md)
+Lein-cljsbuild has built-in support for running external ClojureScript test processes. See the
+[testing documentation](https://github.com/emezeske/lein-cljsbuild/blob/1.1.5/doc/TESTING.md)
 for more details.
 
 ## Extended Configuration

@@ -25,8 +25,8 @@ conditionals](http://dev.clojure.org/display/design/Reader+Conditionals)
 target both Clojure and ClojureScript from the same codebase.
 
 Sharing code with lein-cljsbuild is accomplished via the configuration
-of "crossovers".  A crossover specifies a Clojure namespace, the content
-of which should be copied into your ClojureScript project.  This can be any
+of "crossovers". A crossover specifies a Clojure namespace, the content
+of which should be copied into your ClojureScript project. This can be any
 namespace that is available via the Java CLASSPATH, which includes your
 project's main :source-paths by default.
 
@@ -36,7 +36,7 @@ the files that make up that namespace (recursively) will be monitored for change
 and will be copied to the ClojureScript project whenever modified.
 
 Crossover namespaces provided by jar files cannot be searched recursively, and
-thus must be specified on a per-file basis.  They are copied over once, when
+thus must be specified on a per-file basis. They are copied over once, when
 lein-cljsbuild begins compilation, and are not monitored for changes.
 
 Of course, remember that since the namespace will be used by both Clojure
@@ -93,7 +93,7 @@ to `crossover-cljs`, and you'd end up with this:
 </pre>
 
 Notice that the files in the `crossover-cljs` directory have had their extensions
-modified so that they will be seen by the ClojureScript compiler.  The `crossover-cljs`
+modified so that they will be seen by the ClojureScript compiler. The `crossover-cljs`
 directory will automatically be added to the classpath for the ClojureScript compiler,
 so your other ClojureScript code should be able to reference it via a regular `(ns)` form.
 
@@ -104,7 +104,7 @@ by lein-cljsbuild.
 # Sharing Macros Between Clojure and ClojureScript
 
 In ClojureScript, macros are still written in Clojure, and can not be written
-in the same file as actual ClojureScript code.  Also, to use them in a ClojureScript
+in the same file as actual ClojureScript code. Also, to use them in a ClojureScript
 namespace, they must be required via `:require-macros` rather than the usual `:require`.
 
 This makes using the crossover feature to share macros between Clojure and ClojureScript
@@ -127,7 +127,7 @@ Add this magical comment to any crossover files that contain macros:
 ```
 
 This tells lein-cljsbuild to refrain from copying the `.clj` files
-into the `:crossover-path`.  This step can be skipped if the
+into the `:crossover-path`. This step can be skipped if the
 macro file is not included in any of the crossover namespaces.
 
 ## 3. Use Black Magic to Require Macros Specially
@@ -157,7 +157,7 @@ Thus, after removing comments, Clojure will see:
 ```
 
 However, lein-cljsbuild will remove the `;*CLJSBUILD-REMOVE*;` string entirely,
-before copying the file.  Thus, ClojureScript will see:
+before copying the file. Thus, ClojureScript will see:
 
 ```clj
 (ns example.crossover.some_stuff

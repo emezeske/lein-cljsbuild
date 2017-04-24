@@ -78,7 +78,7 @@
 * ClojureScript `0.0-2156` is now the default release added to projects that do
   not specify a ClojureScript dependency explicitly.
 * Crossovers are now officially deprecated, and will be removed in future
-  releases.  Please use [cljx](http://github.com/lynaghk/cljx) to target both
+  releases. Please use [cljx](http://github.com/lynaghk/cljx) to target both
   Clojure and ClojureScript from the same codebase.
 * Fixed timestamps applied to compiled output files (gh-281, gh-282)
 
@@ -99,7 +99,7 @@ No changes since `1.0.0-alpha2`.
 ## [1.0.0-alpha2](https://github.com/emezeske/lein-cljsbuild/issues?milestone=33&page=1&state=closed)
 
 * ClojureScript `0.0-2014` is now the default release added to projects that do
-  not specify a ClojureScript dependency explicitly.  Further, this version of
+  not specify a ClojureScript dependency explicitly. Further, this version of
   ClojureScript is now a **minimum requirement**; if upgrading to `0.0-2014` is
   not possible for some reason, you must stick with prior revisions of
   lein-cljsbuild. (gh-253, gh-264)
@@ -160,9 +160,9 @@ No changes since `1.0.0-alpha2`.
 
 ## 0.3.0
 
-1. Dropped support for Leiningen 1.x, now that Leiningen 2.0 is available.  **REPEAT: Leiningen 1.x is no longer supported.**
-2. Changed the `:source-path "path"` option to `:source-paths ["path" "path"]`.  The new option accepts a vector of paths rather than a single path.  **The old singular `:source-path` is now deprecated and will be removed soon.**
-3. Changed all default output paths (e.g. for temporary compiler files, crossover files, and REPL files) to be in the `:target-path` directory.  Explicitly configured paths can still be whatever you like.
+1. Dropped support for Leiningen 1.x, now that Leiningen 2.0 is available. **REPEAT: Leiningen 1.x is no longer supported.**
+2. Changed the `:source-path "path"` option to `:source-paths ["path" "path"]`. The new option accepts a vector of paths rather than a single path. **The old singular `:source-path` is now deprecated and will be removed soon.**
+3. Changed all default output paths (e.g. for temporary compiler files, crossover files, and REPL files) to be in the `:target-path` directory. Explicitly configured paths can still be whatever you like.
 4. For compatibility with Leiningen 2.0, `:resource-paths` is now used instead of `:resources-path`.
 5. Fixed a long delay before exiting that could sometimes occur after one-shot tasks (like `cljsbuild once`).
 6. Changes to JavaScript files in `:libs` now trigger rebuilds when using `cljsbuild auto`.
@@ -216,7 +216,7 @@ No changes since `1.0.0-alpha2`.
 
 ## 0.2.4
 
-1. Removed support for `:warn-on-undeclared`, because the compiler itself now supports a `:warnings` option.  Use that instead.
+1. Removed support for `:warn-on-undeclared`, because the compiler itself now supports a `:warnings` option. Use that instead.
 
 [Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=18&state=closed)
 
@@ -236,7 +236,7 @@ No changes since `1.0.0-alpha2`.
 
 ## 0.2.1
 
-1. Automatically add `closure-js/libs` to `:libs` and `closure-js/externs` to `:externs`.  This means that libraries can put their libs and externs in `resources/closure-js/libs/<library-name>` and `resources/closure-js/externs/<library-name>`, respectively, and lein-cljsbuild will automatically pick them up.
+1. Automatically add `closure-js/libs` to `:libs` and `closure-js/externs` to `:externs`. This means that libraries can put their libs and externs in `resources/closure-js/libs/<library-name>` and `resources/closure-js/externs/<library-name>`, respectively, and lein-cljsbuild will automatically pick them up.
 
 [Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=15&state=closed)
 
@@ -245,10 +245,10 @@ No changes since `1.0.0-alpha2`.
 Note that the minor version was incremented not due to any major features, but due to the fact that the `:notify-command` option was changed in a backwards-incompatible way.
 
 1. The compiler is now run under Clojure 1.4.0.
-2. Added a new `:build` suboption `:incremental`, which determines whether intermediate JavaScript sources are left intact between automatic builds.  The old behavior was to delete intermediate files before each build.  This slowed things down, but worked around (unisolated) problems with incremental compilation.  Incremental builds are now the default, as they appear to work well, but this option allows the old behavior to be selected if necessary for troubleshooting.
-3. The :notify option has been changed such that its argument is consistent with other cljsbuild shell commands.  This means that the `%` argument is no longer respected, and the textual result will simply be appended as the last command line argument.  Also, `:beep true` no longer has any effect.  If either of these features is desired, the recommended solution is a small shell script wrapper.
-4. Clojure source files that reside in the ClojureScript :source-path (as well as crossover macro files) are now monitored for changes.  When modified, they will be reloaded, and a build will be triggered.  This is useful for ClojureScript projects that use macros.
-5. Multiple builds are now built sequentially instead of in parallel.  This is due to the fact that the underlying compiler is no longer thread-safe.
+2. Added a new `:build` suboption `:incremental`, which determines whether intermediate JavaScript sources are left intact between automatic builds. The old behavior was to delete intermediate files before each build. This slowed things down, but worked around (unisolated) problems with incremental compilation. Incremental builds are now the default, as they appear to work well, but this option allows the old behavior to be selected if necessary for troubleshooting.
+3. The :notify option has been changed such that its argument is consistent with other cljsbuild shell commands. This means that the `%` argument is no longer respected, and the textual result will simply be appended as the last command line argument. Also, `:beep true` no longer has any effect. If either of these features is desired, the recommended solution is a small shell script wrapper.
+4. Clojure source files that reside in the ClojureScript :source-path (as well as crossover macro files) are now monitored for changes. When modified, they will be reloaded, and a build will be triggered. This is useful for ClojureScript projects that use macros.
+5. Multiple builds are now built sequentially instead of in parallel. This is due to the fact that the underlying compiler is no longer thread-safe.
 
 [Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?milestone=14&state=closed)
 
@@ -273,7 +273,7 @@ Note that the minor version was incremented not due to any major features, but d
 
 ## 0.1.7
 
-1. The various REPL commands now work when used via Leiningen 2.  This should mean that lein-cljsbuild is fully Leiningen-2-compatible.
+1. The various REPL commands now work when used via Leiningen 2. This should mean that lein-cljsbuild is fully Leiningen-2-compatible.
 2. Raise a descriptive error if the parent project uses Clojure < 1.3.
 3. Ensure that `lein cljsbuild clean` cleans up :stdout and :stderr files for various commands.
 4. Add a comprehensive unit test suite, to hopefully help prevent new releases from breaking things.
@@ -282,6 +282,6 @@ Note that the minor version was incremented not due to any major features, but d
 
 ## 0.1.6
 
-1. Changed to use upstream ClojureScript version 0.0-1011.  This should fix REPL issues.
+1. Changed to use upstream ClojureScript version 0.0-1011. This should fix REPL issues.
 
 [Milestone Details for this Release](https://github.com/emezeske/lein-cljsbuild/issues?sort=created&direction=desc&state=closed&page=1&milestone=9)
