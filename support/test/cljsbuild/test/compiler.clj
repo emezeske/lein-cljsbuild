@@ -53,11 +53,11 @@
     assert?
     {}
     false) => (just {cljs-file-a mtime
-                  cljs-file-b mtime
-                  cljs-checkout-file-a mtime
-                  cljs-checkout-file-b mtime
-                  crossover-file mtime
-                  crossover-macro-absolute mtime})
+                     cljs-file-b mtime
+                     cljs-checkout-file-a mtime
+                     cljs-checkout-file-b mtime
+                     crossover-file mtime
+                     crossover-macro-absolute mtime})
   (provided
     (fs/exists? output-to) => false :times 1
     (util/find-files cljs-path-a #{"clj"}) => [] :times 1
@@ -82,7 +82,7 @@
                      cljs-checkout-file-a
                      cljs-checkout-file-b
                      crossover-file]
-                    [crossover-macro-classpath] compiler-options-with-defaults notify-command) => nil :times 1
+                    [crossover-macro-absolute] compiler-options-with-defaults notify-command) => nil :times 1
     ; bapi/inputs returns different instance each time and it doesn't provide equals method
     (bapi/build
       (as-checker #(and (instance? cljs.closure.Compilable %) (instance? cljs.closure.Inputs %)))
