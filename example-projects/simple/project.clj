@@ -1,8 +1,8 @@
 (defproject cljsbuild-example-simple "1.1.5"
   :description "A simple example of how to use lein-cljsbuild"
   :source-paths ["src-clj"]
-  :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-3211"
+  :dependencies [[org.clojure/clojure "1.8.0"]
+                 [org.clojure/clojurescript "1.9.521"
                   :exclusions [org.apache.ant/ant]]
                  [compojure "1.1.6"]
                  [hiccup "1.0.4"]]
