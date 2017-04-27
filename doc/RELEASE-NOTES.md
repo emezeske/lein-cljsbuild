@@ -1,5 +1,12 @@
 # Release Notes for lein-cljsbuild
 
+## [1.1.6](https://github.com/emezeske/lein-cljsbuild/pulls?utf8=%E2%9C%93&q=is%3Aclosed+is%3Apr+milestone%3A1.1.6)
+
+* Fix #453: use ProcessBuilder for output redirect (https://github.com/emezeske/lein-cljsbuild/pull/459)
+* Fix Markdown issues (https://github.com/emezeske/lein-cljsbuild/pull/460, https://github.com/emezeske/lein-cljsbuild/pull/461)
+* Update sample.project.clj doc to reflect default :optimizations value (https://github.com/emezeske/lein-cljsbuild/pull/456)
+* Fix #455: use clojure.tools.namespace for reloading (https://github.com/emezeske/lein-cljsbuild/issues/455)
+
 ## [1.1.5](https://github.com/emezeske/lein-cljsbuild/pulls?utf8=%E2%9C%93&q=is%3Aclosed+is%3Apr+milestone%3A1.1.5)
 
 * Add support for lein 2.7's `:managed-dependencies` (https://github.com/emezeske/lein-cljsbuild/pull/454)
