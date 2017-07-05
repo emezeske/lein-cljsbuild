@@ -5,12 +5,6 @@
   (:require
     [fs.core :as fs]))
 
-(fact
-  (relative-path "/" "/a") => "a"
-  (relative-path "/a/b/c" "/a/b/c/d/e") => "d/e"
-  (relative-path "" "a") => (throws Exception)
-  (relative-path "/a/b/c" "/a/b") => (throws Exception))
-
 (defn- make-bytes [s]
   byte-array (map (comp byte int) s))
 

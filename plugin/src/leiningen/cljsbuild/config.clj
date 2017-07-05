@@ -1,7 +1,8 @@
 (ns leiningen.cljsbuild.config
   "Utilities for parsing the cljsbuild config."
   (:require
-    [clojure.pprint :as pprint]))
+   [clojure.pprint :as pprint]
+   [leiningen.cljsbuild.util :as util]))
 
 (defn in-target-path [target-path subpath]
   (str target-path "/cljsbuild-" subpath))
@@ -113,12 +114,15 @@
 
 (defn- set-default-output-dirs [target-path options]
   (let [output-dir-key [:compiler :output-dir]
+        relative-target-path (when target-path
+                               (util/relative-path (str (System/getProperty "user.dir")
+                                                        (System/getProperty "file.separator")) target-path))
         builds
          (for [[build counter] (map vector (:builds options) (range))]
            (if (get-in build output-dir-key)
              build
              (assoc-in build output-dir-key
-               (str (compiler-output-dir-base target-path) counter))))]
+               (str (compiler-output-dir-base relative-target-path) counter))))]
     (if (or (empty? builds)
             (apply distinct? (map #(get-in % output-dir-key) builds)))
       (assoc options :builds builds)
