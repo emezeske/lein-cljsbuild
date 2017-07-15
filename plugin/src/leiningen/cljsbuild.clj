@@ -282,7 +282,7 @@
   (apply task [project out-file (concat filespecs (jar/get-filespecs project))]))
 
 (defn activate
-  "Set up hooks for the plugin.  Eventually, this can be changed to just hook,
+  "Set up hooks for the plugin. Eventually, this can be changed to just hook,
    and people won't have to specify :hooks in their project.clj files anymore."
   []
   (hooke/add-hook #'lcompile/compile #'compile-hook)

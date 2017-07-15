@@ -82,16 +82,16 @@
     (get project :dependencies)))
 
 (defn make-subproject [project crossover-path builds]
-  (let [deps (get-deps-from-project project)]
+  (let [deps (get-deps-from-project project)
+        remove-compile-task (fn [tasks]
+                              (remove (fn [task]
+                                        (= task "compile"))
+                                      tasks))]
     (with-meta
-      (merge
-       (select-keys project [:checkout-deps-shares
-                             :eval-in
-                             :jvm-opts
-                             :local-repo
-                             :repositories
-                             :mirrors
-                             :resource-paths])
+      ;; Leiningen sets javac and compile as default prep-tasks. We need to remove
+      ;; the compile task, so it doesn't trigger the compile hook for all builds.
+      ;; https://github.com/emezeske/lein-cljsbuild/issues/451
+      (merge (update project :prep-tasks remove-compile-task)
        {:local-repo-classpath true
         :dependencies (merge-dependencies deps)
         :source-paths (concat

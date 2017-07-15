@@ -115,8 +115,7 @@
 (defn- set-default-output-dirs [target-path options]
   (let [output-dir-key [:compiler :output-dir]
         relative-target-path (when target-path
-                               (util/relative-path (str (System/getProperty "user.dir")
-                                                        (System/getProperty "file.separator")) target-path))
+                               (util/relative-path (util/get-working-dir) target-path))
         builds
          (for [[build counter] (map vector (:builds options) (range))]
            (if (get-in build output-dir-key)

@@ -6,7 +6,7 @@
                   :exclusions [org.apache.ant/ant]]
                  [compojure "1.1.6"]
                  [hiccup "1.0.4"]]
-  :plugins [[lein-cljsbuild "1.1.6"]
+  :plugins [[lein-cljsbuild "1.1.7-SNAPSHOT"]
             [lein-ring "0.8.7"]]
   :cljsbuild {
     :builds [{:source-paths ["src-cljs"]
