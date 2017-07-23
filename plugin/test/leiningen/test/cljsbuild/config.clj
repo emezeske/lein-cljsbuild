@@ -73,4 +73,19 @@
 (def config-out (set-compiler-global-dirs config-in))
 
 (fact
-  (extract-options {:cljsbuild config-in}) => config-out)
+ (extract-options {:cljsbuild config-in}) => config-out)
+
+(def modules-config {:compiler {:externs []
+                               :libs []
+                               :modules {:front {:output-to "lib/assets/cljs/cljs-front.js"
+                                                 :entries #{"hb.front.core"}}
+                                         :extranet {:output-to "lib/assets/cljs/cljs-extranet.js"
+                                                    :entries #{"hb.core"}}}}
+                    :assert true
+                    :incremental true
+                    :jar false
+                    :notify-command nil
+                    :source-paths ["src-cljs"]})
+
+(fact "don't set :output-to option when :modules option is provided"
+      (set-default-build-options target-path modules-config) => modules-config)

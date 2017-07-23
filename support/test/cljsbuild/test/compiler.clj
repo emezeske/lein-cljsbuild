@@ -27,6 +27,7 @@
 (def crossover-macro-paths [{:absolute crossover-macro-absolute
                              :classpath crossover-macro-classpath}])
 (def output-to "output-to")
+(def output-to-2 "output-to-2")
 (def compiler-options
   {:output-to output-to
    :output-dir "output-dir"
@@ -38,6 +39,7 @@
 (def assert? false)
 (def incremental? true)
 (def mtime 1234)
+(def mtime-2 5678)
 
 ; TODO: We really need more tests here, particularly for the crossover/clojure reloading stuff.
 
@@ -88,3 +90,23 @@
       (as-checker #(and (instance? cljs.closure.Compilable %) (instance? cljs.closure.Inputs %)))
       compiler-options-with-defaults)
     => nil :times 1))
+
+(fact "returns oldest modified time"
+      (get-oldest-mtime [cljs-file-a cljs-file-b]) => mtime
+      (provided
+       (fs/exists? cljs-file-a) => true
+       (fs/mod-time cljs-file-a) => mtime
+       (fs/exists? cljs-file-b) => true
+       (fs/mod-time cljs-file-b) => mtime-2))
+
+(fact "should get output file provided through output-to option"
+      (get-output-files {:output-to output-to}) => [output-to])
+
+(fact "should get output files provided through modules option"
+      (get-output-files {:modules {:front {:output-to output-to
+                                           :entries #{"hb.front.core"}}
+                                   :extranet {:output-to output-to-2
+                                              :entries #{"hb.core"}}}}) => [output-to output-to-2])
+
+(fact "should return no output files when output-to and modules options not provided"
+      (get-output-files {}) => [])

@@ -23,8 +23,7 @@
    :crossovers []})
 
 (defn- default-compiler-options [target-path]
-  {:output-to (in-target-path target-path "main.js")
-   :externs []
+  {:externs []
    :libs []})
 
 (defn- default-build-options [target-path]
@@ -109,8 +108,12 @@
     (deep-merge a b)
     b))
 
-(defn- set-default-build-options [target-path options]
-  (deep-merge (default-build-options target-path) options))
+(defn set-default-build-options [target-path options]
+  (let [options (deep-merge (default-build-options target-path) options)]
+    (if (or (get-in options [:compiler :output-to])
+            (get-in options [:compiler :modules]))
+      options
+      (assoc-in options [:compiler :output-to] (in-target-path target-path "main.js")))))
 
 (defn- set-default-output-dirs [target-path options]
   (let [output-dir-key [:compiler :output-dir]
