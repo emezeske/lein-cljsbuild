@@ -1,5 +1,11 @@
 # Release Notes for lein-cljsbuild
 
+## [1.1.7](https://github.com/emezeske/lein-cljsbuild/pulls?utf8=%E2%9C%93&q=is%3Aclosed+is%3Apr+milestone%3A1.1.7)
+
+* When no output-dir given use relative target-path instead of absolute target-path. A relative target path is required when building for nodejs [#464](https://github.com/emezeske/lein-cljsbuild/issues/464).
+* Use full project map to build subproject. Previously, some project options (e.g. :root and :prep-tasks) weren't included causing problems such as [#465](https://github.com/emezeske/lein-cljsbuild/issues/465) and [#434](https://github.com/emezeske/lein-cljsbuild/issues/434).
+* No :output-to default needed when :modules option provided. Fix auto build for modules. [#467](https://github.com/emezeske/lein-cljsbuild/issues/467)
+
 ## [1.1.6](https://github.com/emezeske/lein-cljsbuild/pulls?utf8=%E2%9C%93&q=is%3Aclosed+is%3Apr+milestone%3A1.1.6)
 
 * Fix #453: use ProcessBuilder for output redirect (https://github.com/emezeske/lein-cljsbuild/pull/459)
