@@ -72,11 +72,10 @@
   (walk-checkouts
     project
     (fn [checkout]
-      (let [{:keys [builds]} (config/extract-options checkout)
-            root (:root checkout)]
+      (if-let [{:keys [builds]} (config/extract-options checkout)]
         (for [build builds
               path (:source-paths build)]
-          (fs/absolute-path (io/file root path)))))))
+          (fs/absolute-path (io/file (:root checkout) path)))))))
 
 (defn- run-compiler [project {:keys [crossover-path crossovers builds]} build-ids watch?]
   (doseq [build-id build-ids]

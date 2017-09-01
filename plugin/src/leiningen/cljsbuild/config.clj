@@ -148,9 +148,9 @@
 (defn- normalize-options
   "Sets default options and accounts for backwards compatibility."
   [target-path options]
-  (let [options (convert-builds-map options)
-        compat (backwards-compat options)]
-    (when (not= options compat)
+  (let [convert (convert-builds-map options)
+        compat (backwards-compat convert)]
+    (when (and options (not= convert compat))
       (warn-deprecated compat))
     (->> compat
       (set-default-options target-path)
@@ -180,6 +180,6 @@
   "Given a project, returns a seq of cljsbuild option maps."
   [project]
   (when (nil? (:cljsbuild project))
-    (println "WARNING: no :cljsbuild entry found in project definition."))
+    (println "WARNING: no :cljsbuild entry found in" (:name project) "project definition."))
   (let [raw-options (:cljsbuild project)]
     (normalize-options (:target-path project) raw-options)))
