@@ -92,10 +92,10 @@
       ;; the compile task, so it doesn't trigger the compile hook for all builds.
       ;; https://github.com/emezeske/lein-cljsbuild/issues/451
       (merge (update project :prep-tasks remove-compile-task)
-       {:local-repo-classpath true
-        :dependencies (merge-dependencies deps)
-        :source-paths (concat
-                       (:source-paths project)
-                       (mapcat :source-paths builds)
-                       [crossover-path])})
+             {:local-repo-classpath true
+              :dependencies (merge-dependencies deps)
+              :source-paths (concat
+                             (:source-paths project)
+                             (mapcat :source-paths builds)
+                             (filter some? [crossover-path]))})
       (meta project))))

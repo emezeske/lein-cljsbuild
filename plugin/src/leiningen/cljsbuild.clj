@@ -181,6 +181,13 @@
     (do
       (println "REPL subcommands must be run via \"lein trampoline cljsbuild <command>\".")
       (lmain/abort))))
+(defn- deps
+  "Downloads internal `lein-cljsbuild` dependencies"
+  [project]
+  (println "Downloading cljsbuild dependencies..")
+  (leval/eval-in-project
+   (subproject/make-subproject project nil nil)
+   `(println "Done.")))
 
 (defn- once
   "Compile the ClojureScript project once."
@@ -268,6 +275,7 @@
             "Subtask" (str \" subtask \") "not found."
             (lhelp/subtask-help-for *ns* #'cljsbuild))
           (lmain/abort))))))
+       "deps" (deps project)
 
 (defn compile-hook [task & args]
   (apply task args)
