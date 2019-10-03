@@ -263,6 +263,7 @@
   ([project subtask & args]
     (let [options (config/extract-options project)]
       (case subtask
+        "deps" (deps project)
         "once" (once project options args)
         "auto" (auto project options args)
         "test" (test project options args)
@@ -275,7 +276,6 @@
             "Subtask" (str \" subtask \") "not found."
             (lhelp/subtask-help-for *ns* #'cljsbuild))
           (lmain/abort))))))
-       "deps" (deps project)
 
 (defn compile-hook [task & args]
   (apply task args)
