@@ -72,11 +72,10 @@
   (walk-checkouts
     project
     (fn [checkout]
-      (let [{:keys [builds]} (config/extract-options checkout)
-            root (:root checkout)]
+      (if-let [{:keys [builds]} (config/extract-options checkout)]
         (for [build builds
               path (:source-paths build)]
-          (fs/absolute-path (io/file root path)))))))
+          (fs/absolute-path (io/file (:root checkout) path)))))))
 
 (defn- run-compiler [project {:keys [builds]} build-ids watch?]
   (doseq [build-id build-ids]
@@ -167,6 +166,14 @@
       (println "REPL subcommands must be run via \"lein trampoline cljsbuild <command>\".")
       (lmain/abort))))
 
+(defn- deps
+  "Downloads internal `lein-cljsbuild` dependencies"
+  [project]
+  (println "Downloading cljsbuild dependencies..")
+  (leval/eval-in-project
+   (subproject/make-subproject project nil nil)
+   `(println "Done.")))
+
 (defn- once
   "Compile the ClojureScript project once."
   [project options build-ids]
@@ -241,6 +248,7 @@
   ([project subtask & args]
     (let [options (config/extract-options project)]
       (case subtask
+        "deps" (deps project)
         "once" (once project options args)
         "auto" (auto project options args)
         "test" (test project options args)
@@ -266,7 +274,7 @@
   (apply task [project out-file (concat filespecs (jar/get-filespecs project))]))
 
 (defn activate
-  "Set up hooks for the plugin.  Eventually, this can be changed to just hook,
+  "Set up hooks for the plugin. Eventually, this can be changed to just hook,
    and people won't have to specify :hooks in their project.clj files anymore."
   []
   (hooke/add-hook #'lcompile/compile #'compile-hook)

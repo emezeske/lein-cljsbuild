@@ -40,38 +40,34 @@
         (pst+ e))))
   (println (colorizer message)))
 
-(defn ns-from-file [f]
-  (try
-    (when (.exists f)
-      (with-open [rdr (io/reader f)]
-        (-> (java.io.PushbackReader. rdr)
-            read
-            second)))
-    ;; better exception here eh?
-    (catch java.lang.RuntimeException e
-      nil)))
+(defn get-output-files [compiler-options]
+  (if-let [output-file (:output-to compiler-options)]
+    [output-file]
+    (into [] (map :output-to (->> compiler-options :modules vals)))))
 
 (defn- compile-cljs [cljs-paths compiler-options notify-command incremental? assert? watching?]
-  (let [output-file (:output-to compiler-options)
-        output-file-dir (fs/parent output-file)]
-    (println (str "Compiling \"" output-file "\" from " (pr-str cljs-paths) "..."))
+  (let [output-files (get-output-files compiler-options)
+        output-files-parent (map fs/parent output-files)]
+    (println (str "Compiling " (pr-str output-files) " from " (pr-str cljs-paths) "..."))
     (flush)
     (when (not incremental?)
       (fs/delete-dir (:output-dir compiler-options)))
-    (when output-file-dir
-      (fs/mkdirs output-file-dir))
+    (doseq [output-file-parent output-files-parent]
+      (when output-file-parent
+        (fs/mkdirs output-file-parent)))
     (let [started-at (System/currentTimeMillis)]
       (try
         (binding [*assert* assert?]
           (bapi/build (apply bapi/inputs cljs-paths) compiler-options))
-        (fs/touch output-file started-at)
+        (doseq [output-file output-files]
+          (fs/touch output-file started-at))
         (notify-cljs
           notify-command
-          (str "Successfully compiled \"" output-file "\" in " (elapsed started-at) ".") green)
+          (str "Successfully compiled " (pr-str output-files) " in " (elapsed started-at) ".") green)
         (catch Throwable e
           (notify-cljs
             notify-command
-            (str "Compiling \"" output-file "\" failed.") red)
+            (str "Compiling " (pr-str output-files) " failed.") red)
           (if watching?
             (pst+ e)
             (throw e)))))))
@@ -87,6 +83,13 @@
               modified))
           []
           dependency-mtimes))
+
+(defn get-oldest-mtime [output-files]
+  (apply min (map (fn [output-file]
+                    (if (fs/exists? output-file)
+                      (fs/mod-time output-file)
+                      0))
+                  output-files)))
 
 (defn- drop-extension [path]
   (let [i (.lastIndexOf path ".")]
@@ -120,9 +123,9 @@
                     assert? last-dependency-mtimes watching?]
   (let [compiler-options (merge {:output-wrapper (= :advanced (:optimizations compiler-options))}
                                 compiler-options)
-        output-file (:output-to compiler-options)
+        output-files (get-output-files compiler-options)
         lib-paths (:libs compiler-options)
-        output-mtime (if (fs/exists? output-file) (fs/mod-time output-file) 0)
+        output-mtime (get-oldest-mtime output-files)
         clj-files (mapcat (fn [cljs-path]
                             (util/find-files cljs-path (conj additional-file-extensions "clj")))
                           (concat cljs-paths checkout-paths))

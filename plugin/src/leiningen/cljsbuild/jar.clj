@@ -2,9 +2,9 @@
   "Utilities for the cljsbuild jar hook."
   (:require
     [clojure.java.io :as io]
-    [clojure.string :as s]
     [fs.core :as fs]
-    [leiningen.cljsbuild.config :as config]))
+    [leiningen.cljsbuild.config :as config]
+    [leiningen.cljsbuild.util :as util]))
 
 (defn file-bytes
   "Reads a file into a byte array"
@@ -14,15 +14,6 @@
       (let [data (byte-array (.length file))]
         (.read input data)
         data))))
-
-(defn relative-path
-  "Given two normalized path strings, returns a path string of the second relative to the first."
-  [parent child]
-  (let [relative (s/replace child parent "")]
-    (when (= child relative)
-      (throw (Exception.
-               (str child " is not a child of " parent))))
-    (s/replace relative #"^[\\/]" "")))
 
 (defn join-paths [& paths]
   (apply str (interpose "/" paths)))
@@ -43,7 +34,7 @@
                         (join-paths root file))))]
     (for [filename filenames]
       {:type :bytes
-       :path (relative-path (canonical-path path) (canonical-path filename))
+       :path (util/relative-path (canonical-path path) (canonical-path filename))
        :bytes (file-bytes filename)})))
 
 (defn get-filespecs

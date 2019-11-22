@@ -1,7 +1,8 @@
 (ns leiningen.cljsbuild.config
   "Utilities for parsing the cljsbuild config."
   (:require
-    [clojure.pprint :as pprint]))
+   [clojure.pprint :as pprint]
+   [leiningen.cljsbuild.util :as util]))
 
 (defn in-target-path [target-path subpath]
   (str target-path "/cljsbuild-" subpath))
@@ -19,8 +20,7 @@
    :test-commands {}})
 
 (defn- default-compiler-options [target-path]
-  {:output-to (in-target-path target-path "main.js")
-   :externs []
+  {:externs []
    :libs []})
 
 (defn- default-build-options [target-path]
@@ -91,17 +91,23 @@
     (deep-merge a b)
     b))
 
-(defn- set-default-build-options [target-path options]
-  (deep-merge (default-build-options target-path) options))
+(defn set-default-build-options [target-path options]
+  (let [options (deep-merge (default-build-options target-path) options)]
+    (if (or (get-in options [:compiler :output-to])
+            (get-in options [:compiler :modules]))
+      options
+      (assoc-in options [:compiler :output-to] (in-target-path target-path "main.js")))))
 
 (defn- set-default-output-dirs [target-path options]
   (let [output-dir-key [:compiler :output-dir]
+        relative-target-path (when target-path
+                               (util/relative-path (util/get-working-dir) target-path))
         builds
          (for [[build counter] (map vector (:builds options) (range))]
            (if (get-in build output-dir-key)
              build
              (assoc-in build output-dir-key
-               (str (compiler-output-dir-base target-path) counter))))]
+               (str (compiler-output-dir-base relative-target-path) counter))))]
     (if (or (empty? builds)
             (apply distinct? (map #(get-in % output-dir-key) builds)))
       (assoc options :builds builds)
@@ -125,9 +131,9 @@
 (defn- normalize-options
   "Sets default options and accounts for backwards compatibility."
   [target-path options]
-  (let [options (convert-builds-map options)
-        compat (backwards-compat options)]
-    (when (not= options compat)
+  (let [convert (convert-builds-map options)
+        compat (backwards-compat convert)]
+    (when (and options (not= convert compat))
       (warn-deprecated compat))
     (->> compat
       (set-default-options target-path)
@@ -157,6 +163,6 @@
   "Given a project, returns a seq of cljsbuild option maps."
   [project]
   (when (nil? (:cljsbuild project))
-    (println "WARNING: no :cljsbuild entry found in project definition."))
+    (println "WARNING: no :cljsbuild entry found in" (:name project) "project definition."))
   (let [raw-options (:cljsbuild project)]
     (normalize-options (:target-path project) raw-options)))

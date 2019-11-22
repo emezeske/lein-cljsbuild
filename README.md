@@ -58,9 +58,10 @@ shows a dead-simple "compile only" configuration, which is a good place to start
 [advanced project](https://github.com/emezeske/lein-cljsbuild/blob/2.0.0-SNAPSHOT/example-projects/advanced)
 contains examples of how to use the extended features of the plugin.
 
-Also, see the
-[sample.project.clj](https://github.com/emezeske/lein-cljsbuild/blob/2.0.0-SNAPSHOT/sample.project.clj)
-file for an exhaustive list of all options supported by lein-cljsbuild.
+For an exhaustive list of all options supported by lein-cljsbuild, see the
+[sample.project.clj](https://github.com/emezeske/lein-cljsbuild/blob/2.0.0-SNAPSHOT\/sample.project.clj)
+file. For a list of options that can be passed to the ClojureScript compiler have a look at the
+[ClojureScript Compiler Options site](https://clojurescript.org/reference/compiler-options).
 
 ## Basic Configuration
 
@@ -81,10 +82,6 @@ of your `project.clj` file. A simple project might look like this:
           :optimizations :whitespace
           :pretty-print true}}]})
 ```
-
-For an exhaustive list of the configuration options supported by lein-cljsbuild, see the
-[sample.project.clj](https://github.com/emezeske/lein-cljsbuild/blob/2.0.0-SNAPSHOT/sample.project.clj)
-file.
 
 ## Basic Usage
 
