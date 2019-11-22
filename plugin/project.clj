@@ -9,7 +9,7 @@
   :profiles {
     :dev {
       :dependencies [
-        [midje "1.6.3"]
+        [midje "1.9.9"]
         [cljsbuild "2.0.0-SNAPSHOT"]]
-      :plugins [[lein-midje "3.1.3"]]}}
+      :plugins [[lein-midje "3.2.1"]]}}
   :eval-in-leiningen true)
