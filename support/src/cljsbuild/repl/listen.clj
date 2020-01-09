@@ -1,7 +1,6 @@
 (ns cljsbuild.repl.listen
   (:require
     [cljs.repl :as repl]
-    [cljs.repl.browser :as browser]
     [cljsbuild.util :as util]
     [clojure.string :as string]))
 

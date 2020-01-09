@@ -1,8 +1,7 @@
 (ns cljsbuild.util
   (:require
     [clojure.java.io :as io]
-    [clojure.string :as string]
-    [fs.core :as fs])
+    [clojure.string :as string])
   (:import
     (java.io File OutputStreamWriter)
     (java.lang ProcessBuilder$Redirect)
@@ -19,12 +18,11 @@
   ; not using fs because it's slow for listing directories; 40ms vs 1ms for
   ; ~typical `cljsbuild auto` scanning
   (letfn [(files-in-dir [^File dir]
-            (let [fs (.listFiles dir)]
-              (->> (.listFiles dir)
-                   (remove #(.isHidden ^File %))
-                   (mapcat #(if (.isFile ^File %)
-                              [%]
-                              (files-in-dir %))))))]
+            (->> (.listFiles dir)
+                 (remove #(.isHidden ^File %))
+                 (mapcat #(if (.isFile ^File %)
+                            [%]
+                            (files-in-dir %)))))]
     (->> (files-in-dir (io/file dir))
       (map #(.getAbsolutePath ^File %))
       (filter-by-ext types))))

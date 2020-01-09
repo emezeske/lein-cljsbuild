@@ -7,7 +7,7 @@
     [cljs.build.api :as bapi]
     [clojure.string :as string]
     [clojure.java.io :as io]
-    [fs.core :as fs]
+    [me.raynes.fs :as fs]
     [clojure.tools.namespace
      [track :as track]
      [dir :as dir]

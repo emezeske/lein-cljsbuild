@@ -3,8 +3,7 @@
     cljsbuild.util
     midje.sweet)
   (:require
-    [clojure.java.io :as io]
-    [fs.core :as fs]))
+    [clojure.java.io :as io]))
 
 (fact
   (join-paths) => ""

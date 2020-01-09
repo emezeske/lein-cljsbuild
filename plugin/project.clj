@@ -5,7 +5,7 @@
     {:name "Eclipse Public License - v 1.0"
      :url "http://www.eclipse.org/legal/epl-v10.html"
      :distribution :repo}
-    :dependencies [[fs "1.1.2"]]
+    :dependencies [[me.raynes/fs "1.4.6"]]
   :profiles {
     :dev {
       :dependencies [

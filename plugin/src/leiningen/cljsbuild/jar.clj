@@ -2,7 +2,7 @@
   "Utilities for the cljsbuild jar hook."
   (:require
     [clojure.java.io :as io]
-    [fs.core :as fs]
+    [me.raynes.fs :as fs]
     [leiningen.cljsbuild.config :as config]
     [leiningen.cljsbuild.util :as util]))
 

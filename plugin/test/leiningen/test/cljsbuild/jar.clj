@@ -3,7 +3,7 @@
     leiningen.cljsbuild.jar
     midje.sweet)
   (:require
-    [fs.core :as fs]))
+    [me.raynes.fs :as fs]))
 
 (defn- make-bytes [s]
   byte-array (map (comp byte int) s))

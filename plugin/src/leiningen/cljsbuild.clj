@@ -2,7 +2,7 @@
   "Compile ClojureScript source into a JavaScript file."
   (:refer-clojure :exclude [test])
   (:require
-    [fs.core :as fs]
+    [me.raynes.fs :as fs]
     [leiningen.cljsbuild.config :as config]
     [leiningen.cljsbuild.jar :as jar]
     [leiningen.cljsbuild.subproject :as subproject]
@@ -45,7 +45,7 @@
 
 (defn- read-dependency-project [project-file]
   (when (fs/exists? project-file)
-    (let [project (fs/absolute-path project-file)]
+    (let [project (fs/absolute project-file)]
       (try
         (lproject/read project)
         (catch Exception e
@@ -75,7 +75,7 @@
       (if-let [{:keys [builds]} (config/extract-options checkout)]
         (for [build builds
               path (:source-paths build)]
-          (fs/absolute-path (io/file (:root checkout) path)))))))
+          (fs/absolute (io/file (:root checkout) path)))))))
 
 (defn- run-compiler [project {:keys [builds]} build-ids watch?]
   (doseq [build-id build-ids]

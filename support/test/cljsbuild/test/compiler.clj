@@ -6,7 +6,7 @@
     [cljsbuild.util :as util]
     [clojure.java.io :as io]
     [cljs.build.api :as bapi]
-    [fs.core :as fs]))
+    [me.raynes.fs :as fs]))
 
 (def cljs-path-a "src-cljs-a")
 (def cljs-file-a (str cljs-path-a "/file-a.cljs"))

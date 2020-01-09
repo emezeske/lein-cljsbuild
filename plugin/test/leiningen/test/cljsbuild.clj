@@ -10,7 +10,7 @@
     [leiningen.core.main :as lmain]
     [leiningen.core.eval :as leval]
     [leiningen.core.project :as lproject]
-    [fs.core :as fs]
+    [me.raynes.fs :as fs]
     [clojure.java.io :as io]
     cljsbuild.util
     cljsbuild.compiler
@@ -146,9 +146,9 @@
       (fs/exists? checkout-b-project) => true, :times 1
 
       (lproject/read "/project/checkouts/lib-a/project.clj") =>
-        (assoc project :root (fs/absolute-path checkout-a-dir)), :times 1
+        (assoc project :root (fs/absolute checkout-a-dir)), :times 1
       (lproject/read "/project/checkouts/lib-b/project.clj") =>
-        (assoc project :root (fs/absolute-path checkout-b-dir)), :times 1
+        (assoc project :root (fs/absolute checkout-b-dir)), :times 1
 
       (cljsbuild.compiler/run-compiler
         source-paths
