@@ -22,8 +22,8 @@
   (.getCanonicalPath (io/file path)))
 
 ;; The reason we return a :bytes filespec is that it's the only way of
-;; specifying a file's destination path inside the jar and is contents
-;; independently. Obviously this presents issues if there are any very
+;; specifying a file's destination path inside the jar and its contents
+;; independently. Obviously, this presents issues if there are any very
 ;; large files - this should be fixable in leiningen 2.0.
 (defn path-filespecs
   "Given a path, returns a seq of filespecs representing files on the path."
