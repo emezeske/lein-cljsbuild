@@ -1,5 +1,10 @@
 # Release Notes for lein-cljsbuild
 
+## [1.1.8](https://github.com/emezeske/lein-cljsbuild/pulls?utf8=%E2%9C%93&q=is%3Aclosed+is%3Apr+milestone%3A1.1.8)
+
+* Improved checkout handling when cljsbuild entry is missing [#473](https://github.com/emezeske/lein-cljsbuild/pull/473)
+* Add `lein cljsbuild deps` task to install cljsbuild deps to local Maven repo [#497](https://github.com/emezeske/lein-cljsbuild/pull/497)
+
 ## [1.1.7](https://github.com/emezeske/lein-cljsbuild/pulls?utf8=%E2%9C%93&q=is%3Aclosed+is%3Apr+milestone%3A1.1.7)
 
 * When no output-dir given use relative target-path instead of absolute target-path. A relative target path is required when building for nodejs [#464](https://github.com/emezeske/lein-cljsbuild/issues/464).
