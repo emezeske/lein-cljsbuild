@@ -7,6 +7,7 @@
 (gen-class :name cljsbuild.test.TestsFailedException
            :extends java.lang.Exception)
 
+;; TODO remove macro
 (defmacro dofor [seq-exprs body-expr]
   `(doall (for ~seq-exprs ~body-expr)))
 
