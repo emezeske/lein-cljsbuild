@@ -67,8 +67,7 @@
   (eval body))
 
 (deftest cljsbuild
-  (with-redefs [leval/eval-in-project eval-locally
-                cljsbuild.util/once-every-bg (fn [_# _# _#] nil)]
+  (with-redefs [leval/eval-in-project eval-locally]
     (binding [cljsbuild/*suppress-exit?* true
               lmain/*exit-process?* false]
 
@@ -82,5 +81,3 @@
                         nil)]
           (doseq [command ["once" "auto"]]
             (is (nil? (cljsbuild/cljsbuild project command)))))))))
-
-(clojure.test/run-tests)

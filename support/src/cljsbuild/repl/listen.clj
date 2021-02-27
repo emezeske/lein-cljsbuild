@@ -1,8 +1,9 @@
 (ns cljsbuild.repl.listen
   (:require
-    [cljs.repl :as repl]
-    [cljsbuild.util :as util]
-    [clojure.string :as string]))
+   [cljs.repl :as repl]
+   [cljs.repl.browser :as browser]
+   [cljsbuild.util :as util]
+   [clojure.string :as string]))
 
 (defn run-repl-listen [port output-dir]
   (let [env (browser/repl-env :port (Integer. port) :working-dir output-dir)]

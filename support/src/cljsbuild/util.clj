@@ -1,16 +1,12 @@
 (ns cljsbuild.util
   (:require
-    [clojure.java.io :as io]
-    [clojure.string :as string])
+   [clojure.java.io :as io])
   (:import
     (java.io File OutputStreamWriter)
     (java.lang ProcessBuilder$Redirect)
     (java.util List)))
 
-(defn join-paths [& paths]
-  (apply str (interpose "/" paths)))
-
-(defn- filter-by-ext [types files]
+(defn filter-by-ext [types files]
   (let [ext #(nth (re-matches #".+\.([^\.]+)$" %) 1)]
     (filter #(types (ext %)) files)))
 
@@ -29,21 +25,6 @@
 
 (defn sleep [ms]
   (Thread/sleep ms))
-
-(defn once-every
-  ([ms desc f keep-going]
-    (while (keep-going)
-      (try
-        (f)
-        (catch Exception e
-          (println (str "Error " desc ": " e))))
-      (sleep ms)))
-  ([ms desc f]
-    (once-every ms desc f (fn [] true))))
-
-(defn once-every-bg [& args]
-  (future
-    (apply once-every args)))
 
 (defn process-start [{:keys [shell stdout stderr]}]
   (let [process (-> (ProcessBuilder. ^List shell)
