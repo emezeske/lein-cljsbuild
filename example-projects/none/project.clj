@@ -21,7 +21,7 @@
                 ;; from JavaScript
                 :output-dir "out"
                 ;; The :none option is much faster than the other ones,
-                ;; and is the only one to provide correct srouce-maps.
+                ;; and is the only one to provide correct source-maps.
                 :optimizations :none
                 ;; source-maps are used by the browser to show the
                 ;; ClojureScript code in the debugger

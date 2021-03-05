@@ -1,13 +1,13 @@
 (defproject cljsbuild-example-advanced "2.0.0-SNAPSHOT"
   :description "An advanced example of how to use lein-cljsbuild"
   :source-paths ["src-clj" "src-cljc"]
-  :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.9.521"
+  :dependencies [[org.clojure/clojure "1.10.0"]
+                 [org.clojure/clojurescript "1.10.597"
                   :exclusions [org.apache.ant/ant]]
-                 [compojure "1.5.1"]
+                 [compojure "1.6.2"]
                  [hiccup "1.0.5"]]
   :plugins [[lein-cljsbuild "2.0.0-SNAPSHOT"]
-            [lein-ring "0.9.7"]]
+            [lein-ring "0.12.5"]]
   ; Enable the lein hooks for: compile, test, and jar.
   :hooks [leiningen.cljsbuild]
   :cljsbuild {

@@ -1,7 +1,7 @@
 # cljsbuild-example-simple
 
 This is an example web application that uses [lein-cljsbuild][1],
-[Ring][2], and [Compojure][3].  It demonstrates the use of
+[Ring][2], and [Compojure][3]. It demonstrates the use of
 lein-cljsbuild to build ClojureScript into JavaScript.
 
 To play around with this example project, you will first need

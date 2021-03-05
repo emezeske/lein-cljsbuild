@@ -28,8 +28,12 @@
 
 (defn process-start [{:keys [shell stdout stderr]}]
   (let [process (-> (ProcessBuilder. ^List shell)
-                    (.redirectOutput (if stdout (ProcessBuilder$Redirect/to stdout) ProcessBuilder$Redirect/INHERIT))
-                    (.redirectError (if stderr (ProcessBuilder$Redirect/to stderr) ProcessBuilder$Redirect/INHERIT))
+                    (.redirectOutput (if stdout
+                                       (ProcessBuilder$Redirect/to (io/file stdout))
+                                       ProcessBuilder$Redirect/INHERIT))
+                    (.redirectError (if stderr
+                                      (ProcessBuilder$Redirect/to (io/file stderr))
+                                      ProcessBuilder$Redirect/INHERIT))
                     (.start))]
     {:kill (fn []
              (.destroy process))
