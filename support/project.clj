@@ -12,8 +12,8 @@
      [me.raynes/fs "1.4.6"]
      [clj-stacktrace "0.2.8"]
      [org.clojure/tools.namespace "0.3.1"]]
-  :aot [cljsbuild.test]
-  :profiles {
-    :dev {
-      :dependencies [[midje "1.9.9" :exclusions [org.clojure/clojure]]]
-      :plugins [[lein-midje "3.2.1"]]}})
+  :aot [cljsbuild.test])
+  ;; :profiles {
+  ;;   :dev {
+  ;;     :dependencies [[midje "1.9.9" :exclusions [org.clojure/clojure]]]
+      ;; :plugins [[lein-midje "3.2.1"]]}})
