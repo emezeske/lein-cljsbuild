@@ -8,8 +8,6 @@
                  [hiccup "1.0.5"]]
   :plugins [[lein-cljsbuild "2.0.0-SNAPSHOT"]
             [lein-ring "0.12.5"]]
-  ; Enable the lein hooks for: compile, test, and jar.
-  :hooks [leiningen.cljsbuild]
   :cljsbuild {
     ; Configure the REPL support; see the README.md file for more details.
     :repl-listen-port 9000

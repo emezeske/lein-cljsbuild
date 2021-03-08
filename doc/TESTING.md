@@ -22,10 +22,6 @@ Alternately, this command will run *all* configured tests:
 
     $ lein cljsbuild test
 
-If [hooks](https://github.com/emezeske/lein-cljsbuild#hooks) are enabled, this will also result in the tests being run:
-
-    $ lein test
-
 ## Testing with PhantomJS
 
 For ClojureScript code that targets web browsers (as opposed to Node.js), it is often

@@ -114,41 +114,6 @@ installing ANSICON:
 
 Afterwards, you should get colored output from all future console sessions that use ANSI color codes.
 
-## Hooks
-
-Some common lein-cljsbuild tasks can hook into the main Leiningen tasks
-to enable ClojureScript support in each of them. The following tasks are
-supported:
-
-    $ lein compile
-    $ lein test
-    $ lein jar
-
-To enable ClojureScript support for these tasks, add the following entry to
-your project configuration:
-
-```clj
-:hooks [leiningen.cljsbuild]
-```
-
-Note that by default the `lein jar` task does *not* package your ClojureScript
-code in the JAR file. This feature needs to be explicitly enabled by adding
-the following entry to each of the `:builds` that you want included in the
-JAR file. `lein uberjar` derives its behavior from `lein jar` and will include
-the ClojureScript as well if enabled.
-
-```clj
-:jar true
-```
-
-> **Debug Note:** There is a known issue (#366) where the `lein uberjar` task fails
-> to build when using hooks and a cljsbuild configuration within an `:uberjar`
-> profile. Instead of hooks, you can use `:prep-tasks` as an alternative:
->
->```clojure
->:prep-tasks ["compile" ["cljsbuild" "once"]]
->```
-
 ## Multiple Build Configurations
 
 If the `:builds` sequence contains more than one map lein-cljsbuild
@@ -244,6 +209,39 @@ You can place custom warning handlers for the ClojureScript compiler under the `
                                       (cljs.analyzer/message env s))))]}})
 ```
 
+## Hooks
+
+**Note: It is no longer recommended to use hooks, since this mechanism is error-prone and difficult to debug. It should be considered deprecated as of Leiningen 2.8.0 onward and will continue to work until version 3.0 but is strongly advised against. Instead of hooks, you can use `:prep-tasks` as an alternative:
+>
+>```clojure
+>:prep-tasks ["compile" ["cljsbuild" "once"]]
+>```
+**
+
+Some common lein-cljsbuild tasks can hook into the main Leiningen tasks
+to enable ClojureScript support in each of them. The following tasks are
+supported:
+
+    $ lein compile
+    $ lein test
+    $ lein jar
+
+To enable ClojureScript support for these tasks, add the following entry to
+your project configuration:
+
+```clj
+:hooks [leiningen.cljsbuild]
+```
+
+Note that by default the `lein jar` task does *not* package your ClojureScript
+code in the JAR file. This feature needs to be explicitly enabled by adding
+the following entry to each of the `:builds` that you want included in the
+JAR file. `lein uberjar` derives its behavior from `lein jar` and will include
+the ClojureScript as well if enabled.
+
+```clj
+:jar true
+```
 
 ## ClojureScript Version
 

@@ -13,17 +13,17 @@ To play around with this example project, you will first need
 
 ## Running the App
 
-Set up and start the server like this:
+Make sure you are in the right folder:
 
     $ cd example-projects/advanced
-    $ lein ring server-headless 3000
 
-> NOTE 1: You do not need to issue the `lein cljsbuild once`
-> subtask. This is because `cljsbuild` has been hooked to `lein` tasks
-> in the `project.clj` (i.e. `:hooks [leiningen.cljsbuild]`). This way
-> when the above `lein ring server-headless 3000` subtask is executed,
-> it implicitly executes the `lein compile` task which, in turn,
-> implicitly executes the `lein cljsbuild once` subtask as well.
+Then compile the ClojureScript code:
+
+    $ lein cljsbuild once
+
+Now start the server:
+
+    $ lein ring server-headless 3000
 
 Now, point your web browser at `http://localhost:3000`, and see the web app in action!
 
@@ -60,8 +60,9 @@ make this work.
 
 ## Connecting Firefox to a REPL
 
-First, in one terminal, start the Ring server:
+First, in one terminal, compile the ClojureScript code and then start the Ring server:
 
+    $ lein cljsbuild once
     $ lein ring server-headless 3000
 
 Now, in a different terminal, run `repl-launch` with the "firefox" identifier and the URL of the REPL demo page:
@@ -83,8 +84,9 @@ need to have your app running in the background:
 
 ## Connecting PhantomJS to a REPL
 
-To try out a PhantomJS-based REPL, first start the Ring server in one terminal:
+To try out a PhantomJS-based REPL, compile the ClojureScript code and then start the Ring server in one terminal:
 
+    $ lein cljsbuild once
     $ lein ring server-headless 3000
 
 Now, in a different terminal, run `repl-launch` with the "phantom" identifier and the URL of the REPL demo page:

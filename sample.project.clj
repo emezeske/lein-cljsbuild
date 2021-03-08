@@ -18,9 +18,6 @@
   ; The standard Leiningen :source-paths option describes the location of
   ; your source code and will be passed to the ClojureScript compiler
   :source-paths ["src-clj"]
-  ; This is required for lein-cljsbuild to hook into the default Leningen
-  ; tasks, e.g. the "lein compile" and "lein jar" tasks.
-  :hooks [leiningen.cljsbuild]
   ; All lein-cljsbuild-specific configuration is under the :cljsbuild key.
   :cljsbuild {
     ; When using a ClojureScript REPL, this option controls what port
