@@ -13,4 +13,4 @@
               :compiler {:output-to "resources/public/js/main.js"
                          :optimizations :whitespace
                          :pretty-print true}}]}
-  :ring {:handler example.routes/app})
+  :ring {:handler simple.routes/app})

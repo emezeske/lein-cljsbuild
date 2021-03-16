@@ -1,8 +1,7 @@
-(ns example.views
-  (:require
-    [hiccup
-      [page :refer [html5]]
-      [page :refer [include-js]]]))
+(ns simple.views
+  (:require [hiccup
+             [page :refer [html5]]
+             [page :refer [include-js]]]))
 
 (defn index-page []
   (html5

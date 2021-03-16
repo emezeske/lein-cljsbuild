@@ -1,6 +1,6 @@
-(ns example.routes
+(ns simple.routes
   (:use compojure.core
-        example.views
+        simple.views
         [hiccup.middleware :only (wrap-base-url)])
   (:require [compojure.route :as route]
             [compojure.handler :as handler]
