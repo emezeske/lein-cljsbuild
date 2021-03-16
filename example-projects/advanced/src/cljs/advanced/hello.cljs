@@ -1,6 +1,6 @@
-(ns example.hello
+(ns advanced.hello
   (:require
-    [example.shared :as shared]))
+    [advanced.shared :as shared]))
 
 (defn ^:export say-hello []
   (js/alert (shared/make-example-text)))

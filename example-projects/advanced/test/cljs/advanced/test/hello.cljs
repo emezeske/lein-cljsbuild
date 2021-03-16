@@ -1,5 +1,5 @@
-(ns example.test.hello
-  (:use [example.hello :only [add-some-numbers]]))
+(ns advanced.test.hello
+  (:use [advanced.hello :only [add-some-numbers]]))
 
 (defn run []
   (assert (= (add-some-numbers 2 2) 4))

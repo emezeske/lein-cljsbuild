@@ -1,5 +1,5 @@
-(ns example.test
-  (:require [example.test.hello :as hello]))
+(ns advanced.test
+  (:require [advanced.test.hello :as hello]))
 
 (def success 0)
 

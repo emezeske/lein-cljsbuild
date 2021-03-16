@@ -1,6 +1,6 @@
 (defproject cljsbuild-example-advanced "2.0.0-SNAPSHOT"
   :description "An advanced example of how to use lein-cljsbuild"
-  :source-paths ["src-clj" "src-cljc"]
+  :source-paths ["src/clj" "src/cljc"]
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [org.clojure/clojurescript "1.10.597"
                   :exclusions [org.apache.ant/ant]]
@@ -49,7 +49,7 @@
       ; This build has the lowest level of optimizations, so it is
       ; useful when debugging the app.
       :dev
-      {:source-paths ["src-cljs" "src-cljc"]
+      {:source-paths ["src/cljs" "src/cljc"]
        :jar true
        :compiler {:output-to "resources/public/js/main-debug.js"
                   :optimizations :whitespace
@@ -57,7 +57,7 @@
       ; This build has the highest level of optimizations, so it is
       ; efficient when running the app in production.
       :prod
-      {:source-paths ["src-cljs" "src-cljc"]
+      {:source-paths ["src/cljs" "src/cljc"]
        :compiler {:output-to "resources/public/js/main.js"
                   :optimizations :advanced
                   :pretty-print false}}
@@ -65,7 +65,7 @@
       ; be run via PhantomJS.  See the phantom/unit-test.js file
       ; for details on how it's run.
       :test
-      {:source-paths ["src-cljs" "src-cljc" "test-cljs"]
+      {:source-paths ["src/cljs" "src/cljc" "test/cljs"]
        :compiler {:output-to "resources/private/js/unit-test.js"
                   :optimizations :whitespace
                   :pretty-print true}}}}
@@ -73,4 +73,4 @@
   :clean-targets ^{:protect false} ["resources/private/js" 
                                     "resources/public/js"
                                     :target-path]
-  :ring {:handler example.routes/app})
+  :ring {:handler advanced.routes/app})

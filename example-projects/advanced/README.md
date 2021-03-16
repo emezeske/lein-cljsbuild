@@ -71,7 +71,7 @@ Now, in a different terminal, run `repl-launch` with the "firefox" identifier an
 
 The REPL should start, and in a moment, Firefox should start up and browse to the `repl-demo`
 page. Viewing the source for `repl-demo`, you'll see that after loading the main JavaScript
-file, it calls `example.repl.connect()`. This function connects back to the REPL, thereby
+file, it calls `advanced.repl.connect()`. This function connects back to the REPL, thereby
 allowing you to execute arbitrary ClojureScript code in the context of the `repl-demo` page.
 
 There's also a launcher configured for a "naked" page.  This is just a simple static

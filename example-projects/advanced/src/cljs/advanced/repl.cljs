@@ -1,4 +1,4 @@
-(ns example.repl
+(ns advanced.repl
   (:require
     [clojure.browser.repl :as repl]))
 

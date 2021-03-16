@@ -1,6 +1,6 @@
-(ns example.views
+(ns advanced.views
   (:require
-    [example.shared :as shared]
+    [advanced.shared :as shared]
     [hiccup
       [page :refer [html5]]
       [element :refer [javascript-tag]]
@@ -19,7 +19,7 @@
       [:h1 (shared/make-example-text)]
       (run-clojurescript
         "/js/main-debug.js"
-        "example.hello.say_hello()")]))
+        "advanced.hello.say_hello()")]))
 
 (defn repl-demo-page []
   (html5
@@ -45,4 +45,4 @@ lein trampoline cljsbuild repl-listen"]
 > (goog.dom.setTextContent (goog.dom.getElement \"fun\") \"I changed something....\") "]
       (run-clojurescript
         "/js/main-debug.js"
-        "example.repl.connect()")))
+        "advanced.repl.connect()")))
