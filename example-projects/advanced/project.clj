@@ -50,7 +50,6 @@
       ; useful when debugging the app.
       :dev
       {:source-paths ["src/cljs" "src/cljc"]
-       :jar true
        :compiler {:output-to "resources/public/js/main-debug.js"
                   :optimizations :whitespace
                   :pretty-print true}}
@@ -73,4 +72,6 @@
   :clean-targets ^{:protect false} ["resources/private/js" 
                                     "resources/public/js"
                                     :target-path]
-  :ring {:handler advanced.routes/app})
+  :ring {:handler advanced.routes/app}
+  :profiles {:all {:source-paths ["src/clj" "src/cljc" "src/cljs"]}}
+  :aliases {"install" ["do" "clean," "with-profile" "all" "install"]})

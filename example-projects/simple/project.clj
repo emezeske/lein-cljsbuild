@@ -13,4 +13,6 @@
               :compiler {:output-to "resources/public/js/main.js"
                          :optimizations :whitespace
                          :pretty-print true}}]}
-  :ring {:handler simple.routes/app})
+  :ring {:handler simple.routes/app}
+  :profiles {:all {:source-paths ["src/clj" "src/cljs"]}}
+  :aliases {"install" ["do" "clean," "with-profile" "all" "install"]})

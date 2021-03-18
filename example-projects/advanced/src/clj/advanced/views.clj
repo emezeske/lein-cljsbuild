@@ -1,10 +1,9 @@
 (ns advanced.views
-  (:require
-    [advanced.shared :as shared]
-    [hiccup
-      [page :refer [html5]]
-      [element :refer [javascript-tag]]
-      [page :refer [include-js]]]))
+  (:require [advanced.shared :as shared]
+            [hiccup
+             [page :refer [html5]]
+             [element :refer [javascript-tag]]
+             [page :refer [include-js]]]))
 
 (defn- run-clojurescript [path init]
   (list
@@ -14,7 +13,7 @@
 (defn index-page []
   (html5
     [:head
-      [:title (shared/make-example-text)] ]
+      [:title (shared/make-example-text)]]
     [:body
       [:h1 (shared/make-example-text)]
       (run-clojurescript
