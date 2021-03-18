@@ -53,7 +53,7 @@
             cljs-checkout-file-a mtime
             cljs-checkout-file-b mtime}
            (compiler/run-compiler cljs-paths checkout-paths compiler-options
-                                  notify-command incremental? assert? {} false)))))
+                                  notify-command incremental? assert? {} false "")))))
 
 (deftest get-oldest-mtime
   (with-redefs [fs/exists? (constantly true)

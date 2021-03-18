@@ -15,3 +15,7 @@
   (let [path-ends-with? (fn [exts path] (some #(.endsWith path %) exts))]
     (is (true? (every? (partial path-ends-with? #{".md"})
                        (util/find-files ".." #{"md"}))))))
+
+(deftest relative-path
+  (is (= "c/d" (util/relative-path "/a/b" "/a/b/c/d")))
+  (is (= "c/d" (util/relative-path "/a/b/" "/a/b/c/d"))))

@@ -1,17 +1,15 @@
 (ns cljsbuild.compiler
-  (:use
-    [clojure.pprint]
-    [clj-stacktrace.repl :only [pst+]])
-  (:require
-    [cljsbuild.util :as util]
-    [cljs.build.api :as bapi]
-    [clojure.string :as string]
-    [clojure.java.io :as io]
-    [me.raynes.fs :as fs]
-    [clojure.tools.namespace
-     [track :as track]
-     [dir :as dir]
-     [reload :as reload]]))
+  (:use [clojure.pprint]
+        [clj-stacktrace.repl :only [pst+]])
+  (:require [cljsbuild.util :as util]
+            [cljs.build.api :as bapi]
+            [clojure.string :as string]
+            [clojure.java.io :as io]
+            [me.raynes.fs :as fs]
+            [clojure.tools.namespace
+             [track :as track]
+             [dir :as dir]
+             [reload :as reload]]))
 
 (defonce refresh-tracker (track/tracker))
 
@@ -120,7 +118,7 @@
     (pst+ e)))
 
 (defn run-compiler [cljs-paths checkout-paths compiler-options notify-command incremental?
-                    assert? last-dependency-mtimes watching?]
+                    assert? last-dependency-mtimes watching? root]
   (let [compiler-options (merge {:output-wrapper (= :advanced (:optimizations compiler-options))}
                                 compiler-options)
         output-files (get-output-files compiler-options)
@@ -145,7 +143,8 @@
         clj-mtimes (get-mtimes clj-files)
         cljs-mtimes (get-mtimes cljs-files)
         js-mtimes (get-mtimes js-files)
-        dependency-mtimes (merge clj-mtimes cljs-mtimes js-mtimes)]
+        dependency-mtimes (merge clj-mtimes cljs-mtimes js-mtimes)
+        relative-checkout-paths (mapv (partial util/relative-path root) checkout-paths)]
     (when (not= last-dependency-mtimes dependency-mtimes)
       (let [clj-modified (list-modified output-mtime clj-mtimes)
             cljs-modified (list-modified output-mtime cljs-mtimes)
@@ -153,5 +152,5 @@
         (when (seq clj-modified)
           (reload-clojure cljs-files clj-files compiler-options notify-command))
         (when (or (seq clj-modified) (seq cljs-modified) (seq js-modified))
-          (compile-cljs cljs-paths compiler-options notify-command incremental? assert? watching?))))
+          (compile-cljs (into cljs-paths relative-checkout-paths) compiler-options notify-command incremental? assert? watching?))))
     dependency-mtimes))

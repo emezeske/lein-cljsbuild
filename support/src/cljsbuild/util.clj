@@ -1,10 +1,9 @@
 (ns cljsbuild.util
-  (:require
-   [clojure.java.io :as io])
-  (:import
-    (java.io File OutputStreamWriter)
-    (java.lang ProcessBuilder$Redirect)
-    (java.util List)))
+  (:require [clojure.java.io :as io]
+            [clojure.string :as string])
+  (:import (java.io File OutputStreamWriter)
+           (java.lang ProcessBuilder$Redirect)
+           (java.util List)))
 
 (defn filter-by-ext [types files]
   (let [ext #(nth (re-matches #".+\.([^\.]+)$" %) 1)]
@@ -44,3 +43,10 @@
 (defn sh [command]
   (let [process (process-start command)]
     ((:wait process))))
+
+(defn relative-path
+  "Creates a relative path for a given root path and an absolute path."
+  [root path]
+  (let [relative-path (string/replace path (re-pattern root) "")]
+    (cond-> relative-path
+      (string/starts-with? relative-path "/") (string/replace-first #"/" ""))))

@@ -1,22 +1,21 @@
 (ns leiningen.cljsbuild
   "Compile ClojureScript source into a JavaScript file."
   (:refer-clojure :exclude [test])
-  (:require
-    [me.raynes.fs :as fs]
-    [leiningen.cljsbuild.config :as config]
-    [leiningen.cljsbuild.jar :as jar]
-    [leiningen.cljsbuild.subproject :as subproject]
-    [leiningen.compile :as lcompile]
-    [leiningen.core.eval :as leval]
-    [leiningen.core.project :as lproject]
-    [leiningen.core.main :as lmain]
-    [leiningen.help :as lhelp]
-    [leiningen.jar :as ljar]
-    [leiningen.test :as ltest]
-    [leiningen.trampoline :as ltrampoline]
-    [robert.hooke :as hooke]
-    [clojure.java.io :as io]
-    [clojure.string :as string]))
+  (:require [me.raynes.fs :as fs]
+            [leiningen.cljsbuild.config :as config]
+            [leiningen.cljsbuild.jar :as jar]
+            [leiningen.cljsbuild.subproject :as subproject]
+            [leiningen.compile :as lcompile]
+            [leiningen.core.eval :as leval]
+            [leiningen.core.project :as lproject]
+            [leiningen.core.main :as lmain]
+            [leiningen.help :as lhelp]
+            [leiningen.jar :as ljar]
+            [leiningen.test :as ltest]
+            [leiningen.trampoline :as ltrampoline]
+            [robert.hooke :as hooke]
+            [clojure.java.io :as io]
+            [clojure.string :as string]))
 
 (def ^:private repl-output-path "repl")
 
@@ -45,17 +44,17 @@
 
 (defn- read-dependency-project [project-file]
   (when (fs/exists? project-file)
-    (let [project (fs/absolute project-file)]
+    (let [project-file-path (.getAbsolutePath (io/file project-file))]
       (try
-        (lproject/read project)
+        (lproject/read project-file-path)
         (catch Exception e
-          (throw (Exception. (format "Problem loading %s" project) e)))))))
+          (throw (Exception. (format "Problem loading %s" project-file-path) e)))))))
 
 (defn- read-checkouts
   [project]
   (let [checkouts-dir (io/file (:root project) "checkouts")]
     (for [dep (fs/list-dir checkouts-dir)
-          :let [project-file (io/file checkouts-dir dep "project.clj")
+          :let [project-file (io/file dep "project.clj")
                 checkout-project (read-dependency-project project-file)]
           :when checkout-project]
       checkout-project)))
@@ -75,7 +74,7 @@
       (if-let [{:keys [builds]} (config/extract-options checkout)]
         (for [build builds
               path (:source-paths build)]
-          (fs/absolute (io/file (:root checkout) path)))))))
+          (.getAbsolutePath (io/file (:root checkout) path)))))))
 
 (defn- run-compiler [project {:keys [builds]} build-ids watch?]
   (doseq [build-id build-ids]
@@ -86,7 +85,8 @@
                           builds
                           (filter #(some #{(:id %)} build-ids) builds))
         parsed-builds (map config/parse-notify-command filtered-builds)
-        checkout-cljs-paths (checkout-cljs-paths project)]
+        checkout-cljs-paths (checkout-cljs-paths project)
+        root (:root project)]
     (doseq [build parsed-builds]
       (config/warn-unsupported-warn-on-undeclared build)
       (config/warn-unsupported-notify-command build))
@@ -129,7 +129,8 @@
                          (:incremental build#)
                          (:assert build#)
                          mtimes#
-                         ~watch?)))))]
+                         ~watch?
+                         ~root)))))]
              (when ~watch?
                (Thread/sleep 100)
                (recur new-dependency-mtimes#))))))))
