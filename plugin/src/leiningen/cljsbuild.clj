@@ -172,7 +172,7 @@
   [project]
   (println "Downloading cljsbuild dependencies..")
   (leval/eval-in-project
-   (subproject/make-subproject project nil nil)
+   (subproject/make-subproject project nil)
    `(println "Done.")))
 
 (defn- once
