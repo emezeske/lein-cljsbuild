@@ -104,11 +104,11 @@
                          (str "Symbols for :warning-handlers must be fully-qualified, " (pr-str handler#) " is missing namespace."))
                  (when (and n# sym#)
                    (require (symbol n#)))))))
-         (loop [dependency-mtimes# (repeat (count builds#) {})]
-           (let [builds-mtimes# (map vector builds# dependency-mtimes#)
-                 new-dependency-mtimes#
+         (loop [modified-times# (repeat (count builds#) {})]
+           (let [builds-modified-times# (map vector builds# modified-times#)
+                 new-modified-times#
                  (doall
-                  (for [[[build# compiler-env#] mtimes#] builds-mtimes#]
+                  (for [[[build# compiler-env#] build-modified-times#] builds-modified-times#]
                     (cljs.analyzer/with-warning-handlers
                       (if-let [handlers# (:warning-handlers build#)]
                         ;; Prep the warning handlers via eval and
@@ -122,18 +122,18 @@
                         cljs.analyzer/*cljs-warning-handlers*)
                       (binding [cljs.env/*compiler* compiler-env#]
                         (cljsbuild.compiler/run-compiler
-                         (:source-paths build#)
-                         '~checkout-cljs-paths
-                         (:compiler build#)
-                         (:parsed-notify-command build#)
-                         (:incremental build#)
-                         (:assert build#)
-                         mtimes#
-                         ~watch?
-                         ~root)))))]
+                         {:cljs-paths (:source-paths build#)
+                          :checkout-paths '~checkout-cljs-paths
+                          :compiler-options (:compiler build#)
+                          :notify-command (:parsed-notify-command build#)
+                          :incremental? (:incremental build#)
+                          :assert? (:assert build#)
+                          :last-modified-times build-modified-times#
+                          :watching? ~watch?
+                          :project-root ~root})))))]
              (when ~watch?
                (Thread/sleep 100)
-               (recur new-dependency-mtimes#))))))))
+               (recur new-modified-times#))))))))
 
 (defn- run-tests [project {:keys [test-commands builds]} args]
   (when (> (count args) 1)

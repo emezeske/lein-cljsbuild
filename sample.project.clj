@@ -63,11 +63,11 @@
         ; Defaults to nil (disabled).
         :notify-command ["growlnotify" "-m"]
         ; Determines whether the temporary JavaScript files will be left in place between
-        ; automatic builds.  Leaving them in place speeds up compilation because things can
-        ; be built incrementally.  This probably shouldn't be disabled except for troubleshooting.
+        ; automatic builds. Leaving them in place speeds up compilation because things can
+        ; be built incrementally. This probably shouldn't be disabled except for troubleshooting.
         ; Defaults to true.
         :incremental true
-        ; Determines whether assertions are enabled for the ClojureScript code.  Technically, this
+        ; Determines whether assertions are enabled for the ClojureScript code. Technically, this
         ; binds clojure.core/*assert*, which is respected by the ClojureScript compiler.
         ; Defaults to true.
         :assert true

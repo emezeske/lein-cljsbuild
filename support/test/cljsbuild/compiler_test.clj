@@ -52,16 +52,23 @@
             cljs-file-b mtime
             cljs-checkout-file-a mtime
             cljs-checkout-file-b mtime}
-           (compiler/run-compiler cljs-paths checkout-paths compiler-options
-                                  notify-command incremental? assert? {} false "")))))
+           (compiler/run-compiler {:cljs-paths cljs-paths
+                                   :checkout-paths checkout-paths
+                                   :compiler-options compiler-options
+                                   :notify-command notify-command
+                                   :incremental? incremental?
+                                   :assert? assert?
+                                   :last-modified-times {}
+                                   :watching? false
+                                   :project-root ""})))))
 
-(deftest get-oldest-mtime
+(deftest get-oldest-modified-time
   (with-redefs [fs/exists? (constantly true)
                 fs/mod-time (fn [file]
                               (condp = file
                                 cljs-file-a mtime
                                 cljs-file-b mtime-2))]
-    (is (= mtime (compiler/get-oldest-mtime [cljs-file-a cljs-file-b])))))
+    (is (= mtime (compiler/get-oldest-modified-time [cljs-file-a cljs-file-b])))))
 
 (deftest get-output-files
   (testing "should get output file provided through output-to option"

@@ -29,21 +29,22 @@
     (with-precision 2
       (str (/ (double elapsed-us) 1000) " seconds"))))
 
-(defn- notify-cljs [command message colorizer]
+(defn- notify-cljs [{:keys [command message color]}]
   (when (seq (:shell command))
     (try
       (util/sh (update-in command [:shell] (fn [old] (concat old [message]))))
       (catch Throwable e
         (println (red "Error running :notify-command:"))
         (pst+ e))))
-  (println (colorizer message)))
+  (println (color message)))
 
 (defn get-output-files [compiler-options]
   (if-let [output-file (:output-to compiler-options)]
     [output-file]
     (into [] (map :output-to (->> compiler-options :modules vals)))))
 
-(defn- compile-cljs [cljs-paths compiler-options notify-command incremental? assert? watching?]
+(defn- compile-cljs [{:keys [cljs-paths compiler-options notify-command
+                             incremental? assert? watching?]}]
   (let [output-files (get-output-files compiler-options)
         output-files-parent (map fs/parent output-files)]
     (println (str "Compiling " (pr-str output-files) " from " (pr-str cljs-paths) "..."))
@@ -59,30 +60,34 @@
           (bapi/build (apply bapi/inputs cljs-paths) compiler-options))
         (doseq [output-file output-files]
           (fs/touch output-file started-at))
-        (notify-cljs
-          notify-command
-          (str "Successfully compiled " (pr-str output-files) " in " (elapsed started-at) ".") green)
+        (notify-cljs {:command notify-command
+                      :message (str "Successfully compiled " (pr-str output-files) " in " (elapsed started-at) ".")
+                      :color green})
         (catch Throwable e
-          (notify-cljs
-            notify-command
-            (str "Compiling " (pr-str output-files) " failed.") red)
+          (notify-cljs {:command notify-command
+                        :message (str "Compiling " (pr-str output-files) " failed.")
+                        :color red})
           (if watching?
             (pst+ e)
             (throw e)))))))
 
-(defn- get-mtimes [paths]
+(defn- get-modified-times
+  "For given paths, returns a mapping from path to last modified time."
+  [paths]
   (into {}
     (map (fn [path] [path (fs/mod-time path)]) paths)))
 
-(defn- list-modified [output-mtime dependency-mtimes]
+(defn- get-modified-files
+  "Given the last compile time, returns all files that have been modified since."
+  [output-modified-time dependency-modified-times]
   (reduce (fn [modified [path mtime]]
-            (if (< output-mtime mtime)
+            (if (< output-modified-time mtime)
               (conj modified path)
               modified))
           []
-          dependency-mtimes))
+          dependency-modified-times))
 
-(defn get-oldest-mtime [output-files]
+(defn get-oldest-modified-time [output-files]
   (apply min (map (fn [output-file]
                     (if (fs/exists? output-file)
                       (fs/mod-time output-file)
@@ -102,28 +107,38 @@
     (catch Throwable t
       #{})))
 
-(defn reload-clojure [cljs-files paths compiler-options notify-command]
-  ;; touch all cljs target files so that cljsc/build will rebuild them
+(defn touch-files
+  "Touch all cljs target files so that the CLJS build API will rebuild them. This
+  can be necessary when a macro (in a clj file) is being changed, but not cljs files,
+  for example."
+  [cljs-files compiler-options]
   (doseq [cljs-file cljs-files]
     (let [target-file (bapi/src-file->target-file (io/file cljs-file) compiler-options)]
-      (if (.exists target-file)
-        (.setLastModified target-file 5000))))
+      (when (.exists target-file)
+        (.setLastModified target-file 5000)))))
 
-  ;; reload Clojure files
-  (alter-var-root #'refresh-tracker #(apply dir/scan % paths))
+(defn reload-clojure
+  "Reload clojure files that have changed."
+  [clj-files notify-command]
+  (alter-var-root #'refresh-tracker #(dir/scan-dirs % clj-files))
   (alter-var-root #'refresh-tracker reload/track-reload)
   (when-let [e (::reload/error refresh-tracker)]
-    (notify-cljs notify-command
-                 (str "Reloading Clojure file \"" (::reload/error-ns refresh-tracker) "\" failed.") red)
+    (notify-cljs {:command notify-command
+                  :message (str "Reloading Clojure file \"" (::reload/error-ns refresh-tracker) "\" failed.")
+                  :color red})
     (pst+ e)))
 
-(defn run-compiler [cljs-paths checkout-paths compiler-options notify-command incremental?
-                    assert? last-dependency-mtimes watching? root]
+(defn run-compiler
+  "Produces runnable JavaScript using the CLJS build API. Only triggers a build,
+  when a file has been modified since the last build.
+  Returns a mapping from file to last modified time."
+  [{:keys [cljs-paths checkout-paths compiler-options notify-command incremental?
+           assert? last-modified-times watching? project-root]}]
   (let [compiler-options (merge {:output-wrapper (= :advanced (:optimizations compiler-options))}
                                 compiler-options)
         output-files (get-output-files compiler-options)
         lib-paths (:libs compiler-options)
-        output-mtime (get-oldest-mtime output-files)
+        output-modified-time (get-oldest-modified-time output-files)
         clj-files (mapcat (fn [cljs-path]
                             (util/find-files cljs-path (conj additional-file-extensions "clj")))
                           (concat cljs-paths checkout-paths))
@@ -140,17 +155,23 @@
                       ; http://dev.clojure.org/jira/browse/CLJS-526)
                       (remove #(.startsWith ^String % output-dir-str))
                       (remove #(.endsWith ^String % (:output-to compiler-options)))))
-        clj-mtimes (get-mtimes clj-files)
-        cljs-mtimes (get-mtimes cljs-files)
-        js-mtimes (get-mtimes js-files)
-        dependency-mtimes (merge clj-mtimes cljs-mtimes js-mtimes)
-        relative-checkout-paths (mapv (partial util/relative-path root) checkout-paths)]
-    (when (not= last-dependency-mtimes dependency-mtimes)
-      (let [clj-modified (list-modified output-mtime clj-mtimes)
-            cljs-modified (list-modified output-mtime cljs-mtimes)
-            js-modified (list-modified output-mtime js-mtimes)]
+        clj-modified-times (get-modified-times clj-files)
+        cljs-modified-times (get-modified-times cljs-files)
+        js-modified-times (get-modified-times js-files)
+        modified-times (merge clj-modified-times cljs-modified-times js-modified-times)]
+    (when (not= last-modified-times modified-times)
+      (let [clj-modified (get-modified-files output-modified-time clj-modified-times)
+            cljs-modified (get-modified-files output-modified-time cljs-modified-times)
+            js-modified (get-modified-files output-modified-time js-modified-times)
+            relative-checkout-paths (mapv (partial util/relative-path project-root) checkout-paths)]
         (when (seq clj-modified)
-          (reload-clojure cljs-files clj-files compiler-options notify-command))
+          (touch-files cljs-files compiler-options)
+          (reload-clojure clj-files notify-command))
         (when (or (seq clj-modified) (seq cljs-modified) (seq js-modified))
-          (compile-cljs (into cljs-paths relative-checkout-paths) compiler-options notify-command incremental? assert? watching?))))
-    dependency-mtimes))
+          (compile-cljs {:cljs-paths (into cljs-paths relative-checkout-paths)
+                         :compiler-options compiler-options
+                         :notify-command notify-command
+                         :incremental? incremental?
+                         :assert? assert?
+                         :watching? watching?}))))
+    modified-times))
